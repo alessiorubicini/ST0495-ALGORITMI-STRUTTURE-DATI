@@ -1,6 +1,7 @@
 package it.unicam.cs.asdl2223.es4;
 import it.unicam.cs.asdl2223.es3.TimeSlot;
 import it.unicam.cs.asdl2223.es3.Prenotazione;
+import it.unicam.cs.asdl2223.mp1.ShelfItem;
 
 /**
  * Un oggetto della classe aula rappresenta una certa aula con le sue facilities
@@ -165,8 +166,11 @@ public class Aula implements Comparable<Aula> {
     public boolean addFacility(Facility f) {
         if(f == null) throw new NullPointerException();
         if(this.isAlreadyIn(f)) return false;
-        facilities[numFacilities] = f;
-        numFacilities++;
+        if(numFacilities == facilities.length) {
+            this.increaseFacilitiesArray();
+        }
+        this.facilities[numFacilities] = f;
+        this.numFacilities++;
         return true;
     }
 
@@ -183,7 +187,8 @@ public class Aula implements Comparable<Aula> {
      *                                  se il time slot passato è nullo
      */
     public boolean isFree(TimeSlot ts) {
-        for (int i = 0; i < prenotazioni.length ; i++) {
+        if(ts == null) throw new NullPointerException();
+        for (int i = 0; i < numPrenotazioni ; i++) {
             if(prenotazioni[i].getTimeSlot().overlapsWith(ts)) {
                 return false;
             }
@@ -205,8 +210,13 @@ public class Aula implements Comparable<Aula> {
      *                                  se il set di facility richieste è nullo
      */
     public boolean satisfiesFacilities(Facility[] requestedFacilities) {
-        // TODO implementare
-        return false;
+        if(requestedFacilities == null) throw new NullPointerException();
+        for (int i = 0; i < requestedFacilities.length; i++) {
+            if(requestedFacilities[i] != null && !isAlreadyIn(requestedFacilities[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -231,8 +241,14 @@ public class Aula implements Comparable<Aula> {
             throw new IllegalArgumentException("Il time slot si sovrappone con un altro");
         }
         Prenotazione p = new Prenotazione(this.nome, ts, docente, motivo);
-        this.prenotazioni[numPrenotazioni] = p;
-        this.numPrenotazioni++;
+        if(numPrenotazioni == prenotazioni.length) {
+            this.increasePrenotazioniArray();
+            numPrenotazioni++;
+            this.prenotazioni[numPrenotazioni] = p;
+        } else {
+            this.prenotazioni[numPrenotazioni] = p;
+            this.numPrenotazioni++;
+        }
     }
 
     /**
@@ -242,8 +258,8 @@ public class Aula implements Comparable<Aula> {
      * @return true se è già presente, false altrimenti
      */
     private boolean isAlreadyIn(Facility f) {
-        for (int i = 0; i < numPrenotazioni; i++) {
-            if(facilities[i].equals(f)) return true;
+        for (int i = 0; i < numFacilities; i++) {
+            if(facilities[i].getCodice().equals(f.getCodice())) return true;
         }
         return false;
     }
@@ -261,5 +277,27 @@ public class Aula implements Comparable<Aula> {
             }
         }
         return false;
+    }
+
+    /**
+     * Raddoppia la dimensione dell'array di facilities
+     */
+    private void increaseFacilitiesArray() {
+        Facility[] newArray = new Facility[facilities.length * 2];
+        for (int i = 0; i < numFacilities; i++) {
+            newArray[i] = facilities[i];
+        }
+        this.facilities = newArray;
+    }
+
+    /**
+     * Raddoppia la dimensione dell'array di facilities
+     */
+    private void increasePrenotazioniArray() {
+        Prenotazione[] newArray = new Prenotazione[prenotazioni.length * 2];
+        for (int i = 0; i < numPrenotazioni; i++) {
+            newArray[i] = prenotazioni[i];
+        }
+        this.prenotazioni = newArray;
     }
 }

@@ -127,12 +127,12 @@ public class Shelf {
         // Aggiunge l'oggetto
         if(numberOfItems == items.length) {
             this.increaseItemsArray();
-        } else {
-            this.items[numberOfItems] = i;
         }
+        this.items[numberOfItems] = i;
         numberOfItems++;
         this.currentWeight += i.getWeight();
         this.currentOccupiedSurface += i.getOccupiedSurface();
+        System.out.println(this.currentOccupiedSurface + " cm^2");
         return true;
     }
 
@@ -234,11 +234,11 @@ public class Shelf {
      */
     private boolean canBeAdded(ShelfItem i) {
         // Controlla l'oggetto è troppo pesante
-        if(i.getWeight() + this.getCurrentTotalWeight() > this.getMaxTotalWeight()) return false;
+        if((i.getWeight() + this.getCurrentTotalWeight()) > this.getMaxTotalWeight()) return false;
         // Controlla se l'oggetto è troppo lungo o troppo alto
         if(i.getWidth() > maxWidth || i.getLength() > maxLength) return false;
         // Controlla se l'oggetto occupa troppa superficie
-        if(i.getOccupiedSurface() + this.getCurrentOccupiedSurface() > this.getMaxTotalWeight()) return false;
+        if((i.getOccupiedSurface() + this.getCurrentOccupiedSurface()) > this.getMaxOccupableSurface()) return false;
         return true;
     }
 
