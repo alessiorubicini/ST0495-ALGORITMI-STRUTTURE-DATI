@@ -4,14 +4,11 @@ package it.unicam.cs.asdl2223.mp1;
  * Un fattorizzatore è un agente che fattorizza un qualsiasi numero naturale nei
  * sui fattori primi.
  * 
- * @author Luca Tesei (template) // TODO INSERIRE NOME, COGNOME ED EMAIL
- *         xxxx@studenti.unicam.it DELLO STUDENTE (implementazione)
+ * @author Luca Tesei (template) // Alessio Rubicini
+ *         alessio.rubicini@studenti.unicam.it
  *
  */
 public class Factoriser {
-
-    // TODO definire ulteriori variabili istanza che si ritengono necessarie per
-    // implementare tutti i metodi
 
     /**
      * Fattorizza un numero restituendo la sequenza crescente dei suoi fattori

@@ -4,8 +4,8 @@ package it.unicam.cs.asdl2223.mp1;
  * Un oggetto di quest classe rappresenta un fattore primo di un numero naturale
  * con una certa molteplicità.
  * 
- * @author Luca Tesei (template) // TODO INSERIRE NOME, COGNOME ED EMAIL
- *         xxxx@studenti.unicam.it DELLO STUDENTE (implementazione)
+ * @author Luca Tesei (template) // Alessio Rubicini
+ *         alessio.rubicini@studenti.unicam.it
  *
  */
 public class Factor implements Comparable<Factor> {
@@ -21,9 +21,6 @@ public class Factor implements Comparable<Factor> {
      */
     private final int multiplicity;
 
-    // TODO definire ulteriori variabili istanza che si ritengono necessarie per
-    // implementare tutti i metodi
-
     /**
      * Crea un fattore primo di un numero naturale, formato da un numero primo e
      * dalla sua molteplicità.
@@ -38,7 +35,9 @@ public class Factor implements Comparable<Factor> {
      *                                      uguale di 0.
      */
     public Factor(int primeValue, int multiplicity) {
-        // TODO implementare
+        if(multiplicity < 1 || primeValue <= 0) {
+            throw new IllegalArgumentException();
+        }
         this.primeValue = primeValue;
         this.multiplicity = multiplicity;
     }
@@ -63,8 +62,10 @@ public class Factor implements Comparable<Factor> {
      */
     @Override
     public int hashCode() {
-        // TODO implentare
-        return -1;
+        int hash = 5;
+        hash = 89 * hash + primeValue;
+        hash = 89 * hash + multiplicity;
+        return hash;
     }
 
     /*
@@ -73,7 +74,13 @@ public class Factor implements Comparable<Factor> {
      */
     @Override
     public boolean equals(Object obj) {
-        // TODO implementare
+        if(obj == null) return false;
+        if(obj == this) return true;
+        if(!(obj instanceof Factor)) return false;
+        Factor other = (Factor) obj;
+        if(this.primeValue == other.getPrimeValue() && this.multiplicity == other.getMultiplicity()) {
+            return true;
+        }
         return false;
     }
 
@@ -84,8 +91,19 @@ public class Factor implements Comparable<Factor> {
      */
     @Override
     public int compareTo(Factor o) {
-        // TODO implementare
-        return 0;
+        if(this.primeValue > o.getPrimeValue()) {
+            return 1;
+        } else if(this.primeValue < o.getPrimeValue()) {
+            return -1;
+        } else {
+            if(this.multiplicity > o.getMultiplicity()) {
+                return 1;
+            } else if (this.multiplicity < o.getMultiplicity()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
     }
 
     /*
@@ -93,11 +111,6 @@ public class Factor implements Comparable<Factor> {
      */
     @Override
     public String toString() {
-        // TODO implementare
-        return "";
+        return primeValue + "^" + multiplicity;
     }
-
-    // TODO inserire eventuali metodi accessori privati per fini di
-    // implementazione
-
 }

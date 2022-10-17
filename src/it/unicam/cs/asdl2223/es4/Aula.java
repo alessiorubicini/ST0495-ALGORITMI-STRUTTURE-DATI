@@ -237,7 +237,7 @@ public class Aula implements Comparable<Aula> {
         if(ts == null || docente == null || motivo == null) {
             throw new NullPointerException("Uno dei parametri è nullo");
         }
-        if(this.overlapsWithSomeSlot(ts)) {
+        if(!this.isFree(ts)) {
             throw new IllegalArgumentException("Il time slot si sovrappone con un altro");
         }
         Prenotazione p = new Prenotazione(this.nome, ts, docente, motivo);

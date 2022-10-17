@@ -132,7 +132,6 @@ public class Shelf {
         numberOfItems++;
         this.currentWeight += i.getWeight();
         this.currentOccupiedSurface += i.getOccupiedSurface();
-        System.out.println(this.currentOccupiedSurface + " cm^2");
         return true;
     }
 
@@ -187,8 +186,11 @@ public class Shelf {
      * @return the currentTotalOccupiedSurface
      */
     public double getCurrentTotalOccupiedSurface() {
-        // TODO implementare
-        return Double.NaN;
+        double occupiedSurface = 0.0;
+        for (int i = 0; i < numberOfItems; i++) {
+            if(items[i] != null) occupiedSurface += items[i].getOccupiedSurface();
+        }
+        return occupiedSurface;
     }
 
     /**

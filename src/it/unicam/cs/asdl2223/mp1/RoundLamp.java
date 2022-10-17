@@ -3,6 +3,8 @@
  */
 package it.unicam.cs.asdl2223.mp1;
 
+import it.unicam.cs.asdl2223.es3.Prenotazione;
+
 /**
  * Un oggetto di questa classe rappresenta una lampada che ha un appoggio
  * circolare. Implementa l'interfaccia ShelfItem, ma come lunghezza e larghezza
@@ -10,8 +12,8 @@ package it.unicam.cs.asdl2223.mp1;
  * superficie occupata restituiendo l'area del cerchio che corrisponde alla
  * base. Una lampada è identificata dal nome e dal nome del brand.
  * 
- * @author Luca Tesei (template) // TODO INSERIRE NOME, COGNOME ED EMAIL
- *         xxxx@studenti.unicam.it DELLO STUDENTE (implementazione)
+ * @author Luca Tesei (template) // Alessio Rubicini
+ *         alessio.rubicini@studenti.unicam.it
  *
  */
 public class RoundLamp implements ShelfItem {
@@ -23,9 +25,6 @@ public class RoundLamp implements ShelfItem {
     private final String name;
 
     private final String brandName;
-
-    // TODO definire ulteriori variabili istanza che si ritengono necessarie per
-    // implementare tutti i metodi
 
     /**
      * @param diameter
@@ -50,8 +49,7 @@ public class RoundLamp implements ShelfItem {
      */
     @Override
     public double getOccupiedSurface() {
-        // TODO implementare
-        return Double.NaN;
+        return (Math.PI) * (Math.pow((diameter/2), 2));
     }
 
     /*
@@ -102,7 +100,13 @@ public class RoundLamp implements ShelfItem {
      */
     @Override
     public boolean equals(Object obj) {
-        // TODO implementare
+        if(obj == null) return false;
+        if(obj == this) return true;
+        if(!(obj instanceof RoundLamp)) return false;
+        RoundLamp other = (RoundLamp) obj;
+        if(this.name.equals(other.name) && this.brandName.equals(other.brandName)) {
+            return true;
+        }
         return false;
     }
 
@@ -112,11 +116,10 @@ public class RoundLamp implements ShelfItem {
      */
     @Override
     public int hashCode() {
-        // TODO implementare
-        return -1;
+        int hash = 5;
+        hash = 89 * hash + name.hashCode();
+        hash = 89 * hash + brandName.hashCode();
+        return hash;
     }
-
-    // TODO inserire eventuali metodi accessori privati per fini di
-    // implementazione
 
 }
