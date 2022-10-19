@@ -28,7 +28,7 @@ package it.unicam.cs.asdl2223.mp1;
  */
 public class CrivelloDiEratostene {
     /*
-     * Array di booleani che rappresenta il crivello. La posizione i dell'arraya
+     * Array di booleani che rappresenta il crivello. La posizione i dell'array
      * è true se e solo se il numero i è primo altrimenti la posizione i deve
      * essere false. Le posizioni 0 e 1 dell'array non sono significative e non
      * vengono usate. L'ultima posizione dell'array deve essere uguale alla
@@ -41,8 +41,10 @@ public class CrivelloDiEratostene {
      */
     private final int capacity;
 
-    // TODO definire ulteriori variabili istanza che si ritengono necessarie per
-    // implementare tutti i metodi
+    /*
+     * Ultimo numero primo elencato
+     */
+    private int lastListedPrime;
 
     /**
      * Costruisce e inizializza il crivello di Eratostene fino alla capacità
@@ -56,11 +58,22 @@ public class CrivelloDiEratostene {
      *                                      minore di {@code 2}
      */
     public CrivelloDiEratostene(int capacity) {
-        if(capacity < 2) {
-            throw new IllegalArgumentException("La capacità è minore di 2");
-        }
+        if(capacity < 2) throw new IllegalArgumentException("La capacità è minore di 2");
         this.capacity = capacity;
         this.crivello = new boolean[this.capacity + 1];
+        this.lastListedPrime = 1;
+        // Imposta tutti i booleani a true
+        for (int i = 2; i < capacity; i++) this.crivello[i] = true;
+        // Imposta true per i numeri primi, false altrimenti
+        for(int i = 2; i*i <= capacity; i++) {
+            // Se il booleano del numero è ancora true, il numero è primo
+            if(this.crivello[i] == true) {
+                // Imposta a true tutti i multipli del numero in questione
+                for(int j = i*i; j <= capacity; j += i) {
+                    this.crivello[i] = false;
+                }
+            }
+        }
     }
 
     /**
@@ -72,6 +85,8 @@ public class CrivelloDiEratostene {
     public int getCapacity() {
         return this.capacity;
     }
+
+    public int getLastListedPrime() { return this.lastListedPrime; }
 
     /**
      * Controlla se un numero è primo. Può rispondere solo se il numero passato
@@ -87,8 +102,11 @@ public class CrivelloDiEratostene {
      *                                      2.
      */
     public boolean isPrime(int n) {
-        // TODO implementare
-        return false;
+        if(n < 2 || n > this.capacity) {
+            throw new IllegalArgumentException("Numero minore di 2 o oltre la capacità del crivello");
+        }
+        for (int i = 2; i < n; i++) if (n % i == 0) return false;
+        return true;
     }
 
     /**
@@ -106,7 +124,9 @@ public class CrivelloDiEratostene {
      *         numeri primi di questo crivello.
      */
     public boolean hasNextPrime() {
-        // TODO implementare
+        for (int i = lastListedPrime+1; i < this.crivello.length; i++) {
+            if(this.isPrime(i)) return true;
+        }
         return false;
     }
 
@@ -124,7 +144,13 @@ public class CrivelloDiEratostene {
      *                                   ancora fatto ripartire.
      */
     public int nextPrime() {
-        // TODO implementare
+        if(!this.hasNextPrime()) throw new IllegalStateException("Nessun numero primo");
+        for (int i = lastListedPrime+1; i < this.crivello.length; i++) {
+            if(this.isPrime(i)) {
+                this.lastListedPrime = i;
+                return i;
+            }
+        }
         return -1;
     }
 
@@ -135,10 +161,6 @@ public class CrivelloDiEratostene {
      * comunque di ricominciare da 2.
      */
     public void restartPrimeIteration() {
-        // TODO implementare
+        this.lastListedPrime = 1;
     }
-
-    // TODO inserire eventuali metodi accessori privati per fini di
-    // implementazione
-
 }

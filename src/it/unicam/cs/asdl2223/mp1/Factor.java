@@ -63,8 +63,8 @@ public class Factor implements Comparable<Factor> {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 89 * hash + primeValue;
-        hash = 89 * hash + multiplicity;
+        hash = 89 * hash + this.primeValue;
+        hash = 89 * hash + this.multiplicity;
         return hash;
     }
 

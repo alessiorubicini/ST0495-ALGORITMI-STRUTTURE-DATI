@@ -25,10 +25,15 @@ public class Factoriser {
      *                                      numero minore di 1.
      */
     public Factor[] getFactors(int n) {
-        // TODO implementare
+        if(n < 1) throw new IllegalArgumentException("Numero minore di 1");
+        Factor[] factors = new Factor[(int)Math.sqrt(n)];
+        CrivelloDiEratostene crivello = new CrivelloDiEratostene(n);
+        for (int i = 2; crivello.hasNextPrime(); i++) {
+            while() {
+
+            }
+        }
+
         return null;
     }
-
-    // TODO inserire eventuali metodi accessori privati per fini di
-    // implementazione
 }
