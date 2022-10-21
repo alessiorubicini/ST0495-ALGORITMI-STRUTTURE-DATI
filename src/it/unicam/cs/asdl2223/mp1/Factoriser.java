@@ -16,7 +16,7 @@ public class Factoriser {
      * dal momento che il metodo getFactors non sa a priori
      * il numero di fattori del numero dato in input
      */
-    private int effectiveNumberOfFactors = 0;
+    private int numberOfFactors = 0;
 
     /**
      * Fattorizza un numero restituendo la sequenza crescente dei suoi fattori
@@ -34,24 +34,38 @@ public class Factoriser {
      */
     public Factor[] getFactors(int n) {
         if(n < 1) throw new IllegalArgumentException("Numero minore di 1");
+        // Crea un array di fattori temporaneo di lunghezza uguale alla radice di n (la massima necessaria)
         Factor[] factors = new Factor[(int)Math.sqrt(n)];
         CrivelloDiEratostene crivello = new CrivelloDiEratostene(n+1 );
-        int i = 0;
-        int result = n;
-        for (int primeValue = 2; crivello.hasNextPrime() && result != 1; primeValue++) {
-            int multiplicity = 0;
-            while(result % primeValue == 0) {
-                result = result/primeValue;
+        // Fattorizza il numero, inserendo i fattori nell'array
+        this.findFactors(n, factors, crivello);
+        // Restituisce l'array di fattori della giusta lunghezza
+        return buildFactorsArrayOfCorrectLength(factors);
+    }
+
+    /**
+     * Fattorizza un intero
+     * @param n             numero intero
+     * @param factors       array in cui inserire i fattori
+     * @param crivello      crivello di Eratostene da utilizzare
+     */
+    private void findFactors(int n, Factor[] factors, CrivelloDiEratostene crivello) {
+        int multiplicity = 0;
+        for (int primeValue = 2; (crivello.hasNextPrime() && n != 1); primeValue++) {
+            multiplicity = 0;
+            // Dividi il risultato per il numero primo finchè è divisibile e incrementa la molteplicità
+            while(n % primeValue == 0) {
+                n = n/primeValue;
                 multiplicity++;
             }
+            // Se c'è molteplicità, aggiungi il fattore
             if(multiplicity > 0) {
-                factors[i] = new Factor(primeValue, multiplicity);
-                this.effectiveNumberOfFactors++;
-                i++;
+                factors[numberOfFactors] = new Factor(primeValue, multiplicity);
+                this.numberOfFactors++;
             }
+            // Passa al prossimo numero primo
             crivello.nextPrime();
         }
-        return buildFactorsArrayOfCorrectLength(factors);
     }
 
     /**
@@ -62,11 +76,11 @@ public class Factoriser {
      * @return l'array di fattori della giusta lungehzza
      */
     private Factor[] buildFactorsArrayOfCorrectLength(Factor[] factors) {
-        Factor[] result = new Factor[this.effectiveNumberOfFactors];
+        Factor[] result = new Factor[this.numberOfFactors];
         for (int i = 0; i < result.length; i++) {
             if(factors[i] != null) result[i] = factors[i];
         }
-        this.effectiveNumberOfFactors = 0;
+        this.numberOfFactors = 0;
         return result;
     }
 }
