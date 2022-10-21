@@ -141,7 +141,9 @@ public class Aula implements Comparable<Aula> {
      */
     public boolean addFacility(Facility f) {
         if(f == null) throw new NullPointerException("Facility f nulla");
+        // Controlla se la facility è giò presente
         if(!this.facilities.contains(f)) {
+            // Se non è già presente, la aggiunge
             this.facilities.add(f);
             return true;
         }
@@ -164,6 +166,7 @@ public class Aula implements Comparable<Aula> {
         for (Prenotazione p: this.prenotazioni) {
             // Se è arrivato a un time slot seguente, interrompe la ricerca
             if(p.getTimeSlot().compareTo(ts) > 0) return true;
+            // Se si sovrappone, l'aula non è libera
             if(ts.overlapsWith(p.getTimeSlot())) return false;
         }
         return true;
@@ -230,6 +233,7 @@ public class Aula implements Comparable<Aula> {
         if(p == null) throw new NullPointerException();
         // Controlla se la prenotazione è presente
         if(this.prenotazioni.contains(p)) {
+            // Se è presente, la cancella
             this.prenotazioni.remove(p);
             return true;
         }
@@ -249,14 +253,12 @@ public class Aula implements Comparable<Aula> {
      */
     public boolean removePrenotazioniBefore(GregorianCalendar timePoint) {
         if(timePoint == null) throw new NullPointerException();
+        // Inizializza un set vuoto delle prenotazioni da cancellare
         Set<Prenotazione> prenotazioniDaCancellare = new HashSet<Prenotazione>();
         for (Prenotazione p: this.prenotazioni) {
-            if(p.getTimeSlot().getStart().compareTo(timePoint) > 0) {
-                if(!prenotazioniDaCancellare.isEmpty()) return true;
-                else return false;
-            } else {
-                prenotazioniDaCancellare.add(p);
-            }
+            // Se è arrivato a una prentoazione seguente, interrompe la ricerca
+            if(p.getTimeSlot().getStart().compareTo(timePoint) > 0) break;
+            else prenotazioniDaCancellare.add(p);
         }
         if(!prenotazioniDaCancellare.isEmpty()) {
             this.prenotazioni.removeAll(prenotazioniDaCancellare);
