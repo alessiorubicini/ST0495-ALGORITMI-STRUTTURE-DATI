@@ -95,7 +95,6 @@ public class Shelf {
         this.currentWeight = 0.0;
         this.items = new ShelfItem[INITIAL_SIZE];
         this.numberOfItems = 0;
-        // TODO implementare
     }
 
     /**
@@ -121,7 +120,7 @@ public class Shelf {
     public boolean addItem(ShelfItem i) {
         if(i == null) throw new NullPointerException("L'oggetto passato è null");
         // Controlla se l'oggetto è già presente
-        if(this.isAlreadyAdded(i)) return false;
+        if(this.isAlreadyIn(i)) return false;
         // Controlla se l'oggetto può essere fisicamente aggiunto
         if(!this.canBeAdded(i)) throw new IllegalArgumentException();
         // Aggiunge l'oggetto
@@ -238,9 +237,9 @@ public class Shelf {
         // Controlla l'oggetto è troppo pesante
         if((i.getWeight() + this.getCurrentTotalWeight()) > this.getMaxTotalWeight()) return false;
         // Controlla se l'oggetto è troppo lungo o troppo alto
-        if(i.getWidth() > maxWidth || i.getLength() > maxLength) return false;
+        if(i.getWidth() > this.getMaxWidth() || i.getLength() > this.getMaxLength()) return false;
         // Controlla se l'oggetto occupa troppa superficie
-        if((i.getOccupiedSurface() + this.getCurrentOccupiedSurface()) > this.getMaxOccupableSurface()) return false;
+        if(i.getOccupiedSurface() + this.getCurrentOccupiedSurface() > this.getMaxOccupableSurface()) return false;
         return true;
     }
 
@@ -250,11 +249,9 @@ public class Shelf {
      *              l'oggetto da aggiungere
      * @return true se l'oggetto è già aggiunti
      */
-    private boolean isAlreadyAdded(ShelfItem i) {
+    private boolean isAlreadyIn(ShelfItem i) {
         for (int j = 0; j < numberOfItems; j++) {
-            if(items[j].equals(i)) {
-                return true;
-            }
+            if(items[j].equals(i)) return true;
         }
         return false;
     }
@@ -263,10 +260,11 @@ public class Shelf {
      * Raddoppia la dimensione dell'array di oggetti
      */
     private void increaseItemsArray() {
+        // Crea un nuovo array lungo il doppio dell'attuale
         ShelfItem[] newArray = new ShelfItem[items.length*2];
-        for (int i = 0; i < numberOfItems; i++) {
-            newArray[i] = items[i];
-        }
+        // Copia gli oggetti nel nuovo array
+        for (int i = 0; i < numberOfItems; i++) newArray[i] = items[i];
+        // Sostituisce l'array attuale con il nuovo
         this.items = newArray;
     }
 

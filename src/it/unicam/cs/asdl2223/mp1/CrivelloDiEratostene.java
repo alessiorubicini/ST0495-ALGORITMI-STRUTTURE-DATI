@@ -69,9 +69,7 @@ public class CrivelloDiEratostene {
             // Se il booleano del numero è ancora true, il numero è primo
             if(this.crivello[i] == true) {
                 // Imposta a true tutti i multipli del numero in questione
-                for(int j = i*i; j <= capacity; j += i) {
-                    this.crivello[i] = false;
-                }
+                for(int j = i*i; j <= capacity; j += i) this.crivello[i] = false;
             }
         }
     }
@@ -103,7 +101,9 @@ public class CrivelloDiEratostene {
         if(n < 2 || n > this.capacity) {
             throw new IllegalArgumentException("Numero minore di 2 o oltre la capacità del crivello");
         }
-        for (int i = 2; i < n; i++) if (n % i == 0) return false;
+        for (int i = 2; i < n; i++) {
+            if (n % i == 0) return false;
+        }
         return true;
     }
 
@@ -169,4 +169,12 @@ public class CrivelloDiEratostene {
      */
     public int getLastListedPrime() { return this.lastListedPrime; }
 
+    @Override
+    public String toString() {
+        String result = "";
+        for (int i = 0; i < crivello.length; i++) {
+            result += i + ":"+ crivello[i] + ", ";
+        }
+        return result;
+    }
 }

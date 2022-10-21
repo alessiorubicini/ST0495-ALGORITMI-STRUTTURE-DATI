@@ -98,9 +98,7 @@ public class Aula implements Comparable<Aula> {
         if(obj == null) return false;
         if(!(obj instanceof Aula)) return false;
         Aula other = (Aula) obj;
-        if(this.nome.equals(other.getNome())) {
-            return true;
-        }
+        if(this.nome.equals(other.getNome())) return true;
         return false;
     }
 
@@ -167,10 +165,8 @@ public class Aula implements Comparable<Aula> {
         if(f == null) throw new NullPointerException();
         // Controlla se la facility è stata già inserita
         if(this.isAlreadyIn(f)) return false;
-        // Controlla se l'array è pieno, se lo è lo raddoppia
-        if(numFacilities == facilities.length) {
-            this.increaseFacilitiesArray();
-        }
+        // Controlla se l'array è pieno, se lo è lo incrementa
+        if(numFacilities == facilities.length) this.increaseFacilitiesArray();
         // Aggiunge la facility
         this.facilities[numFacilities] = f;
         this.numFacilities++;
@@ -191,10 +187,8 @@ public class Aula implements Comparable<Aula> {
      */
     public boolean isFree(TimeSlot ts) {
         if(ts == null) throw new NullPointerException();
-        for (int i = 0; i < numPrenotazioni ; i++) {
-            if(prenotazioni[i].getTimeSlot().overlapsWith(ts)) {
-                return false;
-            }
+        for (int i = 0; i < numPrenotazioni; i++) {
+            if(ts.overlapsWith(prenotazioni[i].getTimeSlot())) return false;
         }
         return true;
     }
@@ -214,7 +208,9 @@ public class Aula implements Comparable<Aula> {
      */
     public boolean satisfiesFacilities(Facility[] requestedFacilities) {
         if(requestedFacilities == null) throw new NullPointerException();
+        // Per ogni facility richiesta
         for (int i = 0; i < requestedFacilities.length; i++) {
+            // Controlla se la facility non è null e se è stata inserita
             if(requestedFacilities[i] != null && !isAlreadyIn(requestedFacilities[i])) {
                 return false;
             }
@@ -243,15 +239,15 @@ public class Aula implements Comparable<Aula> {
         if(!this.isFree(ts)) {
             throw new IllegalArgumentException("Il time slot si sovrappone con un altro");
         }
+        // Crea la prenotazione
         Prenotazione p = new Prenotazione(this.nome, ts, docente, motivo);
+        // Controlla se l'array è pieno, se lo è lo raddoppia
         if(numPrenotazioni == prenotazioni.length) {
             this.increasePrenotazioniArray();
-            numPrenotazioni++;
-            this.prenotazioni[numPrenotazioni] = p;
-        } else {
-            this.prenotazioni[numPrenotazioni] = p;
-            this.numPrenotazioni++;
         }
+        // Aggiunge la prenotazione
+        this.prenotazioni[numPrenotazioni] = p;
+        this.numPrenotazioni++;
     }
 
     /**
@@ -268,39 +264,26 @@ public class Aula implements Comparable<Aula> {
     }
 
     /**
-     * Controlla se un time slot si sovrappone con una delle prenotazioni
-     * @param ts
-     *              il time slot da controllare
-     * @return true se il time slot si sovrappone, false altrimenti
-     */
-    private boolean overlapsWithSomeSlot(TimeSlot ts) {
-        for (int i = 0; i < numPrenotazioni; i++) {
-            if(ts.overlapsWith(prenotazioni[i].getTimeSlot())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Raddoppia la dimensione dell'array di facilities
      */
     private void increaseFacilitiesArray() {
+        // Crea un nuovo array lungo il doppio dell'attuale
         Facility[] newArray = new Facility[facilities.length * 2];
-        for (int i = 0; i < numFacilities; i++) {
-            newArray[i] = facilities[i];
-        }
+        // Copia le facilities nel nuovo array
+        for (int i = 0; i < numFacilities; i++) newArray[i] = facilities[i];
+        // Sostituisce l'array attuale con il nuovo
         this.facilities = newArray;
     }
 
     /**
-     * Raddoppia la dimensione dell'array di facilities
+     * Raddoppia la dimensione dell'array di prenotazioni
      */
     private void increasePrenotazioniArray() {
+        // Crea un nuovo array lungo il doppio dell'attuale
         Prenotazione[] newArray = new Prenotazione[prenotazioni.length * 2];
-        for (int i = 0; i < numPrenotazioni; i++) {
-            newArray[i] = prenotazioni[i];
-        }
+        // Copia le prenotazioni nel nuovo array
+        for (int i = 0; i < numPrenotazioni; i++) newArray[i] = prenotazioni[i];
+        // Sostituisce l'array attuale con il nuovo
         this.prenotazioni = newArray;
     }
 }

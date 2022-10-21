@@ -124,9 +124,7 @@ public class Book implements ShelfItem {
         if(obj == null) return false;
         if(!(obj instanceof Book)) return false;
         Book other = (Book) obj;
-        if(this.iSBN.equals(other.getiSBN())) {
-            return true;
-        }
+        if(this.iSBN.equals(other.getiSBN())) return true;
         return false;
     }
 

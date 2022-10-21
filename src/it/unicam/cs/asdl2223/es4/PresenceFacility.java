@@ -39,12 +39,11 @@ public class PresenceFacility extends Facility {
     @Override
     public boolean satisfies(Facility o) {
         if(o == null) throw new NullPointerException();
+        // Controlla che la facility sia un'istanza di PresenceFacility
         if(o instanceof PresenceFacility) {
+            // Effettua il casting e confronta i codici delle PresenceFacility
             PresenceFacility pf = (PresenceFacility) o;
-            if (this.getCodice().equals(pf.getCodice())) {
-                return true;
-            }
-            return false;
+            if (this.getCodice().equals(pf.getCodice())) return true;
         }
         return false;
     }

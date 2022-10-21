@@ -29,8 +29,7 @@ public class QuantitativeFacility extends Facility {
      *                                  {@code codice} e {@code descrizione} è
      *                                  nulla.
      */
-    public QuantitativeFacility(String codice, String descrizione,
-            int quantity) {
+    public QuantitativeFacility(String codice, String descrizione, int quantity) {
         super(codice, descrizione);
         this.quantity = quantity;
     }
@@ -51,12 +50,13 @@ public class QuantitativeFacility extends Facility {
     @Override
     public boolean satisfies(Facility o) {
         if(o == null) throw new NullPointerException();
+        // Controlla che la facility sia un'istanza di QuantitativeFacility
         if(o instanceof QuantitativeFacility) {
+            // Effettua il casting e confronta i codici e la quantità delle QuantitativeFacility
             QuantitativeFacility qf = (QuantitativeFacility) o;
             if (this.getCodice().equals(qf.getCodice()) && this.getQuantity() >= qf.getQuantity()) {
                 return true;
             }
-            return false;
         }
         return false;
     }
