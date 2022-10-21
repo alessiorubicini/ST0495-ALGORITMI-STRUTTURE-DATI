@@ -165,10 +165,13 @@ public class Aula implements Comparable<Aula> {
      */
     public boolean addFacility(Facility f) {
         if(f == null) throw new NullPointerException();
+        // Controlla se la facility è stata già inserita
         if(this.isAlreadyIn(f)) return false;
+        // Controlla se l'array è pieno, se lo è lo raddoppia
         if(numFacilities == facilities.length) {
             this.increaseFacilitiesArray();
         }
+        // Aggiunge la facility
         this.facilities[numFacilities] = f;
         this.numFacilities++;
         return true;

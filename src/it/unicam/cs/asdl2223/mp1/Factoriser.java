@@ -29,11 +29,13 @@ public class Factoriser {
         Factor[] factors = new Factor[(int)Math.sqrt(n)];
         CrivelloDiEratostene crivello = new CrivelloDiEratostene(n);
         for (int i = 2; crivello.hasNextPrime(); i++) {
-            while() {
-
+            int result = 0;
+            while(n % i == 0) {
+                result = n/i;
+                factors[i] = new Factor(result, i);
             }
+            crivello.nextPrime();
         }
-
-        return null;
+        return factors;
     }
 }

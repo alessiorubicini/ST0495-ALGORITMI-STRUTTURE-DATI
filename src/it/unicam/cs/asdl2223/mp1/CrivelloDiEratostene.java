@@ -86,8 +86,6 @@ public class CrivelloDiEratostene {
         return this.capacity;
     }
 
-    public int getLastListedPrime() { return this.lastListedPrime; }
-
     /**
      * Controlla se un numero è primo. Può rispondere solo se il numero passato
      * come parametro è minore o uguale alla capacità di questo crivello.
@@ -163,4 +161,12 @@ public class CrivelloDiEratostene {
     public void restartPrimeIteration() {
         this.lastListedPrime = 1;
     }
+
+    /**
+     * Restituisce l'ultimo numero primo elencato
+     *
+     * @return l'ultimo numero primo elencato
+     */
+    public int getLastListedPrime() { return this.lastListedPrime; }
+
 }
