@@ -4,8 +4,7 @@ package it.unicam.cs.asdl2223.mp1;
  * Un oggetto di quest classe rappresenta un fattore primo di un numero naturale
  * con una certa molteplicità.
  * 
- * @author Luca Tesei (template) // Alessio Rubicini
- *         alessio.rubicini@studenti.unicam.it
+ * @author Luca Tesei (template) // Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class Factor implements Comparable<Factor> {
@@ -36,7 +35,7 @@ public class Factor implements Comparable<Factor> {
      */
     public Factor(int primeValue, int multiplicity) {
         if(multiplicity < 1 || primeValue <= 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Molteplicità e/o numero primo minori di 1");
         }
         this.primeValue = primeValue;
         this.multiplicity = multiplicity;
@@ -96,6 +95,7 @@ public class Factor implements Comparable<Factor> {
         } else if(this.primeValue < o.getPrimeValue()) {
             return -1;
         } else {
+            // Numeri primi uguali, controlla molteplicità
             if(this.multiplicity > o.getMultiplicity()) {
                 return 1;
             } else if (this.multiplicity < o.getMultiplicity()) {

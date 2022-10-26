@@ -22,8 +22,7 @@ package it.unicam.cs.asdl2223.mp1;
  * qualsiasi momento chiamando il metodo restartPrimeIteration() e si interrompe
  * non appena il metodo hasNextPrime() restituisce false.
  * 
- * @author Luca Tesei (template) // Alessio Rubicini
- *         alessio.rubicini@studenti.unicam.it
+ * @author Luca Tesei (template) // Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class CrivelloDiEratostene {
@@ -122,7 +121,7 @@ public class CrivelloDiEratostene {
      *         numeri primi di questo crivello.
      */
     public boolean hasNextPrime() {
-        for (int i = lastListedPrime+1; i < this.crivello.length; i++) {
+        for (int i = lastListedPrime+1; i < crivello.length; i++) {
             if(this.isPrime(i)) return true;
         }
         return false;
@@ -142,8 +141,8 @@ public class CrivelloDiEratostene {
      *                                   ancora fatto ripartire.
      */
     public int nextPrime() {
-        if(!this.hasNextPrime()) throw new IllegalStateException("Nessun numero primo");
-        for (int i = lastListedPrime+1; i < this.crivello.length; i++) {
+        if(!this.hasNextPrime()) throw new IllegalStateException("Nessun numero primo rimasto");
+        for (int i = lastListedPrime+1; i < crivello.length; i++) {
             if(this.isPrime(i)) {
                 this.lastListedPrime = i;
                 return i;
@@ -167,7 +166,10 @@ public class CrivelloDiEratostene {
      *
      * @return l'ultimo numero primo elencato
      */
-    public int getLastListedPrime() { return this.lastListedPrime; }
+    public int getLastListedPrime() {
+        if(this.lastListedPrime == 1) return this.lastListedPrime+1;
+        else return this.lastListedPrime;
+    }
 
     @Override
     public String toString() {

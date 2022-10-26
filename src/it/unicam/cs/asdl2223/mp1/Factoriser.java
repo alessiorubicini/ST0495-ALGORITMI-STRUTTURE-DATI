@@ -4,8 +4,7 @@ package it.unicam.cs.asdl2223.mp1;
  * Un fattorizzatore è un agente che fattorizza un qualsiasi numero naturale nei
  * sui fattori primi.
  * 
- * @author Luca Tesei (template) // Alessio Rubicini
- *         alessio.rubicini@studenti.unicam.it
+ * @author Luca Tesei (template) // Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class Factoriser {
@@ -37,7 +36,7 @@ public class Factoriser {
         // Crea un array di fattori temporaneo di lunghezza uguale alla radice di n (la massima necessaria)
         Factor[] factors = new Factor[(int)Math.sqrt(n)];
         CrivelloDiEratostene crivello = new CrivelloDiEratostene(n+1 );
-        // Fattorizza il numero, inserendo i fattori nell'array
+        // Fattorizza il numero, inserendo i fattori nell'array creato
         this.findFactors(n, factors, crivello);
         // Restituisce l'array di fattori della giusta lunghezza
         return buildFactorsArrayOfCorrectLength(factors);
@@ -50,15 +49,17 @@ public class Factoriser {
      * @param crivello      crivello di Eratostene da utilizzare
      */
     private void findFactors(int n, Factor[] factors, CrivelloDiEratostene crivello) {
-        int multiplicity = 0;
-        for (int primeValue = 2; (crivello.hasNextPrime() && n != 1); primeValue++) {
+        int primeValue, multiplicity = 0;
+        while(crivello.hasNextPrime() && n != 1) {
+            // Ottiene l'ultimo numero primo elencato e imposta la sua molteplicità a 0
+            primeValue = crivello.getLastListedPrime();
             multiplicity = 0;
-            // Dividi il risultato per il numero primo finchè è divisibile e incrementa la molteplicità
+            // Divide il risultato per il numero primo finchè è divisibile e incrementa la molteplicità
             while(n % primeValue == 0) {
-                n = n/primeValue;
+                n = n / primeValue;
                 multiplicity++;
             }
-            // Se c'è molteplicità, aggiungi il fattore
+            // Se c'è molteplicità, crea e aggiunge il fattore
             if(multiplicity > 0) {
                 factors[numberOfFactors] = new Factor(primeValue, multiplicity);
                 this.numberOfFactors++;
@@ -77,9 +78,7 @@ public class Factoriser {
      */
     private Factor[] buildFactorsArrayOfCorrectLength(Factor[] factors) {
         Factor[] result = new Factor[this.numberOfFactors];
-        for (int i = 0; i < result.length; i++) {
-            if(factors[i] != null) result[i] = factors[i];
-        }
+        for (int i = 0; i < this.numberOfFactors; i++) result[i] = factors[i];
         this.numberOfFactors = 0;
         return result;
     }

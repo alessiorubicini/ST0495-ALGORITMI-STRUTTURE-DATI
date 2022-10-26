@@ -79,9 +79,7 @@ public class Aula implements Comparable<Aula> {
      */
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 89 * hash + this.nome.hashCode();
-        return hash;
+        return this.nome.hashCode();
     }
 
     /* Due aule sono uguali se e solo se hanno lo stesso nome */
@@ -140,14 +138,9 @@ public class Aula implements Comparable<Aula> {
      *                                  se la facility passata è nulla
      */
     public boolean addFacility(Facility f) {
-        if(f == null) throw new NullPointerException("Facility f nulla");
-        // Controlla se la facility è giò presente
-        if(!this.facilities.contains(f)) {
-            // Se non è già presente, la aggiunge
-            this.facilities.add(f);
-            return true;
-        }
-        return false;
+        if(f == null) throw new NullPointerException("Facility nulla");
+        // Aggiunge la facility, controllando in automatico se è già presente
+        return this.facilities.add(f);
     }
 
     /**
@@ -162,12 +155,13 @@ public class Aula implements Comparable<Aula> {
      *                                  se il time slot passato è nullo
      */
     public boolean isFree(TimeSlot ts) {
-        if(ts == null) throw new NullPointerException();
+        if(ts == null) throw new NullPointerException("Time slot nullo");
         for (Prenotazione p: this.prenotazioni) {
             // Se è arrivato a un time slot seguente, interrompe la ricerca
-            if(p.getTimeSlot().compareTo(ts) > 0) return true;
+            if(p.getTimeSlot().getStart().after(ts.getStop())) break;
             // Se si sovrappone, l'aula non è libera
             if(ts.overlapsWith(p.getTimeSlot())) return false;
+
         }
         return true;
     }
@@ -185,12 +179,10 @@ public class Aula implements Comparable<Aula> {
      *                                  se il set di facility richieste è nullo
      */
     public boolean satisfiesFacilities(Set<Facility> requestedFacilities) {
-        for (Facility f: requestedFacilities) {
-            if(!this.facilities.contains(f)) {
-                return false;
-            }
+        if(requestedFacilities == null) {
+            throw new NullPointerException("Facilities richieste nulle");
         }
-        return true;
+        return facilities.containsAll(requestedFacilities);
     }
 
     /**
@@ -209,13 +201,14 @@ public class Aula implements Comparable<Aula> {
      */
     public void addPrenotazione(TimeSlot ts, String docente, String motivo) {
         if(ts == null || docente == null || motivo == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Uno dei parametri della prenotazione è nullo");
         }
         // Controlla se la prenotazione comporta una sovrapposizione con un'altra prenotazione
-        if(overlapsWithSomeOther(ts)) throw new IllegalArgumentException();
-        // Crea la prenotazione
+        if(this.isFree(ts) == false) {
+            throw new IllegalArgumentException("La prenotazione comporta una sovrapposizione");
+        }
+        // Crea la prenotazione e la aggiunge
         Prenotazione p = new Prenotazione(this, ts, docente, motivo);
-        // Aggiunge la prenotazione
         this.prenotazioni.add(p);
     }
 
@@ -231,13 +224,8 @@ public class Aula implements Comparable<Aula> {
      */
     public boolean removePrenotazione(Prenotazione p) {
         if(p == null) throw new NullPointerException();
-        // Controlla se la prenotazione è presente
-        if(this.prenotazioni.contains(p)) {
-            // Se è presente, la cancella
-            this.prenotazioni.remove(p);
-            return true;
-        }
-        return false;
+        // Rimuove la prenotazione, controllando in automatico se è già presente
+        return this.prenotazioni.remove(p);
     }
 
     /**
@@ -253,29 +241,17 @@ public class Aula implements Comparable<Aula> {
      */
     public boolean removePrenotazioniBefore(GregorianCalendar timePoint) {
         if(timePoint == null) throw new NullPointerException();
-        // Inizializza un set vuoto delle prenotazioni da cancellare
         Set<Prenotazione> prenotazioniDaCancellare = new HashSet<Prenotazione>();
         for (Prenotazione p: this.prenotazioni) {
             // Se è arrivato a una prentoazione seguente, interrompe la ricerca
-            if(p.getTimeSlot().getStart().compareTo(timePoint) > 0) break;
+            if(p.getTimeSlot().getStart().after(timePoint)) break;
+            // Altrimenti aggiunge la prenotazione a quelle da cancellare
             else prenotazioniDaCancellare.add(p);
         }
+        // Se ci sono delle prenotazioni da cancellare, le rimuove dalle prenotazioni
         if(!prenotazioniDaCancellare.isEmpty()) {
             this.prenotazioni.removeAll(prenotazioniDaCancellare);
             return true;
-        }
-        return false;
-    }
-
-    /**
-     * Controlla se un time slot si sovrappone con una delle prenotazioni
-     * @param ts
-     *              il time slot da controllare
-     * @return true se si sovrappone almeno con una prenotazione
-     */
-    private boolean overlapsWithSomeOther(TimeSlot ts) {
-        for (Prenotazione p: this.prenotazioni) {
-            if(ts.overlapsWith(p.getTimeSlot())) return true;
         }
         return false;
     }

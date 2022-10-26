@@ -3,16 +3,13 @@
  */
 package it.unicam.cs.asdl2223.mp1;
 
-import it.unicam.cs.asdl2223.es4.Facility;
-
 /**
  * Un oggetto di questa classe rappresenta un libro. Oltre le informazioni
  * tipiche ci sono la lunghezza, la larghezza e il peso. Queste servono per
  * implementare i metodi dell'interfaccia ShelfItem. Un libro è identificato dal
  * suo codice ISBN.
  * 
- * @author Luca Tesei (template) // Alessio Rubicini
- *         alessio.rubicini@studenti.unicam.it
+ * @author Luca Tesei (template) // Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class Book implements ShelfItem {
@@ -133,8 +130,6 @@ public class Book implements ShelfItem {
      */
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 89 * hash + this.iSBN.hashCode();
-        return hash;
+        return this.iSBN.hashCode();
     }
 }

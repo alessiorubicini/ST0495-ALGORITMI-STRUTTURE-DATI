@@ -32,11 +32,8 @@ public class GestoreAule {
      */
     public boolean addAula(Aula a) {
         if(a == null) throw new NullPointerException();
-        if(!this.aule.contains(a)) {
-            this.aule.add(a);
-            return true;
-        }
-        return false;
+        // Aggiunge la l'aula, controllando in automatico se è già presente
+        return this.aule.add(a);
     }
 
     /**
@@ -67,14 +64,17 @@ public class GestoreAule {
      */
     public Set<Aula> cercaAuleLibere(Set<Facility> requestedFacilities, TimeSlot ts) {
         if(requestedFacilities == null || ts == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Facilities e/o Time slot nulli");
         }
+        // Crea un nuovo set in cui inserire le aule libere
         Set<Aula> auleLibere = new HashSet<Aula>();
+        // Per ogni aula, se è libera e soddisfa le facilities la aggiunge al set
         for (Aula a: this.aule) {
             if(a.isFree(ts) && a.satisfiesFacilities(requestedFacilities)) {
                 auleLibere.add(a);
             }
         }
+        // Ritorna il set
         return auleLibere;
     }
 

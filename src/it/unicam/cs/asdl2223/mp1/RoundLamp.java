@@ -3,8 +3,6 @@
  */
 package it.unicam.cs.asdl2223.mp1;
 
-import it.unicam.cs.asdl2223.es3.Prenotazione;
-
 /**
  * Un oggetto di questa classe rappresenta una lampada che ha un appoggio
  * circolare. Implementa l'interfaccia ShelfItem, ma come lunghezza e larghezza
@@ -12,8 +10,7 @@ import it.unicam.cs.asdl2223.es3.Prenotazione;
  * superficie occupata restituiendo l'area del cerchio che corrisponde alla
  * base. Una lampada è identificata dal nome e dal nome del brand.
  * 
- * @author Luca Tesei (template) // Alessio Rubicini
- *         alessio.rubicini@studenti.unicam.it
+ * @author Luca Tesei (template) // Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class RoundLamp implements ShelfItem {
@@ -36,8 +33,7 @@ public class RoundLamp implements ShelfItem {
      * @param brandName
      *                      nome del brand della lampada
      */
-    public RoundLamp(double diameter, double weight, String name,
-            String brandName) {
+    public RoundLamp(double diameter, double weight, String name, String brandName) {
         this.diameter = diameter;
         this.weight = weight;
         this.name = name;

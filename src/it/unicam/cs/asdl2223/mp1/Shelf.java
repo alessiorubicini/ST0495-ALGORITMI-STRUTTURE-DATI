@@ -10,9 +10,8 @@ package it.unicam.cs.asdl2223.mp1;
  * superficie occupata o il cui peso fanno eccedere la massima superficie
  * occupabile o il massimo peso sostenibile definiti nel costruttore della
  * mensola.
- * 
- * @author Luca Tesei (template) // Alessio Rubicini
- *         alessio.rubicini@studenti.unicam.it
+ *
+ *  * @author Luca Tesei (template) // Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class Shelf {
@@ -121,12 +120,11 @@ public class Shelf {
         if(i == null) throw new NullPointerException("L'oggetto passato è null");
         // Controlla se l'oggetto è già presente
         if(this.isAlreadyIn(i)) return false;
-        // Controlla se l'oggetto può essere fisicamente aggiunto
+        // Controlla se l'oggetto soddisfa i requisiti per essere aggiunto
         if(!this.canBeAdded(i)) throw new IllegalArgumentException();
+        // Se ha raggiunto il numero massimo di oggetti, incrementa l'array
+        if(numberOfItems == items.length) this.increaseItemsArray();
         // Aggiunge l'oggetto
-        if(numberOfItems == items.length) {
-            this.increaseItemsArray();
-        }
         this.items[numberOfItems] = i;
         numberOfItems++;
         this.currentWeight += i.getWeight();
@@ -171,14 +169,10 @@ public class Shelf {
     }
 
     /**
-     * @return the currentTotalWeight
+     * @return the currentWeight
      */
     public double getCurrentTotalWeight() {
-        double totalWeight = 0.0;
-        for (int i = 0; i < numberOfItems; i++) {
-            totalWeight += items[i].getWeight();
-        }
-        return totalWeight;
+        return this.currentWeight;
     }
 
     /**
@@ -187,7 +181,7 @@ public class Shelf {
     public double getCurrentTotalOccupiedSurface() {
         double occupiedSurface = 0.0;
         for (int i = 0; i < numberOfItems; i++) {
-            if(items[i] != null) occupiedSurface += items[i].getOccupiedSurface();
+            occupiedSurface += items[i].getOccupiedSurface();
         }
         return occupiedSurface;
     }
@@ -228,18 +222,18 @@ public class Shelf {
     }
 
     /**
-     * Controlla se un oggetto può essere aggiunto alla mensola
+     * Controlla se un oggetto soddisfa i requisiti per essere aggiunto
      * @param i
      *              l'oggetto da aggiungere
      * @return true se l'oggetto può essere aggiunto
      */
     private boolean canBeAdded(ShelfItem i) {
         // Controlla l'oggetto è troppo pesante
-        if((i.getWeight() + this.getCurrentTotalWeight()) > this.getMaxTotalWeight()) return false;
+        if(i.getWeight() + getCurrentTotalWeight() > getMaxTotalWeight()) return false;
         // Controlla se l'oggetto è troppo lungo o troppo alto
-        if(i.getWidth() > this.getMaxWidth() || i.getLength() > this.getMaxLength()) return false;
+        if(i.getWidth() > getMaxWidth() || i.getLength() > getMaxLength()) return false;
         // Controlla se l'oggetto occupa troppa superficie
-        if(i.getOccupiedSurface() + this.getCurrentOccupiedSurface() > this.getMaxOccupableSurface()) return false;
+        if(i.getOccupiedSurface() + this.getCurrentOccupiedSurface() > getMaxOccupableSurface()) return false;
         return true;
     }
 
@@ -250,7 +244,7 @@ public class Shelf {
      * @return true se l'oggetto è già aggiunti
      */
     private boolean isAlreadyIn(ShelfItem i) {
-        for (int j = 0; j < numberOfItems; j++) {
+        for (int j = 0; j < this.numberOfItems; j++) {
             if(items[j].equals(i)) return true;
         }
         return false;
@@ -261,9 +255,9 @@ public class Shelf {
      */
     private void increaseItemsArray() {
         // Crea un nuovo array lungo il doppio dell'attuale
-        ShelfItem[] newArray = new ShelfItem[items.length*2];
+        ShelfItem[] newArray = new ShelfItem[this.items.length*2];
         // Copia gli oggetti nel nuovo array
-        for (int i = 0; i < numberOfItems; i++) newArray[i] = items[i];
+        for (int i = 0; i < this.numberOfItems; i++) newArray[i] = this.items[i];
         // Sostituisce l'array attuale con il nuovo
         this.items = newArray;
     }
