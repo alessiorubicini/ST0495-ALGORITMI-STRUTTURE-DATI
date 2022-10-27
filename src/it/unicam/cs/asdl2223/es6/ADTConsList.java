@@ -109,8 +109,7 @@ public interface ADTConsList<E> {
      */
     default ADTConsList<E> removeFirst(E element) {
         // caso base
-        if (this.isEmpty())
-            return this;
+        if (this.isEmpty()) return this;
         // caso ricorsivo
         if (this.first().equals(element))
             return this.rest();
@@ -127,10 +126,9 @@ public interface ADTConsList<E> {
      *         {@code element} sono state cancellate.
      */
     default ADTConsList<E> removeAll(E element) {
-        if(this.isEmpty()) return this;
-        if(this.find(element)) {
+        if(!this.isEmpty() && this.find(element)) {
             if (this.first().equals(element))
-                return this.rest();
+                return this.rest().removeAll(element);
             else
                 return this.rest().removeAll(element).cons(this.first());
         }
@@ -155,8 +153,7 @@ public interface ADTConsList<E> {
         if(this.isEmpty()) return this;
         // Caso ricorsivo
         if(this.first().equals(element)) {
-            this.removeFirst(element);
-            return this.cons(newElement);
+            return this.rest().cons(newElement);
         } else {
             return this.rest().updateFirst(element, newElement).cons(this.first());
         }
@@ -176,8 +173,14 @@ public interface ADTConsList<E> {
      *         {@code newElement}
      */
     default ADTConsList<E> updateAll(E element, E newElement) {
-        // TODO implementare ricorsivamente
-        return null;
+        if(!this.isEmpty() && this.find(element)) {
+            if (this.first().equals(element)) {
+                return this.rest().cons(newElement).updateAll(element, newElement);
+            }  else {
+                return this.rest().updateAll(element, newElement).cons(this.first());
+            }
+        }
+        return this;
     }
 
     /**
@@ -189,8 +192,8 @@ public interface ADTConsList<E> {
      *         elementi di {@code list}.
      */
     default ADTConsList<E> append(ADTConsList<E> list) {
-        // TODO implementare ricorsivamente
-        return null;
+        if(this.isEmpty()) return list;
+        return this.rest().append(list).cons(this.first());
     }
 
     /**
@@ -202,8 +205,11 @@ public interface ADTConsList<E> {
      */
     @SuppressWarnings("unchecked")
     default ADTConsList<E> reverse() {
-        // TODO implementare ricorsivamente
-        return null;
+        if(this.isEmpty()) return this;
+        if(!this.removeFirst(this.first()).isEmpty()) {
+            return this.rest().reverse().append(ADTConsList.EMPTY_LIST.cons(this.first()));
+        }
+        return this;
     }
 
 }

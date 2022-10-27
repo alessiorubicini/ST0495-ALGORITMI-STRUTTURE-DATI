@@ -255,11 +255,10 @@ public class Shelf {
      */
     private void increaseItemsArray() {
         // Crea un nuovo array lungo il doppio dell'attuale
-        ShelfItem[] newArray = new ShelfItem[this.items.length*2];
+        ShelfItem[] newArray = new ShelfItem[this.items.length * 2];
         // Copia gli oggetti nel nuovo array
         for (int i = 0; i < this.numberOfItems; i++) newArray[i] = this.items[i];
         // Sostituisce l'array attuale con il nuovo
         this.items = newArray;
     }
-
 }

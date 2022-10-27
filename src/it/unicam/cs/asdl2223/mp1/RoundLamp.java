@@ -117,5 +117,4 @@ public class RoundLamp implements ShelfItem {
         hash = 89 * hash + brandName.hashCode();
         return hash;
     }
-
 }

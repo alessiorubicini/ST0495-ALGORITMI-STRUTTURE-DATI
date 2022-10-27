@@ -33,9 +33,10 @@ public class Factoriser {
      */
     public Factor[] getFactors(int n) {
         if(n < 1) throw new IllegalArgumentException("Numero minore di 1");
+        if(n == 1) return new Factor[0];
         // Crea un array di fattori temporaneo di lunghezza uguale alla radice di n (la massima necessaria)
         Factor[] factors = new Factor[(int)Math.sqrt(n)];
-        CrivelloDiEratostene crivello = new CrivelloDiEratostene(n+1 );
+        CrivelloDiEratostene crivello = new CrivelloDiEratostene(n );
         // Fattorizza il numero, inserendo i fattori nell'array creato
         this.findFactors(n, factors, crivello);
         // Restituisce l'array di fattori della giusta lunghezza
