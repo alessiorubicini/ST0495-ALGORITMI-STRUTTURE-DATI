@@ -67,8 +67,10 @@ public class CrivelloDiEratostene {
         for(int i = 2; i*i <= capacity; i++) {
             // Se il booleano del numero è ancora true, il numero è primo
             if(this.crivello[i] == true) {
-                // Imposta a true tutti i multipli del numero in questione
-                for(int j = i*i; j <= capacity; j += i) this.crivello[i] = false;
+                // Imposta a false tutti i multipli del numero in questione
+                for(int j = i*i; j <= capacity; j += i) {
+                    this.crivello[j] = false;
+                }
             }
         }
     }
