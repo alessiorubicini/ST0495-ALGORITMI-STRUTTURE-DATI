@@ -213,6 +213,7 @@ public class SingleLinkedList<E> implements List<E> {
 
     @Override
     public boolean contains(Object o) {
+        if(o == null) throw new NullPointerException();
         Iterator<E> thisIterator = this.iterator();
         while (thisIterator.hasNext()) {
             if (o.equals(thisIterator.next())) return true;
@@ -239,8 +240,22 @@ public class SingleLinkedList<E> implements List<E> {
     public boolean remove(Object o) {
         if(o == null) throw new NullPointerException();
         if(!this.contains(o)) return false;
-        // TODO implementare
-        return true;
+        if(this.size == 1) {
+            head = null;
+            this.size--;
+            return true;
+        } else {
+            Node<E> currentNode = head;
+            while (currentNode.next != null) {
+                if (currentNode.next.item.equals(o)) {
+                    currentNode.next = currentNode.next.next;
+                    this.size--;
+                    return true;
+                }
+                currentNode = currentNode.next;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -252,20 +267,64 @@ public class SingleLinkedList<E> implements List<E> {
 
     @Override
     public E get(int index) {
-        // TODO implementare
-        return null;
+        if(index < 0 || index > size - 1) throw new IndexOutOfBoundsException();
+        if(index == 0) {
+            if(head != null) return head.item;
+            else throw new IndexOutOfBoundsException();
+        }
+        if(index == size - 1) {
+            if(tail != null) return tail.item;
+            else throw new IndexOutOfBoundsException();
+        }
+        Iterator<E> thisIterator = this.iterator();
+        int currentIndex = 0;
+        E item = thisIterator.next();
+        while(currentIndex != index) {
+            item = thisIterator.next();
+            currentIndex++;
+        }
+        return item;
     }
 
     @Override
     public E set(int index, E element) {
-        // TODO implementare
+        if(index > this.size-1 || index < 0) throw new IndexOutOfBoundsException();
+        if(element == null) throw new NullPointerException();
+        Node<E> currentNode = head;
+        int i = 0;
+        while (currentNode.next != null) {
+            if(i == index) {
+                E oldItem = currentNode.item;
+                currentNode.item = element;
+                return oldItem;
+            }
+            i++;
+            currentNode = currentNode.next;
+        }
         return null;
     }
 
     @Override
     public void add(int index, E element) {
-        // TODO implementare
-
+        if(element == null) throw new NullPointerException();
+        if(index > this.size-1 || index < 0) throw new IndexOutOfBoundsException();
+        Node<E> currentNode = head;
+        if(index == 0) head = new Node<E>(element, head.next);
+        if(index == this.size-1) {
+            this.add(element);
+        }
+        int i = -1;
+        while (currentNode.next != null) {
+            if(i+1 == index) {
+                Node<E> nodeToShift = currentNode.next;
+                currentNode.next = new Node<E>(element, nodeToShift);
+                this.size++;
+                return;
+            }
+            i++;
+            currentNode = currentNode.next;
+        }
+        return;
     }
 
     @Override
