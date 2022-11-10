@@ -307,15 +307,26 @@ public class SingleLinkedList<E> implements List<E> {
     @Override
     public void add(int index, E element) {
         if(element == null) throw new NullPointerException();
-        if(index > this.size-1 || index < 0) throw new IndexOutOfBoundsException();
-        Node<E> currentNode = head;
-        if(index == 0) head = new Node<E>(element, head.next);
-        if(index == this.size-1) {
-            this.add(element);
+        // Se l'indice è 0, aggiunge in testa
+        if(index == 0) {
+            head = new Node<E>(element, head.next);
+            this.size++;
+            return;
         }
-        int i = -1;
+        // Se l'indice è uguale alla lunghezza della lista, aggiunge in coda
+        if(index == this.size) {
+            this.add(element);
+            return;
+        }
+        // Altrimenti l'elemento va inserito da qualche parte nel mezzo, quindi controlla validità dell'indice
+        if(index < 0 || index > this.size - 1) throw new IndexOutOfBoundsException();
+        // Scorro la lista fino alla coda
+        int i = 0;
+        Node<E> currentNode = head;
         while (currentNode.next != null) {
+            // Se il prossimo nodo ha l'indice che cerchiamo
             if(i+1 == index) {
+                // Inserisco il nuovo nodo e shifto il prossimo nodo di una posizione
                 Node<E> nodeToShift = currentNode.next;
                 currentNode.next = new Node<E>(element, nodeToShift);
                 this.size++;
@@ -335,20 +346,42 @@ public class SingleLinkedList<E> implements List<E> {
 
     @Override
     public int indexOf(Object o) {
-        // TODO implementare
-        return -1;
+        if(!contains(o)) return -1;
+        int i = 0;
+        Node<E> currentNode = head;
+        while (currentNode.next != null) {
+            if(o.equals(currentNode.item)) {
+                return i;
+            }
+            i++;
+            currentNode = currentNode.next;
+        }
+        return i;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        // TODO implementare
-        return -1;
+        if(o == null) throw new NullPointerException();
+        if(!contains(o)) return -1;
+        int i = 0;
+        int index = 0;
+        Node<E> currentNode = head;
+        while (currentNode != null) {
+            if(o.equals(currentNode.item)) index = i;
+            i++;
+            currentNode = currentNode.next;
+        }
+        return index;
     }
 
     @Override
     public Object[] toArray() {
-        // TODO implementare
-        return null;
+        Object[] array = new Object[size];
+        Iterator<E> thisIterator = this.iterator();
+        for (int i = 0; i < size; i++) {
+            array[i] = thisIterator.next();
+        }
+        return array;
     }
 
     @Override

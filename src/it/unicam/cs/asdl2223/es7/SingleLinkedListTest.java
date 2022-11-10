@@ -143,7 +143,6 @@ class SingleLinkedListTest {
 
         list.add("1");
         list.add(1, "1.5");
-        System.out.println("get(1) = " + list.get(1));
         assertTrue(list.get(1).equals("1.5"));
         assertTrue(list.get(2).equals("1"));
 
