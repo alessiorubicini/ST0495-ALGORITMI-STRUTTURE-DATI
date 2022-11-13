@@ -59,7 +59,7 @@ public class MaxHeap<E extends Comparable<E>> {
         if(list == null) throw new NullPointerException("Lista nulla");
         this.heap = new ArrayList<E>();
         for (E element: list) {
-            this.heap.add(element);
+            this.insert(element);
         }
     }
 
@@ -146,9 +146,18 @@ public class MaxHeap<E extends Comparable<E>> {
      * @return l'elemento massimo di questo heap oppure null se lo heap è vuoto
      */
     public E extractMax() {
-        // TODO implementare
-        this.heapify(0);
-        return null;
+        if(heap == null || heap.size() == 0) return null;
+        // Ottiene il primo elemento (il massimo)
+        E max = heap.get(0);
+        // Sostituisce radice con ultima foglia
+        heap.set(0, heap.get(heap.size()-1));
+        // Rimuove l'ultima foglia
+        heap.remove(heap.size()-1);
+        // Se l'heap è vuoto, vuol dire che c'era solo un elemento
+        if(heap.size() == 0) return max;
+        // Chiama heapify a partire dal primo livello dell'heap
+        this.heapify(1);
+        return max;
     }
 
     /*
@@ -156,26 +165,25 @@ public class MaxHeap<E extends Comparable<E>> {
      * suoi sottoalberi sinistro e destro (se esistono) siano heap.
      */
     private void heapify(int i) {
-        if(i >= heap.size()) throw new IllegalArgumentException();
-        // Ottiene sottoalberi figli
-        int leftNode = this.leftIndex(i);
-        int rightNode = this.rightIndex(i);
-        int maximum = 0;
+        // Ottiene indici dei sottoalberi figli
+        int leftNodeIndex = this.leftIndex(i)-1;
+        int rightNodeIndex = this.rightIndex(i)-1;
+        int maximumValueIndex = 0;
         // Confronta nodo attuale con figlio sinistro
-        if(leftNode < heap.size() && heap.get(leftNode).compareTo(heap.get(i)) > 0) {
-            maximum = leftNode;
+        if(leftNodeIndex < heap.size() && heap.get(leftNodeIndex).compareTo(heap.get(i-1)) > 0) {
+            maximumValueIndex = leftNodeIndex;
         } else {
-            maximum = rightNode;
+            maximumValueIndex = i-1;
         }
         // Confronta massimo attuale con figlio destro
-        if(rightNode < heap.size() && heap.get(rightNode).compareTo(heap.get(maximum)) > 0) {
-            maximum = rightNode;
+        if(rightNodeIndex < heap.size() && heap.get(rightNodeIndex).compareTo(heap.get(maximumValueIndex)) > 0) {
+            maximumValueIndex = rightNodeIndex;
         }
         // Se il massimo è diverso dal nodo attuale, c'è da scambiare
-        if(maximum != i) {
-            Collections.swap(heap, i, maximum);
+        if(maximumValueIndex != (i-1)) {
+            Collections.swap(heap, i-1, maximumValueIndex);
             // Richiama ricorsivamente heapify sul livello sottostante
-            heapify(maximum);
+            if(i+1 < heap.size()) heapify(heap.indexOf(heap.get(i+1)));
         }
     }
     
