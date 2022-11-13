@@ -1,4 +1,4 @@
-package it.unicam.cs.asdl2223.es7;
+package it.unicam.cs.asdl2223.es8;
 
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -213,207 +213,67 @@ public class SingleLinkedList<E> implements List<E> {
 
     @Override
     public boolean contains(Object o) {
-        if(o == null) throw new NullPointerException();
-        Iterator<E> thisIterator = this.iterator();
-        while (thisIterator.hasNext()) {
-            if (o.equals(thisIterator.next())) return true;
-        }
+        // TODO implementare
         return false;
     }
 
     @Override
     public boolean add(E e) {
-        if(e == null) throw new NullPointerException();
-        Node<E> newNode = new Node<E>(e, null);
-        if(this.head == null) {
-            this.head = newNode;
-            this.tail = head;
-        } else {
-            this.tail.next = newNode;
-            this.tail = newNode;
-        }
-        this.size++;
-        this.numeroModifiche++;
-        return true;
+        // TODO implementare
+        return false;
     }
 
     @Override
     public boolean remove(Object o) {
-        if(o == null) throw new NullPointerException();
-        if(!this.contains(o)) return false;
-        if(this.size == 1) {
-            head = null;
-            this.size--;
-            return true;
-        } else {
-            Node<E> currentNode = head;
-            while (currentNode.next != null) {
-                if (currentNode.next.item.equals(o)) {
-                    currentNode.next = currentNode.next.next;
-                    this.size--;
-                    return true;
-                }
-                currentNode = currentNode.next;
-            }
-        }
+        // TODO implementare
         return false;
     }
 
     @Override
     public void clear() {
-        this.head = null;
-        this.tail = null;
-        this.numeroModifiche++;
-        this.size = 0;
+        // TODO implementare
     }
 
     @Override
     public E get(int index) {
-        if(index < 0 || index > size - 1) throw new IndexOutOfBoundsException();
-        if(index == 0) {
-            if(head != null) return head.item;
-            else throw new IndexOutOfBoundsException();
-        }
-        if(index == size - 1) {
-            if(tail != null) return tail.item;
-            else throw new IndexOutOfBoundsException();
-        }
-        Iterator<E> thisIterator = this.iterator();
-        int currentIndex = 0;
-        E item = thisIterator.next();
-        while(currentIndex != index) {
-            item = thisIterator.next();
-            currentIndex++;
-        }
-        return item;
+        // TODO implementare
+        return null;
     }
 
     @Override
     public E set(int index, E element) {
-        if(index > this.size-1 || index < 0) throw new IndexOutOfBoundsException();
-        if(element == null) throw new NullPointerException();
-        Node<E> currentNode = head;
-        int i = 0;
-        while (currentNode.next != null) {
-            if(i == index) {
-                E oldItem = currentNode.item;
-                currentNode.item = element;
-                return oldItem;
-            }
-            i++;
-            currentNode = currentNode.next;
-        }
+        // TODO implementare
         return null;
     }
 
     @Override
     public void add(int index, E element) {
-        if(element == null) throw new NullPointerException();
-        // Se l'indice è 0, aggiunge in testa
-        if(index == 0) {
-            head = new Node<E>(element, head.next);
-            this.size++;
-            return;
-        }
-        // Se l'indice è uguale alla lunghezza della lista, aggiunge in coda
-        if(index == this.size) {
-            this.add(element);
-            return;
-        }
-        // Altrimenti l'elemento va inserito da qualche parte nel mezzo, quindi controlla validità dell'indice
-        if(index < 0 || index > this.size - 1) throw new IndexOutOfBoundsException();
-        // Scorro la lista fino alla coda
-        int i = 0;
-        Node<E> currentNode = head;
-        while (currentNode.next != null) {
-            // Se il prossimo nodo ha l'indice che cerchiamo
-            if(i+1 == index) {
-                // Inserisco il nuovo nodo e shifto il prossimo nodo di una posizione
-                Node<E> nodeToShift = currentNode.next;
-                currentNode.next = new Node<E>(element, nodeToShift);
-                this.size++;
-                return;
-            }
-            i++;
-            currentNode = currentNode.next;
-        }
-        return;
+        // TODO implementare
+
     }
 
     @Override
     public E remove(int index) {
-        if(index < 0 || index > size - 1) throw new IndexOutOfBoundsException();
-        // Controlla se vuole rimuovere la testa
-        if(index == 0) {
-            E removedElement = head.item;
-            if(this.size == 1) head = null;
-            else head = head.next;
-            this.size--;
-            return removedElement;
-        }
-        int i = 0;
-        Node<E> currentNode = head;
-        while (currentNode.next != null) {
-            // Se il prossimo nodo ha l'indice che cerchiamo
-            // Modifico il puntatore del nodo attuale al successivo del successivo
-            if(i+1 == index) {
-                // Controlla se l'elemento da rimuovere è la coda
-                if(currentNode.next.next == null) {
-                    E result = currentNode.next.item;
-                    currentNode.next = null;
-                    this.size--;
-                    return result;
-                }
-                // Se non è nella coda, applica un ragionamento generale
-                E removedElement = currentNode.next.item;
-                currentNode.next = currentNode.next.next;
-                this.size--;
-                return removedElement;
-            }
-            i++;
-            currentNode = currentNode.next;
-        }
-        return currentNode.item;
+        // TODO implementare
+        return null;
     }
 
     @Override
     public int indexOf(Object o) {
-        if(!contains(o)) return -1;
-        int i = 0;
-        Node<E> currentNode = head;
-        while (currentNode.next != null) {
-            if(o.equals(currentNode.item)) {
-                return i;
-            }
-            i++;
-            currentNode = currentNode.next;
-        }
-        return i;
+        // TODO implementare
+        return -1;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        if(o == null) throw new NullPointerException();
-        if(!contains(o)) return -1;
-        int i = 0;
-        int index = 0;
-        Node<E> currentNode = head;
-        while (currentNode != null) {
-            if(o.equals(currentNode.item)) index = i;
-            i++;
-            currentNode = currentNode.next;
-        }
-        return index;
+        // TODO implementare
+        return -1;
     }
 
     @Override
     public Object[] toArray() {
-        Object[] array = new Object[size];
-        Iterator<E> thisIterator = this.iterator();
-        for (int i = 0; i < size; i++) {
-            array[i] = thisIterator.next();
-        }
-        return array;
+        // TODO implementare
+        return null;
     }
 
     @Override

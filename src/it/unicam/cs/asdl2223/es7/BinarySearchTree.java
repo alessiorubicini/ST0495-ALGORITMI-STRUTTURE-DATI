@@ -23,12 +23,12 @@ import java.util.Set;
  * complessità delle operazioni può diventare O(n) dove n è il numero degli
  * elementi presenti.
  * 
- * @param <E>
+ * @param E
  *              il tipo delle etichette dei nodi in questo Binary Search Tree.
  *              La classe {@code E} deve avere un ordinamento naturale definito
  *              tra gli elementi.
  * 
- * @author Template: Luca Tesei, Implementazione: collettiva
+ * @author Luca Tesei
  *
  */
 public class BinarySearchTree<E extends Comparable<E>> {
@@ -358,6 +358,47 @@ public class BinarySearchTree<E extends Comparable<E>> {
         }
 
         /*
+         * Cancella l'etichetta di questo nodo dall'albero. Potrebbe non
+         * eliminare proprio questo nodo, ma un'altro nodo, copiando l'etichetta
+         * di quel nodo cancellato (scollegandolo dal parent) in questo nodo.
+         */
+        protected void deleteSelfLabel() {
+            RecBST nodeToDelete = null;
+            // Determino il nodo effettivo da eliminare
+            if (this.left == null || this.right == null)
+                nodeToDelete = this;
+            else // questo nodo ha almeno un successore
+                nodeToDelete = this.getSuccessorNode();
+            // Determino il figlio non null più a sinistra del nodo da eliminare
+            // (se esiste, altrimenti è null)
+            RecBST leftMostNonNullChild = null;
+            if (nodeToDelete.left != null)
+                leftMostNonNullChild = nodeToDelete.left;
+            else
+                leftMostNonNullChild = nodeToDelete.right;
+            // Collego il parent del figlio non null (se esiste) con il parent
+            // del nodo da cancellare
+            if (leftMostNonNullChild != null)
+                leftMostNonNullChild.parent = nodeToDelete.parent;
+            // Controllo se sto cancellando la radice dell'albero della classe
+            // principale
+            if (nodeToDelete.parent == null)
+                // Aggiorno la radice dell'albero della classe principale
+                BinarySearchTree.this.root = leftMostNonNullChild;
+            else if (nodeToDelete.parent.left == nodeToDelete)
+                // sto cancellando un figlio sinistro, quindi collego il nuovo
+                // figlio a sinistra
+                nodeToDelete.parent.left = leftMostNonNullChild;
+            else // sto cancellando un figlio destro, quindi collego il nuovo
+                 // figlio a destra
+                nodeToDelete.parent.right = leftMostNonNullChild;
+            // Infine, se il nodo che ho cancellato non è effettivamente questo
+            // allora copio qui l'etichetta del nodo cancellato
+            if (nodeToDelete != this)
+                this.label = nodeToDelete.label;
+        }
+
+        /*
          * Costruisce un (sotto-albero) a partire da un nodo, due sotto-alberi e
          * un nodo genitore.
          * 
@@ -442,34 +483,19 @@ public class BinarySearchTree<E extends Comparable<E>> {
          * @return la lunghezza del massimo cammino da questo nodo a una foglia.
          */
         protected int computeHeight() {
-            // TODO implementare ricorsivamente
-            return -1;
-        }
-
-        /*
-         * Aggiunge un nodo a questo (sotto-)albero con una etichetta
-         * specificata.
-         * 
-         * @param label etichetta da inserire
-         * 
-         * @return true se il nodo è stato effettivamente inserito, false se
-         * l'etichetta era già presente.
-         */
-        protected boolean insert(E label) {
-            return false;
-        }
-
-        /*
-         * Cerca un nodo con una certa etichetta in questo albero.
-         * 
-         * @param label l'etichetta da cercare
-         * 
-         * @return il puntatore al nodo che contiene l'etichetta cercata, oppure
-         * null se l'etichetta non è presente
-         */
-        protected RecBST search(E label) {
-            // TODO implementare ricorsivamente
-            return null;
+            if (this.left == null && this.right == null)
+                // Sono una radice foglia
+                return 0;
+            else if (this.left == null)
+                // Ho solo il figlio destro
+                return 1 + this.right.computeHeight();
+            else if (this.right == null)
+                // Ho solo il figlio sinistro
+                return 1 + this.left.computeHeight();
+            else
+                // Ho tutti e due i figli
+                return 1 + Math.max(this.left.computeHeight(),
+                        this.right.computeHeight());
         }
 
         /*
@@ -481,7 +507,15 @@ public class BinarySearchTree<E extends Comparable<E>> {
          * etichette in ordine
          */
         protected void addLabelsInOrder(List<E> l) {
-            // TODO implementare ricorsivamente
+            // Visita simmetrica
+            // Visito il sottoalbero sinistro, se esiste
+            if (this.left != null)
+                this.left.addLabelsInOrder(l);
+            // Adesso visito il nodo corrente
+            l.add(this.label);
+            // Visito il sottoalbero destro, se esiste
+            if (this.right != null)
+                this.right.addLabelsInOrder(l);
         }
 
         /*
@@ -493,8 +527,54 @@ public class BinarySearchTree<E extends Comparable<E>> {
          * (sotto-)albero secondo l'ordinamento naturale della classe {@code E}
          */
         protected List<E> inOrderVisit() {
-            // TODO implementare ricorsivamente
-            return null;
+            List<E> l = null;
+            // Visito il sottoalbero sinistro, se esiste
+            if (this.left != null)
+                // la lista ls non è mai vuota perché l'albero non null contiene
+                // sempre
+                // almeno un elemento
+                l = this.left.inOrderVisit();
+            else // creo io la lista vuota
+                l = new ArrayList<E>();
+            // aggiungo alla lista ordinata dei valori a sinistra me stesso
+            l.add(this.label);
+            // aggiungo tutti gli elementi della lista ordinata dei valori a
+            // destra
+            if (this.right != null)
+                l.addAll(this.right.inOrderVisit());
+            return l;
+        }
+
+        /*
+         * Cerca un nodo con una certa etichetta in questo albero.
+         * 
+         * @param label l'etichetta da cercare
+         * 
+         * @return il puntatore al nodo che contiene l'etichetta cercata, oppure
+         * null se l'etichetta non è presente
+         */
+        protected RecBST search(E label) {
+            // caso base
+            if (this.left == null && this.right == null)
+                // sono radice foglia
+                if (this.label.equals(label))
+                    return this;
+                else
+                    return null;
+            // caso ricorsivo
+            int cmp = this.label.compareTo(label);
+            if (cmp == 0)
+                return this;
+            else if (cmp > 0) {
+                if (this.left == null)
+                    return null;
+                else
+                    return this.left.search(label);
+            } else // cmp < 0
+            if (this.right == null)
+                return null;
+            else
+                return this.right.search(label);
         }
 
         /*
@@ -505,8 +585,12 @@ public class BinarySearchTree<E extends Comparable<E>> {
          * questo (sotto-)albero
          */
         protected RecBST getMinNode() {
-            // TODO implementare ricorsivamente
-            return null;
+            if (this.left == null)
+                // Sono il nodo più a sinistra che non ha il figlio sinistro
+                return this;
+            else
+                // Mi richiamo sul sottoalbero sinistro
+                return this.left.getMinNode();
         }
 
         /*
@@ -517,8 +601,12 @@ public class BinarySearchTree<E extends Comparable<E>> {
          * questo (sotto-)albero
          */
         protected RecBST getMaxNode() {
-            // TODO implementare ricorsivamente
-            return null;
+            if (this.right == null)
+                // Sono il nodo più a destra che non ha il figlio destro
+                return this;
+            else
+                // Mi richiamo sul sottoalbero destro
+                return this.right.getMaxNode();
         }
 
         /*
@@ -530,7 +618,27 @@ public class BinarySearchTree<E extends Comparable<E>> {
          * non ha successore
          */
         protected RecBST getSuccessorNode() {
-            // TODO implementare
+            // Caso 1 - questo nodo ha un figlio destro
+            if (this.right != null)
+                return this.right.getMinNode();
+            // Caso 2 - questo nodo non ha un figlio destro
+            Set<E> ancestors = new HashSet<E>();
+            // Questo nodo è considerato antenato di se stesso
+            ancestors.add(this.label);
+            // Cerco il primo nodo che ha un figlio sinistro che è tra gli
+            // antenati
+            RecBST p = this;
+            while (p.parent != null) {
+                if (p.parent.left != null
+                        && ancestors.contains(p.parent.left.label))
+                    // p.parent è il successore
+                    return p.parent;
+                // altrimenti aggiungi p.parent agli antenati e continua a
+                // salire
+                ancestors.add(p.parent.label);
+                p = p.parent;
+            }
+            // non ho trovato il successore
             return null;
         }
 
@@ -543,18 +651,68 @@ public class BinarySearchTree<E extends Comparable<E>> {
          * non ha predecessore
          */
         protected RecBST getPredecessorNode() {
-            // TODO implementare
+            // Caso 1 - questo nodo ha un figlio sinistro
+            if (this.left != null)
+                return this.left.getMaxNode();
+            // Caso 2 - questo nodo non ha un figlio sinistro
+            Set<E> ancestors = new HashSet<E>();
+            // Questo nodo è considerato antenato di se stesso
+            ancestors.add(this.label);
+            // Cerco il primo nodo che ha un figlio destro che è tra gli
+            // antenati
+            RecBST p = this;
+            while (p.parent != null) {
+                if (p.parent.right != null
+                        && ancestors.contains(p.parent.right.label))
+                    // p.parent è il predecessore
+                    return p.parent;
+                // altrimenti aggiungi p.parent agli antenati e continua a
+                // salire
+                ancestors.add(p.parent.label);
+                p = p.parent;
+            }
+            // non ho trovato il predecessore
             return null;
         }
 
         /*
-         * Cancella l'etichetta di questo nodo dall'albero. Potrebbe non
-         * eliminare proprio questo nodo, ma un'altro nodo, copiando l'etichetta
-         * di quel nodo cancellato (scollegandolo dal parent) in questo nodo.
-         * Cfr. slides di teoria.
+         * Aggiunge un nodo a questo (sotto-)albero con una etichetta
+         * specificata.
+         * 
+         * @param label etichetta da inserire
+         * 
+         * @return true se il nodo è stato effettivamente inserito, false se
+         * l'etichetta era già presente.
          */
-        protected void deleteSelfLabel() {
-            // TODO implementare
+        protected boolean insert(E label) {
+            // Un nuovo nodo inserito non presente è sempre
+            // inserito come foglia
+            // Confronto l'elemento con la radice
+            int x = this.label.compareTo(label);
+            // Caso di uguaglianza
+            if (x == 0)
+                // L'elemento è già presente in questo nodo
+                return false;
+            // Caso non di uguaglianza
+            if (x < 0)
+                // L'elemento da inserire va nel sottoalbero destro
+                if (this.right == null) {
+                    // Inseriamo l'elemento come sottoalbero destro
+                    this.right = new RecBST(label);
+                    this.right.setParent(this);
+                    return true;
+                } else
+                    return this.right.insert(label);
+            else
+            // L'elemento da inserire va nel sottoalbero sinistro
+            if (this.left == null) {
+                // Inseriamo l'elemento come sottoalbero sinistro
+                this.left = new RecBST(label);
+                this.left.setParent(this);
+                return true;
+            } else
+                return this.left.insert(label);
         }
     }
+
 }
