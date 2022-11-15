@@ -3,6 +3,7 @@
  */
 package it.unicam.cs.asdl2223.es8;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,4 +44,5 @@ public class BubbleSort<E extends Comparable<E>>
     public String getName() {
         return "BubbleSort";
     }
+
 }

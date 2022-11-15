@@ -81,18 +81,15 @@ public class MaxHeap<E extends Comparable<E>> {
         // Cicla sull'heap dall'ultimo elemento alla radice
         E support;
         for (int i = this.size(); i > 1; i = parentIndex(i)) {
-            // Controlla se il parent esiste
-            if(parentIndex(i) > 0) {
-                // Controlla se il nuovo elemento è maggiore del parent
-                if(el.compareTo(heap.get(parentIndex(i)-1)) == 1) {
-                    // Scambia parent e nuovo elemento
-                    support = heap.get(parentIndex(i)-1);
-                    heap.set(parentIndex(i)-1, el);
-                    if(heap.get(leftIndex(parentIndex(i))-1).compareTo(el) == 0) {
-                        heap.set(leftIndex(parentIndex(i))-1, support);
-                    } else {
-                        heap.set(rightIndex(parentIndex(i))-1, support);
-                    }
+            // Controlla se il nuovo elemento è maggiore del suo parent
+            if(el.compareTo(heap.get(parentIndex(i)-1)) == 1) {
+                // Scambia parent e nuovo elemento
+                support = heap.get(parentIndex(i)-1);
+                heap.set(parentIndex(i)-1, el);
+                if(heap.get(leftIndex(parentIndex(i))-1).compareTo(el) == 0) {
+                    heap.set(leftIndex(parentIndex(i))-1, support);
+                } else {
+                    heap.set(rightIndex(parentIndex(i))-1, support);
                 }
             }
         }
@@ -149,13 +146,13 @@ public class MaxHeap<E extends Comparable<E>> {
         if(heap == null || heap.size() == 0) return null;
         // Ottiene il primo elemento (il massimo)
         E max = heap.get(0);
-        // Sostituisce radice con ultima foglia
+        // Sostituisce il primo elemento con l'ultimo
         heap.set(0, heap.get(heap.size()-1));
-        // Rimuove l'ultima foglia
+        // Rimuove l'ultimo elemento
         heap.remove(heap.size()-1);
         // Se l'heap è vuoto, vuol dire che c'era solo un elemento
         if(heap.size() == 0) return max;
-        // Chiama heapify a partire dal primo livello dell'heap
+        // Esegue heapify a partire dal primo livello dell'heap
         this.heapify(1);
         return max;
     }
@@ -179,7 +176,7 @@ public class MaxHeap<E extends Comparable<E>> {
         if(rightNodeIndex < heap.size() && heap.get(rightNodeIndex).compareTo(heap.get(maximumValueIndex)) > 0) {
             maximumValueIndex = rightNodeIndex;
         }
-        // Se il massimo è diverso dal nodo attuale, c'è da scambiare
+        // Se il massimo è diverso dal nodo attuale, li scambia
         if(maximumValueIndex != (i-1)) {
             Collections.swap(heap, i-1, maximumValueIndex);
             // Richiama ricorsivamente heapify sul livello sottostante
