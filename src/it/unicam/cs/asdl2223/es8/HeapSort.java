@@ -38,8 +38,6 @@ public class HeapSort<E extends Comparable<E>> implements SortingAlgorithm<E> {
         return "HeapSort";
     }
 
-    // Heapify del sottoalbero radicato con il nodo i che è
-    // un indice in arr []. n è la dimensione dell'heap
     private void heapify(List<E> list, int heapSize, int index) {
         int largest = index;
         int left = 2 * index + 1;

@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 /**
  * Lista concatenata singola che non accetta valori null, ma permette elementi
  * duplicati. Le seguenti operazioni non sono supportate:
- * 
+ *
  * <ul>
  * <li>ListIterator<E> listIterator()</li>
  * <li>ListIterator<E> listIterator(int index)</li>
@@ -22,12 +22,12 @@ import java.util.NoSuchElementException;
  * <li>boolean removeAll(Collection<?> c)</li>
  * <li>boolean retainAll(Collection<?> c)</li>
  * </ul>
- * 
+ *
  * L'iteratore restituito dal metodo {@code Iterator<E> iterator()} è fail-fast,
  * cioè se c'è una modifica strutturale alla lista durante l'uso dell'iteratore
  * allora lancia una {@code ConcurrentMopdificationException} appena possibile,
  * cioè alla prima chiamata del metodo {@code next()}.
- * 
+ *
  * @author Luca Tesei
  *
  * @param <E>
@@ -79,7 +79,7 @@ public class SingleLinkedList<E> implements List<E> {
      * ConcurrentModificationException se a una chiamata di next() si "accorge"
      * che la lista è stata cambiata rispetto a quando l'iteratore è stato
      * creato.
-     * 
+     *
      * La classe è non-static perché l'oggetto iteratore, per funzionare
      * correttamente, ha bisogno di accedere ai campi dell'oggetto della classe
      * principale presso cui è stato creato.
@@ -137,24 +137,24 @@ public class SingleLinkedList<E> implements List<E> {
     /*
      * Una lista concatenata è uguale a un'altra lista se questa è una lista
      * concatenata e contiene gli stessi elementi nello stesso ordine.
-     * 
+     *
      * Si noti che si poteva anche ridefinire il metodo equals in modo da
      * accettare qualsiasi oggetto che implementi List<E> senza richiedere che
      * sia un oggetto di questa classe:
-     * 
+     *
      * obj instanceof List
-     * 
+     *
      * In quel caso si può fare il cast a List<?>:
-     * 
+     *
      * List<?> other = (List<?>) obj;
-     * 
+     *
      * e usando l'iteratore si possono tranquillamente controllare tutti gli
      * elementi (come è stato fatto anche qui):
-     * 
+     *
      * Iterator<E> thisIterator = this.iterator();
-     * 
+     *
      * Iterator<?> otherIterator = other.iterator();
-     * 
+     *
      * ...
      */
     @Override
@@ -213,67 +213,207 @@ public class SingleLinkedList<E> implements List<E> {
 
     @Override
     public boolean contains(Object o) {
-        // TODO implementare
+        if(o == null) throw new NullPointerException();
+        Iterator<E> thisIterator = this.iterator();
+        while (thisIterator.hasNext()) {
+            if (o.equals(thisIterator.next())) return true;
+        }
         return false;
     }
 
     @Override
     public boolean add(E e) {
-        // TODO implementare
-        return false;
+        if(e == null) throw new NullPointerException();
+        Node<E> newNode = new Node<E>(e, null);
+        if(this.head == null) {
+            this.head = newNode;
+            this.tail = head;
+        } else {
+            this.tail.next = newNode;
+            this.tail = newNode;
+        }
+        this.size++;
+        this.numeroModifiche++;
+        return true;
     }
 
     @Override
     public boolean remove(Object o) {
-        // TODO implementare
+        if(o == null) throw new NullPointerException();
+        if(!this.contains(o)) return false;
+        if(this.size == 1) {
+            head = null;
+            this.size--;
+            return true;
+        } else {
+            Node<E> currentNode = head;
+            while (currentNode.next != null) {
+                if (currentNode.next.item.equals(o)) {
+                    currentNode.next = currentNode.next.next;
+                    this.size--;
+                    return true;
+                }
+                currentNode = currentNode.next;
+            }
+        }
         return false;
     }
 
     @Override
     public void clear() {
-        // TODO implementare
+        this.head = null;
+        this.tail = null;
+        this.numeroModifiche++;
+        this.size = 0;
     }
 
     @Override
     public E get(int index) {
-        // TODO implementare
-        return null;
+        if(index < 0 || index > size - 1) throw new IndexOutOfBoundsException();
+        if(index == 0) {
+            if(head != null) return head.item;
+            else throw new IndexOutOfBoundsException();
+        }
+        if(index == size - 1) {
+            if(tail != null) return tail.item;
+            else throw new IndexOutOfBoundsException();
+        }
+        Iterator<E> thisIterator = this.iterator();
+        int currentIndex = 0;
+        E item = thisIterator.next();
+        while(currentIndex != index) {
+            item = thisIterator.next();
+            currentIndex++;
+        }
+        return item;
     }
 
     @Override
     public E set(int index, E element) {
-        // TODO implementare
+        if(index > this.size-1 || index < 0) throw new IndexOutOfBoundsException();
+        if(element == null) throw new NullPointerException();
+        Node<E> currentNode = head;
+        int i = 0;
+        while (currentNode.next != null) {
+            if(i == index) {
+                E oldItem = currentNode.item;
+                currentNode.item = element;
+                return oldItem;
+            }
+            i++;
+            currentNode = currentNode.next;
+        }
         return null;
     }
 
     @Override
     public void add(int index, E element) {
-        // TODO implementare
-
+        if(element == null) throw new NullPointerException();
+        // Se l'indice è 0, aggiunge in testa
+        if(index == 0) {
+            head = new Node<E>(element, head.next);
+            this.size++;
+            return;
+        }
+        // Se l'indice è uguale alla lunghezza della lista, aggiunge in coda
+        if(index == this.size) {
+            this.add(element);
+            return;
+        }
+        // Altrimenti l'elemento va inserito da qualche parte nel mezzo, quindi controlla validità dell'indice
+        if(index < 0 || index > this.size - 1) throw new IndexOutOfBoundsException();
+        // Scorro la lista fino alla coda
+        int i = 0;
+        Node<E> currentNode = head;
+        while (currentNode.next != null) {
+            // Se il prossimo nodo ha l'indice che cerchiamo
+            if(i+1 == index) {
+                // Inserisco il nuovo nodo e shifto il prossimo nodo di una posizione
+                Node<E> nodeToShift = currentNode.next;
+                currentNode.next = new Node<E>(element, nodeToShift);
+                this.size++;
+                return;
+            }
+            i++;
+            currentNode = currentNode.next;
+        }
+        return;
     }
 
     @Override
     public E remove(int index) {
-        // TODO implementare
-        return null;
+        if(index < 0 || index > size - 1) throw new IndexOutOfBoundsException();
+        // Controlla se vuole rimuovere la testa
+        if(index == 0) {
+            E removedElement = head.item;
+            if(this.size == 1) head = null;
+            else head = head.next;
+            this.size--;
+            return removedElement;
+        }
+        int i = 0;
+        Node<E> currentNode = head;
+        while (currentNode.next != null) {
+            // Se il prossimo nodo ha l'indice che cerchiamo
+            // Modifico il puntatore del nodo attuale al successivo del successivo
+            if(i+1 == index) {
+                // Controlla se l'elemento da rimuovere è la coda
+                if(currentNode.next.next == null) {
+                    E result = currentNode.next.item;
+                    currentNode.next = null;
+                    this.size--;
+                    return result;
+                }
+                // Se non è nella coda, applica un ragionamento generale
+                E removedElement = currentNode.next.item;
+                currentNode.next = currentNode.next.next;
+                this.size--;
+                return removedElement;
+            }
+            i++;
+            currentNode = currentNode.next;
+        }
+        return currentNode.item;
     }
 
     @Override
     public int indexOf(Object o) {
-        // TODO implementare
-        return -1;
+        if(!contains(o)) return -1;
+        int i = 0;
+        Node<E> currentNode = head;
+        while (currentNode.next != null) {
+            if(o.equals(currentNode.item)) {
+                return i;
+            }
+            i++;
+            currentNode = currentNode.next;
+        }
+        return i;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        // TODO implementare
-        return -1;
+        if(o == null) throw new NullPointerException();
+        if(!contains(o)) return -1;
+        int i = 0;
+        int index = 0;
+        Node<E> currentNode = head;
+        while (currentNode != null) {
+            if(o.equals(currentNode.item)) index = i;
+            i++;
+            currentNode = currentNode.next;
+        }
+        return index;
     }
 
     @Override
     public Object[] toArray() {
-        // TODO implementare
-        return null;
+        Object[] array = new Object[size];
+        Iterator<E> thisIterator = this.iterator();
+        for (int i = 0; i < size; i++) {
+            array[i] = thisIterator.next();
+        }
+        return array;
     }
 
     @Override

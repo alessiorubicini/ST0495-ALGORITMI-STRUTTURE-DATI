@@ -73,20 +73,17 @@ public class MaxHeap<E extends Comparable<E>> {
      * 
      */
     public void insert(E el) {
-        // Controlla se l'elemento è null
-        if (el == null) throw new NullPointerException ("L'elemento da aggiunger è null");
-        // Aggiunge l'elemento come ultimo nodo
+        if (el == null) {
+            throw new NullPointerException ("l'elemento è nullo");
+        }
         this.heap.add(el);
-        // Ottine el'indice dell'ultimo nodo (-1)
-        int index = this.heap.size() - 1;
-        // Itera finché il nodo è maggior del suo nodo genitore
-        while (this.heap.get(index).compareTo(this.heap.get(parentIndex(index))) > 0){
-            // Scambia il nodo con il suo nodo genitore
-            Collections.swap(heap, index, parentIndex(index));
-            // Scorre al livello superiore dell'heap
-            index = parentIndex(index);
+        int index = this.heap.size()-1;
+        while (index > 0 && this.heap.get(index).compareTo(this.heap.get(parentIndex(index-1))) > 0){
+            Collections.swap(heap, index, parentIndex(index-1));
+            index = parentIndex(index-1);
         }
     }
+
 
     /*
      * Funzione di comodo per calcolare l'indice del figlio sinistro del nodo in
