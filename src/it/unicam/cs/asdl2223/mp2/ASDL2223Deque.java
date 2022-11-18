@@ -28,8 +28,7 @@ import java.util.NoSuchElementException;
  * <li><code>public boolean removeLastOccurrence(Object o)</code></li>
  * </ul>
  * 
- * @author Template: Luca Tesei, Implementation: INSERIRE NOME E COGNOME DELLO
- *         STUDENTE - INSERIRE ANCHE L'EMAIL xxxx@studenti.unicam.it
+ * @author Template: Luca Tesei, Implementation: Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class ASDL2223Deque<E> implements Deque<E> {
