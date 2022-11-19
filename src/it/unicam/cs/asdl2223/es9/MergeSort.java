@@ -20,15 +20,6 @@ public class MergeSort<E extends Comparable<E>> implements SortingAlgorithm<E> {
         return null;
     }
 
-    private void merge(List<E> list, int leftIndex, int midIndex, int rightIndex) {
-        int n1 = midIndex - leftIndex + 1;
-        int n2 = rightIndex - midIndex;
-        for (int i = 0; i < n1; i++) {
-        }
-        for (int i = 0; i < n2; i++) {
-        }
-    }
-
     public String getName() {
         return "MergeSort";
     }

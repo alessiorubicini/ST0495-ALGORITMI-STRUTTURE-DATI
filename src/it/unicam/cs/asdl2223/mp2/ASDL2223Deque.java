@@ -127,15 +127,21 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public void addFirst(E e) {
-        if(e == null) throw new NullPointerException();
+        // Controlla se l'elemento è nullo
+        if(e == null) throw new NullPointerException("L'elemento è nullo");
+        // Se la coda è vuota, aggiunge l'elemento come primo e ultimo
         if(this.isEmpty()) {
             this.first = new Node<E>(null, e, null);
             this.last = first;
         } else {
+            // Crea il nuovo nodo
             Node<E> newNode = new Node<E>(null, e, first);
+            // Il vecchio primo elemento diventa il secondo
             newNode.next.prev = newNode;
+            // Il nuovo nodo diventa il primo elemento
             this.first = newNode;
         }
+        // Incrementa dimensione e numero di modifiche
         this.size++;
         this.changesCounter++;
         return;
@@ -434,7 +440,41 @@ public class ASDL2223Deque<E> implements Deque<E> {
     @Override
     public boolean remove(Object o) {
         if(o == null) throw new NullPointerException("Elemento nullo");
-        if(!this.contains(o)) return false;
+        if(isEmpty() || !this.contains(o)) return false;
+        // Controlla se il primo elemento è uguale all'ultimo
+        if(first == last) {
+            this.clear();
+            return true;
+        }
+        // Controlla se l'elemento da eliminare è il primo
+        if(first.item.equals(o)) {
+            this.first.next.prev = null;
+            this.first = this.first.next;
+            this.size--;
+            this.changesCounter++;
+            return true;
+        }
+        // Controlla se l'elemento da eliminare è l'ultimo
+        if(last.item.equals(o)) {
+            this.last.prev.next = null;
+            this.last = this.last.prev;
+            this.size--;
+            this.changesCounter++;
+            return true;
+        }
+        Node<E> node = this.first;
+        // Cerco un elemento uguale a o
+        while (node != null) {
+            // Se trova un elemento uguale, lo rimuove e ritorna
+            if (o.equals(node.item)) {
+                node.next.prev = node.prev;
+                node.prev = node.next;
+                this.size--;
+                this.changesCounter++;
+                return true;
+            }
+            node = node.next;
+        }
         // TODO implement
         return false;
     }
