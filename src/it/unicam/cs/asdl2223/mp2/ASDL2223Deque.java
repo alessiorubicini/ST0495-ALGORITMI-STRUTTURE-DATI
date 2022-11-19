@@ -97,14 +97,13 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
+        if(c == null || c.contains(null)) throw new NullPointerException("Collezione nulla");
         int oldSize = this.size;
         Iterator<?> thisIterator = c.iterator();
         for (int i = 0; i < c.size(); i++) {
-            this.add(c.iterator().next());
+            this.add((E) thisIterator.next());
         }
-        if(oldSize != this.size) {
-            return true;
-        }
+        if(oldSize != this.size) return true;
         return false;
     }
 
@@ -434,6 +433,8 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean remove(Object o) {
+        if(o == null) throw new NullPointerException("Elemento nullo");
+        if(!this.contains(o)) return false;
         // TODO implement
         return false;
     }
@@ -590,15 +591,6 @@ public class ASDL2223Deque<E> implements Deque<E> {
      */
     protected Node<E> getLastNode() {
         return this.last;
-    }
-
-    private void debugQueue() {
-        Iterator<E> thisIterator = this.iterator();
-        for (int i = 0; i < size; i++) {
-            E item = thisIterator.next();
-            System.out.print(item + "->");
-        }
-        System.out.println("----");
     }
 
 }
