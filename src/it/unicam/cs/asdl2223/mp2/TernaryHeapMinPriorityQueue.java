@@ -14,8 +14,7 @@ import java.util.NoSuchElementException;
  * Duplicated elements are permitted while <code>null</code> elements are not
  * permitted.
  * 
- * @author Template: Luca Tesei, Implementation: INSERIRE NOME E COGNOME DELLO
- *         STUDENTE - INSERIRE ANCHE L'EMAIL xxxx@studenti.unicam.it
+ * @author Template: Luca Tesei, Implementation: Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class TernaryHeapMinPriorityQueue {

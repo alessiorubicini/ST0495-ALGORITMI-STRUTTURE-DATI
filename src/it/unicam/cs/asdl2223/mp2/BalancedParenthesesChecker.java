@@ -15,8 +15,7 @@ package it.unicam.cs.asdl2223.mp2;
  * NOT a string of balanced parentheses - "( ( \n [(P)] \t ))" is NOT a string
  * of balanced parentheses
  * 
- * @author Template: Luca Tesei, Implementation: INSERIRE NOME E COGNOME DELLO
- *         STUDENTE - INSERIRE ANCHE L'EMAIL xxxx@studenti.unicam.it
+ * @author Template: Luca Tesei, Implementation: Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class BalancedParenthesesChecker {

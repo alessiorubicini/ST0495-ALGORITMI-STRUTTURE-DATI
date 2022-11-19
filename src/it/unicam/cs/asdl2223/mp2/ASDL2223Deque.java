@@ -3,6 +3,8 @@
  */
 package it.unicam.cs.asdl2223.mp2;
 
+import it.unicam.cs.asdl2223.es7.SingleLinkedList;
+
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Deque;
@@ -50,190 +52,384 @@ public class ASDL2223Deque<E> implements Deque<E> {
      */
     private Node<E> last;
 
-    // TODO implement: possibly insert other private fields that may be needed
-    // for implementation
+    private int changesCounter;
 
     /**
      * Constructs an empty deque.
      */
     public ASDL2223Deque() {
-        // TODO implement
+        this.size = 0;
+        this.first = null;
+        this.last = null;
+        this.changesCounter = 0;
     }
 
     @Override
     public boolean isEmpty() {
-        // TODO implement
-        return false;
+        return this.size == 0;
     }
 
     @Override
     public Object[] toArray() {
-        // TODO implement
-        return null;
+        Object[] array = new Object[size];
+        Iterator<E> thisIterator = this.iterator();
+        for (int i = 0; i < size; i++) {
+            array[i] = thisIterator.next();
+        }
+        return array;
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        throw new UnsupportedOperationException(
-                "This class does not implement this service.");
+        throw new UnsupportedOperationException("This class does not implement this service.");
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        // TODO implement
-        return false;
+        Iterator<?> thisIterator = c.iterator();
+        for (int i = 0; i < c.size(); i++) {
+            if(!this.contains(thisIterator.next())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        // TODO implement
+        int oldSize = this.size;
+        Iterator<?> thisIterator = c.iterator();
+        for (int i = 0; i < c.size(); i++) {
+            this.add(c.iterator().next());
+        }
+        if(oldSize != this.size) {
+            return true;
+        }
         return false;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException(
-                "This class does not implement this service.");
+        throw new UnsupportedOperationException("This class does not implement this service.");
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException(
-                "This class does not implement this service.");
+        throw new UnsupportedOperationException("This class does not implement this service.");
     }
 
     @Override
     public void clear() {
-        // TODO implement
+        this.first = null;
+        this.last = null;
+        this.changesCounter++;
+        this.size = 0;
     }
 
     @Override
     public void addFirst(E e) {
-        // TODO implement
+        if(e == null) throw new NullPointerException();
+        if(this.isEmpty()) {
+            this.first = new Node<E>(null, e, null);
+            this.last = first;
+        } else {
+            Node<E> newNode = new Node<E>(null, e, first);
+            newNode.next.prev = newNode;
+            this.first = newNode;
+        }
+        this.size++;
+        this.changesCounter++;
+        return;
     }
 
     @Override
     public void addLast(E e) {
-        // TODO implement
+        if(e == null) throw new NullPointerException();
+        // Se la coda è vuota, aggiunge l'elemento come primo e ultimo
+        if(this.isEmpty()) {
+            this.first = new Node<E>(null, e, null);
+            this.last = first;
+        } else {
+            // Se il primo elemento coincide con l'ultimo (cioè la coda ha dimensione 1)
+            if(first == last) {
+                // Crea nuovo nodo e lo inserisce dopo il primo
+                Node<E> newNode = new Node<E>(first, e, null);
+                this.first.next = newNode;
+                this.last = newNode;
+            } else {
+                // Altrimenti, crea nuovo nodo e lo inserisce come ultimo
+                Node<E> newNode = new Node<E>(last, e, null);
+                this.last.next = newNode;
+                this.last = newNode;
+            }
+        }
+        this.size++;
+        this.changesCounter++;
+        return;
     }
 
     @Override
     public boolean offerFirst(E e) {
-        // TODO implement
-        return false;
+        if(e == null) throw new NullPointerException("Elemento nullo");
+        if(this.isEmpty()) {
+            this.first = new Node<E>(null, e, null);
+            this.last = first;
+        } else {
+            Node<E> newNode = new Node<E>(null, e, first);
+            newNode.next.prev = newNode;
+            this.first = newNode;
+        }
+        this.size++;
+        this.changesCounter++;
+        return true;
     }
 
     @Override
     public boolean offerLast(E e) {
-        // TODO implement
-        return false;
+        if(e == null) throw new NullPointerException("Elemento nullo");
+        // Se la coda è vuota, aggiunge l'elemento come primo e ultimo
+        if(this.isEmpty()) {
+            this.first = new Node<E>(null, e, null);
+            this.last = first;
+        } else {
+            // Se il primo elemento coincide con l'ultimo (cioè la coda ha dimensione 1)
+            if(first == last) {
+                // Crea nuovo nodo e lo inserisce dopo il primo
+                Node<E> newNode = new Node<E>(first, e, null);
+                this.first.next = newNode;
+                this.last = newNode;
+            } else {
+                // Altrimenti, crea nuovo nodo e lo inserisce come ultimo
+                Node<E> newNode = new Node<E>(last, e, null);
+                this.last.next = newNode;
+                this.last = newNode;
+            }
+        }
+        this.size++;
+        this.changesCounter++;
+        return true;
     }
 
     @Override
     public E removeFirst() {
-        // TODO implement
-        return null;
+        if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        E retrievedElement = first.item;
+        if(this.size == 1) {
+            this.first = null;
+            this.last = null;
+        } else {
+            this.first = first.next;
+            first.prev = null;
+        }
+        this.size--;
+        this.changesCounter++;
+        return retrievedElement;
     }
 
     @Override
     public E removeLast() {
-        // TODO implement
-        return null;
+        if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        E retrievedElement = last.item;
+        if(this.size == 1) {
+            this.first = null;
+            this.last = null;
+        } else {
+            this.last = this.last.prev;
+            this.last.next = null;
+        }
+        this.size--;
+        this.changesCounter++;
+        return retrievedElement;
     }
 
     @Override
     public E pollFirst() {
-        // TODO implement
-        return null;
+        if(isEmpty()) return null;
+        E retrievedElement = first.item;
+        if(this.size == 1) {
+            this.first = null;
+            this.last = null;
+        } else {
+            this.first = first.next;
+            first.prev = null;
+        }
+        this.size--;
+        this.changesCounter++;
+        return retrievedElement;
     }
 
     @Override
     public E pollLast() {
-        // TODO implement
-        return null;
+        if(isEmpty()) return null;
+        E retrievedElement = last.item;
+        if(this.size == 1) {
+            this.first = null;
+            this.last = null;
+        } else {
+            this.last = this.last.prev;
+            this.last.next = null;
+        }
+        this.size--;
+        this.changesCounter++;
+        return retrievedElement;
     }
 
     @Override
     public E getFirst() {
-        // TODO implement
-        return null;
+        if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        return this.first.item;
     }
 
     @Override
     public E getLast() {
-        // TODO implement
-        return null;
+        if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        return this.last.item;
     }
 
     @Override
     public E peekFirst() {
-        // TODO implement
-        return null;
+        if(isEmpty()) return null;
+        return this.first.item;
     }
 
     @Override
     public E peekLast() {
-        // TODO implement
-        return null;
+        if(isEmpty()) return null;
+        return this.last.item;
     }
 
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        throw new UnsupportedOperationException(
-                "This class does not implement this service.");
+        throw new UnsupportedOperationException("This class does not implement this service.");
     }
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        throw new UnsupportedOperationException(
-                "This class does not implement this service.");
+        throw new UnsupportedOperationException("This class does not implement this service.");
     }
 
     @Override
     public boolean add(E e) {
-        // TODO implement
-        return false;
+        // Controlla che l'elemento non sia nullo
+        if(e == null) throw new NullPointerException();
+        // Crea un nuovo nodo con l'elemento dato
+        Node<E> newNode = new Node<E>(null, e, null);
+        // Se la coda è vuota, aggiunge elemento come primo e ultimo
+        if(this.size == 0) {
+            this.first = newNode;
+            this.last = newNode;
+        } else {
+            // Altrimenti inserisce come ultimo
+            newNode.prev = this.last;
+            this.last.next = newNode;
+            this.last = newNode;
+        }
+        // Incrementa dimensione della coda e numero di modifiche effettuato
+        this.size++;
+        this.changesCounter++;
+        return true;
     }
 
     @Override
     public boolean offer(E e) {
-        // TODO implement
-        return false;
+        // Controlla che l'elemento non sia nullo
+        if(e == null) throw new NullPointerException();
+        // Crea un nuovo nodo con l'elemento dato
+        Node<E> newNode = new Node<E>(null, e, null);
+        // Se la coda è vuota, aggiunge elemento come primo e ultimo
+        if(this.size == 0) {
+            this.first = newNode;
+            this.last = newNode;
+        } else {
+            // Altrimenti inserisce come ultimo
+            newNode.prev = this.last;
+            this.last.next = newNode;
+            this.last = newNode;
+        }
+        // Incrementa dimensione della coda e numero di modifiche effettuato
+        this.size++;
+        this.changesCounter++;
+        return true;
     }
 
     @Override
     public E remove() {
-        // TODO implement
-        return null;
+        if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        E retrievedElement = first.item;
+        // Se primo e ultimo coincidono, li cancella svuotando così la coda
+        if(first == last) {
+            this.first = null;
+            this.last = null;
+        } else {
+            // Altrimenti rimuove il primo elemento
+            this.first = first.next;
+            first.prev = null;
+        }
+        this.size--;
+        this.changesCounter++;
+        return retrievedElement;
     }
 
     @Override
     public E poll() {
-        // TODO implement
-        return null;
+        if(isEmpty()) return null;
+        E retrievedElement = first.item;
+        // Se primo e ultimo coincidono, li cancella svuotando così la coda
+        if(first == last) {
+            this.first = null;
+            this.last = null;
+        } else {
+            // Altrimenti rimuove il primo elemento
+            this.first = first.next;
+            first.prev = null;
+        }
+        this.size--;
+        this.changesCounter++;
+        return retrievedElement;
     }
 
     @Override
     public E element() {
-        // TODO implement
-        return null;
+        if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        return this.first.item;
     }
 
     @Override
     public E peek() {
-        // TODO implement
-        return null;
+        if(isEmpty()) return null;
+        return this.first.item;
     }
 
     @Override
     public void push(E e) {
-        // TODO implement
+        if(e == null) throw new NullPointerException();
+        if(this.isEmpty()) {
+            this.first = new Node<E>(null, e, null);
+            this.last = first;
+        } else {
+            Node<E> newNode = new Node<E>(null, e, first);
+            newNode.next.prev = newNode;
+            this.first = newNode;
+        }
+        this.size++;
+        this.changesCounter++;
+        return;
     }
 
     @Override
     public E pop() {
-        // TODO implement
-        return null;
+        if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        E retrievedElement = first.item;
+        if(this.size == 1) {
+            this.first = null;
+            this.last = null;
+        } else {
+            this.first = first.next;
+            first.prev = null;
+        }
+        this.size--;
+        this.changesCounter++;
+        return retrievedElement;
     }
 
     @Override
@@ -244,14 +440,20 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean contains(Object o) {
-        // TODO implement
+        // Controlla che l'oggetto non sia nullo
+        if(o == null) throw new NullPointerException();
+        // Itera sulla coda utilizzando l'iterator
+        Iterator<E> thisIterator = this.iterator();
+        while (thisIterator.hasNext()) {
+            // Se l'elemento corrente è uguale all'elemento dato, la coda lo contiene
+            if (o.equals(thisIterator.next())) return true;
+        }
         return false;
     }
 
     @Override
     public int size() {
-        // TODO implement
-        return -1;
+        return this.size;
     }
 
     /*
@@ -286,24 +488,42 @@ public class ASDL2223Deque<E> implements Deque<E> {
      * method <code>next()</code> is done.
      */
     private class Itr implements Iterator<E> {
-        // TODO implement: insert private fields needed for the implementation
-        // and for making the iterator fail-safe
+        private Node<E> lastReturned;           // Ultimo elemento restituito
+        private int expectedChangesNumber;      // Numero di modifiche atteso
 
         Itr() {
-            // TODO implement
+            this.lastReturned = null;
+            this.expectedChangesNumber = ASDL2223Deque.this.changesCounter;
         }
 
         public boolean hasNext() {
-            // TODO implement
-            return false;
+            if(this.lastReturned == null) {
+                // È all'inizio della lista, controlla se il primo nodo esiste
+                return ASDL2223Deque.this.first != null;
+            } else {
+                // È avanzato di almeno un nodo, controlla il successivo
+                return lastReturned.next != null;
+            }
         }
 
         public E next() {
-            // TODO implement: REMEMBER that the iterator must be fail-safe: if
-            // the Deque has been modified by a method of the main class the
-            // first attempt to call next() must throw a
-            // ConcurrentModificationException
-            return null;
+            // Controlla modifiche concorrenti
+            if(this.expectedChangesNumber != ASDL2223Deque.this.changesCounter) {
+                throw new ConcurrentModificationException("Deque modificata durante l'iterazione");
+            }
+            // Controlla se c'è un elemento successivo
+            if(!hasNext()) {
+                throw new NoSuchElementException("Non c'è un elemento successivo");
+            }
+            // Restituisce l'elemento successivo
+            // Il primo nel caso in cui l'ultimo restituito sia null
+            if(this.lastReturned == null) {
+                this.lastReturned = ASDL2223Deque.this.first;
+                return ASDL2223Deque.this.first.item;
+            } else {
+                lastReturned = lastReturned.next;
+                return lastReturned.item;
+            }
         }
     }
 
@@ -320,29 +540,43 @@ public class ASDL2223Deque<E> implements Deque<E> {
      * method <code>next()</code> is done.
      */
     private class DescItr implements Iterator<E> {
-        // TODO implement: insert private fields needed for the implementation
-        // and for making the iterator fail-safe
+        private Node<E> lastReturned;           // Ultimo elemento ritornato
+        private int expectedChangesNumber;      // Numero di modifiche atteso
 
         DescItr() {
-            // TODO implement
+            this.lastReturned = null;
+            this.expectedChangesNumber = ASDL2223Deque.this.changesCounter;
         }
 
         public boolean hasNext() {
-            // TODO implement
-            return false;
+            if(this.lastReturned == null) {
+                return ASDL2223Deque.this.last != null;
+            } else {
+                return lastReturned.prev != null;
+            }
         }
 
         public E next() {
-            // TODO implement: REMEMBER that the iterator must be fail-safe: if
-            // the Deque has been modified by a method of the main class the
-            // first attempt to call next() must throw a
-            // ConcurrentModificationException
-            return null;
+            // Controlla modifiche concorrenti
+            if(this.expectedChangesNumber != ASDL2223Deque.this.changesCounter) {
+                throw new ConcurrentModificationException("Deque modificata durante l'iterazione");
+            }
+            // Controlla se c'è un elemento precedente
+            if(!hasNext()) {
+                throw new NoSuchElementException("Non c'è un elemento precedente");
+            }
+            // Restituisce l'elemento precedente
+            // Il primo nel caso in cui l'ultimo restituito sia null
+            if(this.lastReturned == null) {
+                this.lastReturned = ASDL2223Deque.this.last;
+                return ASDL2223Deque.this.last.item;
+            } else {
+                lastReturned = lastReturned.prev;
+                return lastReturned.item;
+            }
         }
 
     }
-
-    // TODO implement: possibly add private methods for implementation purposes
 
     /*
      * This method is only for JUnit testing purposes.
@@ -356,6 +590,15 @@ public class ASDL2223Deque<E> implements Deque<E> {
      */
     protected Node<E> getLastNode() {
         return this.last;
+    }
+
+    private void debugQueue() {
+        Iterator<E> thisIterator = this.iterator();
+        for (int i = 0; i < size; i++) {
+            E item = thisIterator.next();
+            System.out.print(item + "->");
+        }
+        System.out.println("----");
     }
 
 }

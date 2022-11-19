@@ -129,7 +129,6 @@ public class SingleLinkedList<E> implements List<E> {
                 lastReturned = lastReturned.next;
                 return lastReturned.item;
             }
-
         }
 
     }
