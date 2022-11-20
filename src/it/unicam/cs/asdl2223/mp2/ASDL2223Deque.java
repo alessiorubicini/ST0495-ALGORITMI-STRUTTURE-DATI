@@ -52,6 +52,10 @@ public class ASDL2223Deque<E> implements Deque<E> {
      */
     private Node<E> last;
 
+    /*
+     * Numero di modifiche effettuato
+     * Utile all'Iterator per verificare modifiche concorrenti
+     */
     private int changesCounter;
 
     /**
@@ -71,11 +75,14 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public Object[] toArray() {
+        // Crea un array della stessa dimensione della coda
         Object[] array = new Object[size];
+        // Itera sugli elementi della coda inserendoli nell'array
         Iterator<E> thisIterator = this.iterator();
         for (int i = 0; i < size; i++) {
             array[i] = thisIterator.next();
         }
+        // Ritorna l'array costruito
         return array;
     }
 
@@ -86,8 +93,10 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
+        // Itera sugli elementi della collezione data
         Iterator<?> thisIterator = c.iterator();
         for (int i = 0; i < c.size(); i++) {
+            // Controlla se l'elemento della collezione è contenuto nella coda
             if(!this.contains(thisIterator.next())) {
                 return false;
             }
@@ -97,10 +106,14 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
+        // Controlla se la collezione è nulla o contiene elementi nulli
         if(c == null || c.contains(null)) throw new NullPointerException("Collezione nulla");
+        // Memorizza la dimensione attuale della coda per la successiva verifica
         int oldSize = this.size;
+        // Itera sugli elementi della collezione data
         Iterator<?> thisIterator = c.iterator();
         for (int i = 0; i < c.size(); i++) {
+            // Aggiunge ogni elemento in coda
             this.add((E) thisIterator.next());
         }
         if(oldSize != this.size) return true;
@@ -119,26 +132,30 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public void clear() {
+        // Imposta a null il primo e l'ultimo elemento della coda
         this.first = null;
         this.last = null;
+        // Incrementa il numero di modifiche
         this.changesCounter++;
+        // Re-inizializza la dimensione della coda
         this.size = 0;
     }
 
     @Override
     public void addFirst(E e) {
-        // Controlla se l'elemento è nullo
+        // Controlla se l'elemento dato è nullo
         if(e == null) throw new NullPointerException("L'elemento è nullo");
-        // Se la coda è vuota, aggiunge l'elemento come primo e ultimo
+        // Se la coda è vuota
         if(this.isEmpty()) {
+            // Crea nodo con l'elemento dato e lo aggiunge come primo e ultimo
             this.first = new Node<E>(null, e, null);
             this.last = first;
         } else {
-            // Crea il nuovo nodo
+            // Crea il nuovo nodo con l'elemento dato
             Node<E> newNode = new Node<E>(null, e, first);
-            // Il vecchio primo elemento diventa il secondo
+            // Il vecchio primo nodo diventa il secondo
             newNode.next.prev = newNode;
-            // Il nuovo nodo diventa il primo elemento
+            // Il nuovo nodo diventa il primo nodo
             this.first = newNode;
         }
         // Incrementa dimensione e numero di modifiche
@@ -149,25 +166,28 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public void addLast(E e) {
+        // Controlla se l'elemento dato è nullo
         if(e == null) throw new NullPointerException();
-        // Se la coda è vuota, aggiunge l'elemento come primo e ultimo
+        // Se la coda è vuota
         if(this.isEmpty()) {
+            // Crea nodo con l'elemento dato e lo aggiunge come primo e ultimo
             this.first = new Node<E>(null, e, null);
             this.last = first;
         } else {
-            // Se il primo elemento coincide con l'ultimo (cioè la coda ha dimensione 1)
+            // Se il primo nodo coincide con l'ultimo (cioè la coda ha dimensione 1)
             if(first == last) {
-                // Crea nuovo nodo e lo inserisce dopo il primo
+                // Crea nodo con l'elemento dato e lo inserisce dopo il primo
                 Node<E> newNode = new Node<E>(first, e, null);
                 this.first.next = newNode;
                 this.last = newNode;
             } else {
-                // Altrimenti, crea nuovo nodo e lo inserisce come ultimo
+                // Altrimenti, crea nuovo nodo con l'elemento dato e lo inserisce come ultimo
                 Node<E> newNode = new Node<E>(last, e, null);
                 this.last.next = newNode;
                 this.last = newNode;
             }
         }
+        // Incrementa dimensione e numero di modifiche
         this.size++;
         this.changesCounter++;
         return;
@@ -175,6 +195,8 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean offerFirst(E e) {
+        // La coda non ha restrizioni di capacità
+        // Quindi il metodo è equivalente ad addFirst
         if(e == null) throw new NullPointerException("Elemento nullo");
         if(this.isEmpty()) {
             this.first = new Node<E>(null, e, null);
@@ -191,6 +213,8 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean offerLast(E e) {
+        // La coda non ha restrizioni di capacità
+        // Quindi il metodo è equivalente ad addLast
         if(e == null) throw new NullPointerException("Elemento nullo");
         // Se la coda è vuota, aggiunge l'elemento come primo e ultimo
         if(this.isEmpty()) {
@@ -217,38 +241,52 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public E removeFirst() {
+        // Controlla se la coda è vuota
         if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        // Salva il primo elemento
         E retrievedElement = first.item;
+        // Se la coda ha un solo elemento, lo elimina direttamente
         if(this.size == 1) {
             this.first = null;
             this.last = null;
         } else {
+            // Altrimenti imposta il secondo elemento come primo
             this.first = first.next;
             first.prev = null;
         }
+        // Decrementa dimensione e Incrementa numero di modifiche
         this.size--;
         this.changesCounter++;
+        // Ritorna l'elemento rimosso
         return retrievedElement;
     }
 
     @Override
     public E removeLast() {
+        // Controlla se la coda è vuota
         if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        // Salva il primo elemento
         E retrievedElement = last.item;
+        // Se la coda ha un solo elemento, lo elimina direttamente
         if(this.size == 1) {
             this.first = null;
             this.last = null;
         } else {
+            // Altrimenti imposta il penultimo elemento come ultimo
             this.last = this.last.prev;
             this.last.next = null;
         }
+        // Decrementa dimensione e Incrementa numero di modifiche
         this.size--;
         this.changesCounter++;
+        // Ritorna l'elemento rimosso
         return retrievedElement;
     }
 
     @Override
     public E pollFirst() {
+        // Il metodo è equivalente ad removeFirst
+        // L'unica differenza risiede nel controllo iniziale che ritorna null in caso di coda vuota
         if(isEmpty()) return null;
         E retrievedElement = first.item;
         if(this.size == 1) {
@@ -265,6 +303,8 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public E pollLast() {
+        // Il metodo è equivalente ad removeLast
+        // L'unica differenza risiede nel controllo iniziale che ritorna null in caso di coda vuota
         if(isEmpty()) return null;
         E retrievedElement = last.item;
         if(this.size == 1) {
@@ -281,24 +321,32 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public E getFirst() {
+        // Controlla se la coda è vuota
         if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        // Ritorna il primo elemento della coda
         return this.first.item;
     }
 
     @Override
     public E getLast() {
+        // Controlla se la coda è vuota
         if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        // Ritorna l'ultimo elemento della coda
         return this.last.item;
     }
 
     @Override
     public E peekFirst() {
+        // Il metodo è equivalente ad getFirst
+        // L'unica differenza risiede nel controllo iniziale che ritorna null in caso di coda vuota
         if(isEmpty()) return null;
         return this.first.item;
     }
 
     @Override
     public E peekLast() {
+        // Il metodo è equivalente ad getLast
+        // L'unica differenza risiede nel controllo iniziale che ritorna null in caso di coda vuota
         if(isEmpty()) return null;
         return this.last.item;
     }
@@ -315,11 +363,11 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean add(E e) {
-        // Controlla che l'elemento non sia nullo
+        // Controlla se l'elemento dato è nullo
         if(e == null) throw new NullPointerException();
         // Crea un nuovo nodo con l'elemento dato
         Node<E> newNode = new Node<E>(null, e, null);
-        // Se la coda è vuota, aggiunge elemento come primo e ultimo
+        // Se la coda è vuota, aggiunge nodo come primo e ultimo
         if(this.size == 0) {
             this.first = newNode;
             this.last = newNode;
@@ -329,7 +377,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
             this.last.next = newNode;
             this.last = newNode;
         }
-        // Incrementa dimensione della coda e numero di modifiche effettuato
+        // Incrementa dimensione della coda e numero di modifiche
         this.size++;
         this.changesCounter++;
         return true;
@@ -337,11 +385,11 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean offer(E e) {
-        // Controlla che l'elemento non sia nullo
+        // Controlla se l'elemento dato è nullo
         if(e == null) throw new NullPointerException();
         // Crea un nuovo nodo con l'elemento dato
         Node<E> newNode = new Node<E>(null, e, null);
-        // Se la coda è vuota, aggiunge elemento come primo e ultimo
+        // Se la coda è vuota, aggiunge nodo come primo e ultimo
         if(this.size == 0) {
             this.first = newNode;
             this.last = newNode;
@@ -351,7 +399,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
             this.last.next = newNode;
             this.last = newNode;
         }
-        // Incrementa dimensione della coda e numero di modifiche effettuato
+        // Incrementa dimensione e numero di modifiche
         this.size++;
         this.changesCounter++;
         return true;
@@ -407,6 +455,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public void push(E e) {
+        // Il metodo è equivalente a addFirst
         if(e == null) throw new NullPointerException();
         if(this.isEmpty()) {
             this.first = new Node<E>(null, e, null);
@@ -423,6 +472,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public E pop() {
+        // Il metodo è equivalente a removeFirst
         if(isEmpty()) throw new NoSuchElementException("Coda vuota");
         E retrievedElement = first.item;
         if(this.size == 1) {
@@ -439,10 +489,13 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public boolean remove(Object o) {
+        // Controlla se l'elemento dato è nullo
         if(o == null) throw new NullPointerException("Elemento nullo");
+        // Controlla se la lista è vuota e se contiene l'elemento dato
         if(isEmpty() || !this.contains(o)) return false;
-        // Controlla se il primo elemento è uguale all'ultimo
+        // Se il primo elemento è uguale all'ultimo
         if(first == last) {
+            // L'unico elemento presente è quello cercato, quindi lo rimuove
             this.clear();
             return true;
         }
@@ -463,30 +516,31 @@ public class ASDL2223Deque<E> implements Deque<E> {
             return true;
         }
         Node<E> node = this.first;
-        // Cerco un elemento uguale a o
+        // Itera sui nodi della coda, cercando un elemento uguale a quello dato
         while (node != null) {
-            // Se trova un elemento uguale, lo rimuove e ritorna
+            // Se trova un elemento uguale a quello dato, lo rimuove e ritorna
             if (o.equals(node.item)) {
                 node.next.prev = node.prev;
                 node.prev = node.next;
+                // Decrementa dimensione e Incrementa numero di modifiche
                 this.size--;
                 this.changesCounter++;
                 return true;
             }
+            // Passa al prossimo nodo lungo l'iterazione
             node = node.next;
         }
-        // TODO implement
         return false;
     }
 
     @Override
     public boolean contains(Object o) {
-        // Controlla che l'oggetto non sia nullo
+        // Controlla se l'oggetto dato è nullo
         if(o == null) throw new NullPointerException();
-        // Itera sulla coda utilizzando l'iterator
+        // Itera sulla coda
         Iterator<E> thisIterator = this.iterator();
         while (thisIterator.hasNext()) {
-            // Se l'elemento corrente è uguale all'elemento dato, la coda lo contiene
+            // Se l'elemento dato è uguale al prossimo elemento, la coda lo contiene
             if (o.equals(thisIterator.next())) return true;
         }
         return false;
@@ -538,11 +592,12 @@ public class ASDL2223Deque<E> implements Deque<E> {
         }
 
         public boolean hasNext() {
+            // Se l'ultimo elemento ritornato è nullo
             if(this.lastReturned == null) {
-                // È all'inizio della lista, controlla se il primo nodo esiste
+                // È all'inizio della lista, quindi controlla se il primo nodo esiste
                 return ASDL2223Deque.this.first != null;
             } else {
-                // È avanzato di almeno un nodo, controlla il successivo
+                // Altrimenti è avanzato di almeno un nodo, quindi controlla il successivo
                 return lastReturned.next != null;
             }
         }
@@ -556,12 +611,13 @@ public class ASDL2223Deque<E> implements Deque<E> {
             if(!hasNext()) {
                 throw new NoSuchElementException("Non c'è un elemento successivo");
             }
-            // Restituisce l'elemento successivo
-            // Il primo nel caso in cui l'ultimo restituito sia null
+            // Se l'ultimo elemento ritornato è nullo
             if(this.lastReturned == null) {
+                // Restituisce il primo elemento
                 this.lastReturned = ASDL2223Deque.this.first;
                 return ASDL2223Deque.this.first.item;
             } else {
+                // Altrimenti restituisce il successivo dell'ultimo ritornato
                 lastReturned = lastReturned.next;
                 return lastReturned.item;
             }
@@ -590,9 +646,12 @@ public class ASDL2223Deque<E> implements Deque<E> {
         }
 
         public boolean hasNext() {
+            // Se l'ultimo elemento ritornato è nullo
             if(this.lastReturned == null) {
+                // È alla fine della lista, quindi controlla se l'ultimo nodo esiste
                 return ASDL2223Deque.this.last != null;
             } else {
+                // Altrimenti è avanzato di almeno un nodo, quindi controlla il precedente
                 return lastReturned.prev != null;
             }
         }
@@ -606,12 +665,13 @@ public class ASDL2223Deque<E> implements Deque<E> {
             if(!hasNext()) {
                 throw new NoSuchElementException("Non c'è un elemento precedente");
             }
-            // Restituisce l'elemento precedente
-            // Il primo nel caso in cui l'ultimo restituito sia null
+            // Se l'ultimo elemento ritornato è nullo
             if(this.lastReturned == null) {
+                // Restituisce l'ultimo elemento
                 this.lastReturned = ASDL2223Deque.this.last;
                 return ASDL2223Deque.this.last.item;
             } else {
+                // Altrimenti restituisce il precedente dell'ultimo ritornato
                 lastReturned = lastReturned.prev;
                 return lastReturned.item;
             }
