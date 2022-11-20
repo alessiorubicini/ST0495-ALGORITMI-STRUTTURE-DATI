@@ -111,7 +111,7 @@ public class TernaryHeapMinPriorityQueue {
         // Se l'heap è vuoto, vuol dire che c'era solo un elemento
         if(heap.size() == 0) return minimum;
         // Esegue heapify a partire dal primo livello dell'heap
-        this.heapify(0);
+        this.heapify(0, false);
         return minimum;
     }
 
@@ -149,8 +149,8 @@ public class TernaryHeapMinPriorityQueue {
                 } else {
                     // Cambia la priorità
                     elem.setPriority(newPriority);
-                    // Esegue heapify sul sotto-albero dell'elemento
-                    this.heapify(elem.getHandle());
+                    // Esegue heapify
+                    this.heapify(parentIndex(elem.getHandle()), true);
                 }
             }
         }
@@ -178,7 +178,14 @@ public class TernaryHeapMinPriorityQueue {
         return (3*i)+3;
     }
 
-    private void heapify(int i) {
+    /**
+     * Ricostituisce uno heap a partire dal nodo in posizione i assumendo che i
+     * suoi sottoalberi siano heap.
+     * @param i             la posizione da cui ricostruire
+     * @param reversed      true se l'heapify deve essere svolto verso l'alto (decreasePriority),
+     *                      false altrimenti
+     */
+    private void heapify(int i, boolean reversed) {
         // Ottiene indici dei nodi figli
         int left = this.leftIndex(i);
         int center = this.centerIndex(i);
@@ -189,8 +196,6 @@ public class TernaryHeapMinPriorityQueue {
         // Confronta nodo attuale con figlio sinistro
         if(left < heap.size() && heap.get(left).getPriority() < heap.get(i).getPriority()) {
             minimum = left;
-        } else {
-            minimum = i;
         }
         // Confronta minimo trovato con figlio centrale
         if(center < heap.size() && heap.get(center).getPriority() < heap.get(minimum).getPriority()) {
@@ -207,8 +212,12 @@ public class TernaryHeapMinPriorityQueue {
             // Aggiorna gli handle
             this.heap.get(i).setHandle(i);
             this.heap.get(minimum).setHandle(minimum);
-            // Richiama ricorsivamente heapify sul nodo appena scambiato
-            this.heapify(minimum);
+            // Richiama ricorsivamente heapify sul nodo minimo o sul nodo genitore a seconda della richiesta
+            if(reversed) {
+                this.heapify(parentIndex(i), true);
+            } else {
+                this.heapify(minimum, false);
+            }
         }
     }
 
