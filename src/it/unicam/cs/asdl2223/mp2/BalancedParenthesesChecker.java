@@ -1,5 +1,8 @@
 package it.unicam.cs.asdl2223.mp2;
 
+import java.util.Collections;
+import java.util.Iterator;
+
 /**
  * An object of this class is an actor that uses an ASDL2223Deque<Character> as
  * a Stack in order to check that a sequence containing the following
@@ -46,9 +49,30 @@ public class BalancedParenthesesChecker {
      *                                      and newline '\n'
      */
     public boolean check(String s) {
-        // TODO implement - NOTE: the stack must be cleared first every time
-        // this method is called. Then it has to be used to perform the check.
-        return false;
+        // Pulisce lo stack
+        this.stack.clear();
+        // Trasferisce la stringa nello stack
+        for (int i = 0; i < s.length(); i++) {
+            // Controlla se la stringa contiene caratteri non ammessi
+            char character = s.charAt(i);
+            if(character != '(' || character != ')' || character != '[' || character != ']' || character != '{'
+                    || character != '}' || character != ' ' || character != '\t' || character != '\n') {
+                throw new IllegalArgumentException("La stringa contiene caratteri non ammessi");
+            } else {
+                this.stack.add(character);
+            }
+        }
+        // Pulisce lo stack dai caratteri inutili
+        this.stack.remove("\t");
+        this.stack.remove("\n");
+        this.stack.remove(" ");
+        // Controlla se le parentesi sono bilanciate
+        while (this.stack.size() != 0) {
+            if(stack.removeFirst() != stack.removeLast()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

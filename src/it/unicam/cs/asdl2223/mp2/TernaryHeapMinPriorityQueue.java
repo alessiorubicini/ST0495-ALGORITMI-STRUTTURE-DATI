@@ -26,9 +26,6 @@ public class TernaryHeapMinPriorityQueue {
      */
     private ArrayList<PriorityQueueElement> heap;
 
-    // TODO implement: possibly insert other private fields that may be needed
-    // for implementation
-
     /**
      * Create an empty queue.
      */
@@ -57,6 +54,7 @@ public class TernaryHeapMinPriorityQueue {
      *                                  if the element passed is null
      */
     public void insert(PriorityQueueElement element) {
+        if(element == null) throw new NullPointerException("Elemento nullo");
         // TODO implement
     }
 
@@ -70,6 +68,7 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement minimum() {
+        if(this.size() == 0) throw new NoSuchElementException();
         // TODO implement
         return null;
     }
@@ -83,6 +82,7 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement extractMinimum() {
+        if(this.size() == 0) throw new NoSuchElementException();
         // TODO implement
         return null;
     }
@@ -107,8 +107,7 @@ public class TernaryHeapMinPriorityQueue {
      *                                      strictly less than the current
      *                                      priority of the element
      */
-    public void decreasePriority(PriorityQueueElement element,
-            double newPriority) {
+    public void decreasePriority(PriorityQueueElement element, double newPriority) {
         // TODO implement
     }
 
@@ -120,7 +119,21 @@ public class TernaryHeapMinPriorityQueue {
         this.heap.clear();
     }
 
-    // TODO implement: possibly add private methods for implementation purposes
+    private int parentIndex(int i) {
+        return (i/3);
+    }
+
+    private int leftIndex(int i) {
+        return (3*i-1);
+    }
+
+    private int centerIndex(int i) {
+        return (3*i);
+    }
+
+    private int rightIndex(int i) {
+        return (3*i+1);
+    }
 
     /*
      * This method is only for JUnit testing purposes.
