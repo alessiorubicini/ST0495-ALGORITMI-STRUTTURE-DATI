@@ -51,28 +51,41 @@ public class BalancedParenthesesChecker {
     public boolean check(String s) {
         // Pulisce lo stack
         this.stack.clear();
-        // Trasferisce la stringa nello stack
+        // Itera sulla stringa dal primo carattere
         for (int i = 0; i < s.length(); i++) {
-            // Controlla se la stringa contiene caratteri non ammessi
             char character = s.charAt(i);
-            if(character != '(' || character != ')' || character != '[' || character != ']' || character != '{'
-                    || character != '}' || character != ' ' || character != '\t' || character != '\n') {
+            // Controlla la presenza di caratteri non ammessi
+            if(character != '(' && character != ')' && character != '[' && character != ']' && character != '{'
+                    && character != '}' && character != ' ' && character != '\t' && character != '\n') {
                 throw new IllegalArgumentException("La stringa contiene caratteri non ammessi");
-            } else {
-                this.stack.add(character);
+            }
+            // Se il carattere è una parentesi aperta
+            if (character == '(' || character == '[' || character == '{') {
+                // Push della parentesi aperta in testa allo stack
+                this.stack.push(character);
+                // Trattandosi di una parentesi aperta, ignora i controlli delle parentesi chiuse
+                continue;
+            }
+            // Ignora caratteri aggiuntivi
+            if (character == ' ' || character == '\t' || character == '\n') continue;
+            // Se non ci sono parentesi aperte, allora ci sono parentesi chiuse, quindi la stringa non è bilanciata
+            if (this.stack.isEmpty()) return false;
+            // Controlla se la parentesi chiusa combacia con l'ultima aperta
+            if(character == ')') {
+                if (stack.peekFirst() == '{' || stack.peekFirst() == '[') return false;
+                this.stack.removeFirst();
+            }
+            if(character == '}') {
+                if (stack.peekFirst() == '(' || stack.peekFirst() == '[') return false;
+                this.stack.removeFirst();
+            }
+            if(character == ']') {
+                if (stack.peekFirst() == '(' || stack.peekFirst() == '{') return false;
+                this.stack.removeFirst();
             }
         }
-        // Pulisce lo stack dai caratteri inutili
-        this.stack.remove("\t");
-        this.stack.remove("\n");
-        this.stack.remove(" ");
-        // Controlla se le parentesi sono bilanciate
-        while (this.stack.size() != 0) {
-            if(stack.removeFirst() != stack.removeLast()) {
-                return false;
-            }
-        }
-        return true;
+        // Se lo stack è vuoto, allora la stringa è bilanciata
+        return (this.stack.isEmpty());
     }
 
 }
