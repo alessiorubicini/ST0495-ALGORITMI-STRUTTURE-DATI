@@ -1,6 +1,7 @@
 package it.unicam.cs.asdl2223.mp2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 
 /**
@@ -55,7 +56,22 @@ public class TernaryHeapMinPriorityQueue {
      */
     public void insert(PriorityQueueElement element) {
         if(element == null) throw new NullPointerException("Elemento nullo");
-        // TODO implement
+        // Aggiunge l'elemento come foglia
+        this.heap.add(element);
+        // Ottiene l'indice dell'ultimo elemento
+        int index = this.heap.size()-1;
+        // Imposta l'handle corretto all'elemento appena aggiunto
+        this.heap.get(index).setHandle(index);
+        // Sposta l'elemento in alto finché la sua priorità è minore del genitore
+        while (index > 0 && this.heap.get(index).getPriority() < heap.get(parentIndex(index)).getPriority()) {
+            // Scambia gli elementi
+            Collections.swap(this.heap, index, parentIndex(index));
+            // Aggiorna gli handle
+            this.heap.get(index).setHandle(index);
+            this.heap.get(parentIndex(index)).setHandle(parentIndex(index));
+            // Passa al nodo superiore
+            index = parentIndex(index);
+        }
     }
 
     /**
@@ -68,9 +84,11 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement minimum() {
-        if(this.size() == 0) throw new NoSuchElementException();
-        // TODO implement
-        return null;
+        if(this.size() == 0) {
+            throw new NoSuchElementException();
+        } else {
+            return this.heap.get(0);
+        }
     }
 
     /**
@@ -83,8 +101,18 @@ public class TernaryHeapMinPriorityQueue {
      */
     public PriorityQueueElement extractMinimum() {
         if(this.size() == 0) throw new NoSuchElementException();
-        // TODO implement
-        return null;
+        // Ottiene il primo elemento (il minimo)
+        PriorityQueueElement minimum = this.minimum();
+        // Sostituisce il primo elemento con l'ultimo e aggiorna l'handle
+        heap.set(0, heap.get(heap.size()-1));
+        heap.get(0).setHandle(0);
+        // Rimuove l'ultimo elemento
+        heap.remove(heap.size()-1);
+        // Se l'heap è vuoto, vuol dire che c'era solo un elemento
+        if(heap.size() == 0) return minimum;
+        // Esegue heapify a partire dal primo livello dell'heap
+        this.heapify(0);
+        return minimum;
     }
 
     /**
@@ -108,7 +136,24 @@ public class TernaryHeapMinPriorityQueue {
      *                                      priority of the element
      */
     public void decreasePriority(PriorityQueueElement element, double newPriority) {
-        // TODO implement
+        // Controlla se l'elemento è contenuto nell'heap
+        if(!this.heap.contains(element)) {
+            throw new NoSuchElementException("L'elemento non è contenuto nell'heap");
+        }
+        // Cerca l'elemento nell'heap
+        for(PriorityQueueElement elem: this.heap) {
+            if(elem == element) {
+                // Controlla se la nuova priorità è valida
+                if (newPriority >= elem.getPriority()) {
+                    throw new IllegalArgumentException("Priorità non valida");
+                } else {
+                    // Cambia la priorità
+                    elem.setPriority(newPriority);
+                    // Esegue heapify sul sotto-albero dell'elemento
+                    this.heapify(elem.getHandle());
+                }
+            }
+        }
     }
 
     /**
@@ -119,20 +164,52 @@ public class TernaryHeapMinPriorityQueue {
         this.heap.clear();
     }
 
-    private int parentIndex(int i) {
-        return (i/3);
-    }
+    private int parentIndex(int i) { return (i-1)/3; }
 
     private int leftIndex(int i) {
-        return (3*i-1);
+        return (3*i)+1;
     }
 
     private int centerIndex(int i) {
-        return (3*i);
+        return (3*i)+2;
     }
 
     private int rightIndex(int i) {
-        return (3*i+1);
+        return (3*i)+3;
+    }
+
+    private void heapify(int i) {
+        // Ottiene indici dei nodi figli
+        int left = this.leftIndex(i);
+        int center = this.centerIndex(i);
+        int right = this.rightIndex(i);
+        // Inizializza indice nodo minimo
+        int minimum = i;
+        // Determina l'indice del nodo minimo tra il nodo attuale e i suoi figli
+        // Confronta nodo attuale con figlio sinistro
+        if(left < heap.size() && heap.get(left).getPriority() < heap.get(i).getPriority()) {
+            minimum = left;
+        } else {
+            minimum = i;
+        }
+        // Confronta minimo trovato con figlio centrale
+        if(center < heap.size() && heap.get(center).getPriority() < heap.get(minimum).getPriority()) {
+            minimum = center;
+        }
+        // Confronta minimo trovato con figlio destro
+        if(right < heap.size() && heap.get(right).getPriority() < heap.get(minimum).getPriority()) {
+            minimum = right;
+        }
+        // Se il minimo è diverso dal nodo attuale
+        if(minimum != i) {
+            // Scambia i nodi
+            Collections.swap(heap, i, minimum);
+            // Aggiorna gli handle
+            this.heap.get(i).setHandle(i);
+            this.heap.get(minimum).setHandle(minimum);
+            // Richiama ricorsivamente heapify sul nodo appena scambiato
+            this.heapify(minimum);
+        }
     }
 
     /*

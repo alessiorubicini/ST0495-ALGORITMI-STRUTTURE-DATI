@@ -445,8 +445,10 @@ class TernaryHeapMinPriorityQueueTest {
     }
     
     final void controlloHandles(ArrayList<PriorityQueueElement> a, int n) {
-        for (int i = 0; i<n; i++)
+        for (int i = 0; i<n; i++) {
+            System.out.println(i + " = " + a.get(i).getHandle());
             assertTrue(a.get(i).getHandle() == i);
+        }
     }
 
 }
