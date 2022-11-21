@@ -174,18 +174,10 @@ public class ASDL2223Deque<E> implements Deque<E> {
             this.first = new Node<E>(null, e, null);
             this.last = first;
         } else {
-            // Se il primo nodo coincide con l'ultimo (cioè la coda ha dimensione 1)
-            if(first == last) {
-                // Crea nodo con l'elemento dato e lo inserisce dopo il primo
-                Node<E> newNode = new Node<E>(first, e, null);
-                this.first.next = newNode;
-                this.last = newNode;
-            } else {
-                // Altrimenti, crea nuovo nodo con l'elemento dato e lo inserisce come ultimo
-                Node<E> newNode = new Node<E>(last, e, null);
-                this.last.next = newNode;
-                this.last = newNode;
-            }
+            // Crea nuovo nodo con l'elemento dato e lo inserisce dopo l'ultimo
+            Node<E> newNode = new Node<E>(last, e, null);
+            this.last.next = newNode;
+            this.last = newNode;
         }
         // Incrementa dimensione e numero di modifiche
         this.size++;
@@ -221,19 +213,12 @@ public class ASDL2223Deque<E> implements Deque<E> {
             this.first = new Node<E>(null, e, null);
             this.last = first;
         } else {
-            // Se il primo elemento coincide con l'ultimo (cioè la coda ha dimensione 1)
-            if(first == last) {
-                // Crea nuovo nodo e lo inserisce dopo il primo
-                Node<E> newNode = new Node<E>(first, e, null);
-                this.first.next = newNode;
-                this.last = newNode;
-            } else {
-                // Altrimenti, crea nuovo nodo e lo inserisce come ultimo
-                Node<E> newNode = new Node<E>(last, e, null);
-                this.last.next = newNode;
-                this.last = newNode;
-            }
+            // Crea nuovo nodo con l'elemento dato e lo inserisce dopo l'ultimo
+            Node<E> newNode = new Node<E>(last, e, null);
+            this.last.next = newNode;
+            this.last = newNode;
         }
+        // Incrementa dimensione e numero di modifiche
         this.size++;
         this.changesCounter++;
         return true;
@@ -366,14 +351,13 @@ public class ASDL2223Deque<E> implements Deque<E> {
         // Controlla se l'elemento dato è nullo
         if(e == null) throw new NullPointerException();
         // Crea un nuovo nodo con l'elemento dato
-        Node<E> newNode = new Node<E>(null, e, null);
+        Node<E> newNode = new Node<E>(this.last, e, null);
         // Se la coda è vuota, aggiunge nodo come primo e ultimo
         if(this.size == 0) {
             this.first = newNode;
             this.last = newNode;
         } else {
             // Altrimenti inserisce come ultimo
-            newNode.prev = this.last;
             this.last.next = newNode;
             this.last = newNode;
         }
@@ -388,14 +372,13 @@ public class ASDL2223Deque<E> implements Deque<E> {
         // Controlla se l'elemento dato è nullo
         if(e == null) throw new NullPointerException();
         // Crea un nuovo nodo con l'elemento dato
-        Node<E> newNode = new Node<E>(null, e, null);
+        Node<E> newNode = new Node<E>(this.last, e, null);
         // Se la coda è vuota, aggiunge nodo come primo e ultimo
         if(this.size == 0) {
             this.first = newNode;
             this.last = newNode;
         } else {
             // Altrimenti inserisce come ultimo
-            newNode.prev = this.last;
             this.last.next = newNode;
             this.last = newNode;
         }
@@ -407,7 +390,9 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public E remove() {
+        // Controlla se la coda è vuota
         if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        // Salva il primo elemento
         E retrievedElement = first.item;
         // Se primo e ultimo coincidono, li cancella svuotando così la coda
         if(first == last) {
@@ -418,6 +403,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
             this.first = first.next;
             first.prev = null;
         }
+        // Decrementa dimensione e Incrementa numero modifiche
         this.size--;
         this.changesCounter++;
         return retrievedElement;
@@ -425,7 +411,9 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public E poll() {
+        // Controlla se la lista è vuota
         if(isEmpty()) return null;
+        // Salva il primo elemento
         E retrievedElement = first.item;
         // Se primo e ultimo coincidono, li cancella svuotando così la coda
         if(first == last) {
@@ -436,6 +424,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
             this.first = first.next;
             first.prev = null;
         }
+        // Decrementa dimensione e Incrementa numero modifiche
         this.size--;
         this.changesCounter++;
         return retrievedElement;
@@ -443,13 +432,17 @@ public class ASDL2223Deque<E> implements Deque<E> {
 
     @Override
     public E element() {
+        // Controlla se la coda è vuota
         if(isEmpty()) throw new NoSuchElementException("Coda vuota");
+        // Ritorna l'item del primo nodo
         return this.first.item;
     }
 
     @Override
     public E peek() {
+        // Controlla se la coda è vuota
         if(isEmpty()) return null;
+        // Ritorna l'item del primo nodo
         return this.first.item;
     }
 
@@ -501,8 +494,8 @@ public class ASDL2223Deque<E> implements Deque<E> {
         }
         // Controlla se l'elemento da eliminare è il primo
         if(first.item.equals(o)) return this.removeFirst().equals(o);
+        // Itera sui nodi della coda partendo dal primo
         Node<E> node = this.first;
-        // Itera sui nodi della coda, cercando un elemento uguale a quello dato
         while (node != null) {
             // Se trova un elemento uguale a quello dato, lo rimuove e ritorna
             if (o.equals(node.item)) {
@@ -512,7 +505,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
                 } else {
                     // Cambia puntatori in modo da eliminare il nodo
                     node.next.prev = node.prev;
-                    node.prev = node.next;
+                    node.prev.next = node.next;
                     // Decrementa dimensione e Incrementa numero di modifiche
                     this.size--;
                     this.changesCounter++;

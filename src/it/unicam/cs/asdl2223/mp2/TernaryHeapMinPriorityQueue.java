@@ -55,11 +55,12 @@ public class TernaryHeapMinPriorityQueue {
      *                                  if the element passed is null
      */
     public void insert(PriorityQueueElement element) {
+        // Controlla se l'elemento dato è nullo
         if(element == null) throw new NullPointerException("Elemento nullo");
         // Aggiunge l'elemento come foglia
         this.heap.add(element);
         // Ottiene l'indice dell'ultimo elemento
-        int index = this.heap.size()-1;
+        int index = this.heap.size() - 1;
         // Imposta l'handle corretto all'elemento appena aggiunto
         this.heap.get(index).setHandle(index);
         // Sposta l'elemento in alto finché la sua priorità è minore del genitore
@@ -84,9 +85,11 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement minimum() {
+        // Controlla se l'heap è vuoto
         if(this.size() == 0) {
             throw new NoSuchElementException();
         } else {
+            // Ritorna la radice (il minimo) dell'heap
             return this.heap.get(0);
         }
     }
@@ -100,18 +103,20 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement extractMinimum() {
+        // Controlla se l'heap è vuoto
         if(this.size() == 0) throw new NoSuchElementException();
         // Ottiene il primo elemento (il minimo)
         PriorityQueueElement minimum = this.minimum();
         // Sostituisce il primo elemento con l'ultimo e aggiorna l'handle
-        heap.set(0, heap.get(heap.size()-1));
+        heap.set(0, heap.get(heap.size() - 1));
         heap.get(0).setHandle(0);
         // Rimuove l'ultimo elemento
-        heap.remove(heap.size()-1);
-        // Se l'heap è vuoto, vuol dire che c'era solo un elemento
+        heap.remove(heap.size() - 1);
+        // Se l'heap è vuoto, c'era solo un elemento
         if(heap.size() == 0) return minimum;
         // Esegue heapify a partire dal primo livello dell'heap
         this.heapify(0, false);
+        // Ritorna il minimo
         return minimum;
     }
 
@@ -140,18 +145,18 @@ public class TernaryHeapMinPriorityQueue {
         if(!this.heap.contains(element)) {
             throw new NoSuchElementException("L'elemento non è contenuto nell'heap");
         }
+        // Controlla se la nuova priorità è corretta
+        if(newPriority >= element.getPriority()) {
+            throw new IllegalArgumentException("Priorità non valida");
+        }
         // Cerca l'elemento nell'heap
         for(PriorityQueueElement elem: this.heap) {
+            // Se trova l'elemento
             if(elem == element) {
-                // Controlla se la nuova priorità è valida
-                if (newPriority >= elem.getPriority()) {
-                    throw new IllegalArgumentException("Priorità non valida");
-                } else {
-                    // Cambia la priorità
-                    elem.setPriority(newPriority);
-                    // Esegue heapify
-                    this.heapify(parentIndex(elem.getHandle()), true);
-                }
+                // Cambia la priorità
+                elem.setPriority(newPriority);
+                // Esegue heapify sul nodo genitorea (verso l'alto)
+                this.heapify(parentIndex(elem.getHandle()), true);
             }
         }
     }
@@ -164,16 +169,28 @@ public class TernaryHeapMinPriorityQueue {
         this.heap.clear();
     }
 
+    /*
+     * Funzione di comodo per calcolare l'indice del genitore del nodo in posizione i.
+     */
     private int parentIndex(int i) { return (i-1)/3; }
 
+    /*
+     * Funzione di comodo per calcolare l'indice del figlio sinistro del nodo in posizione i.
+     */
     private int leftIndex(int i) {
         return (3*i)+1;
     }
 
+    /*
+     * Funzione di comodo per calcolare l'indice del figlio centrale del nodo in posizione i.
+     */
     private int centerIndex(int i) {
         return (3*i)+2;
     }
 
+    /*
+     * Funzione di comodo per calcolare l'indice del figlio destro  del nodo in posizione i.
+     */
     private int rightIndex(int i) {
         return (3*i)+3;
     }
