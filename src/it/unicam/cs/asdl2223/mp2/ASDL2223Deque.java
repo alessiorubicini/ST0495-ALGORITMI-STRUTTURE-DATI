@@ -500,32 +500,24 @@ public class ASDL2223Deque<E> implements Deque<E> {
             return true;
         }
         // Controlla se l'elemento da eliminare è il primo
-        if(first.item.equals(o)) {
-            this.first.next.prev = null;
-            this.first = this.first.next;
-            this.size--;
-            this.changesCounter++;
-            return true;
-        }
-        // Controlla se l'elemento da eliminare è l'ultimo
-        if(last.item.equals(o)) {
-            this.last.prev.next = null;
-            this.last = this.last.prev;
-            this.size--;
-            this.changesCounter++;
-            return true;
-        }
+        if(first.item.equals(o)) return this.removeFirst().equals(o);
         Node<E> node = this.first;
         // Itera sui nodi della coda, cercando un elemento uguale a quello dato
         while (node != null) {
             // Se trova un elemento uguale a quello dato, lo rimuove e ritorna
             if (o.equals(node.item)) {
-                node.next.prev = node.prev;
-                node.prev = node.next;
-                // Decrementa dimensione e Incrementa numero di modifiche
-                this.size--;
-                this.changesCounter++;
-                return true;
+                // Controlla se l'elemento da eliminare è l'ultimo
+                if(node.equals(this.last)) {
+                    return this.removeLast().equals(o);
+                } else {
+                    // Cambia puntatori in modo da eliminare il nodo
+                    node.next.prev = node.prev;
+                    node.prev = node.next;
+                    // Decrementa dimensione e Incrementa numero di modifiche
+                    this.size--;
+                    this.changesCounter++;
+                    return true;
+                }
             }
             // Passa al prossimo nodo lungo l'iterazione
             node = node.next;

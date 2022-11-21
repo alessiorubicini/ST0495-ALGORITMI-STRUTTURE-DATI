@@ -51,10 +51,11 @@ public class BalancedParenthesesChecker {
     public boolean check(String s) {
         // Pulisce lo stack
         this.stack.clear();
-        // Itera sulla stringa dal primo carattere
+        // Itera sulla stringa partendo dal primo carattere
         for (int i = 0; i < s.length(); i++) {
+            // Ottiene il carattere
             char character = s.charAt(i);
-            // Controlla la presenza di caratteri non ammessi
+            // Controlla se il carattere corrisponde a uno non ammesso
             if(character != '(' && character != ')' && character != '[' && character != ']' && character != '{'
                     && character != '}' && character != ' ' && character != '\t' && character != '\n') {
                 throw new IllegalArgumentException("La stringa contiene caratteri non ammessi");
@@ -63,7 +64,8 @@ public class BalancedParenthesesChecker {
             if (character == '(' || character == '[' || character == '{') {
                 // Push della parentesi aperta in testa allo stack
                 this.stack.push(character);
-                // Trattandosi di una parentesi aperta, ignora i controlli delle parentesi chiuse
+                // Trattandosi di una parentesi aperta, passa alla prossima iterazione
+                // ignorado i controlli delle parentesi chiuse
                 continue;
             }
             // Ignora caratteri aggiuntivi
