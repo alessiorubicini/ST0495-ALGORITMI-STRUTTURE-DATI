@@ -63,16 +63,8 @@ public class TernaryHeapMinPriorityQueue {
         int index = this.heap.size() - 1;
         // Imposta l'handle corretto all'elemento appena aggiunto
         this.heap.get(index).setHandle(index);
-        // Sposta l'elemento in alto finché la sua priorità è minore del genitore
-        while (index > 0 && this.heap.get(index).getPriority() < heap.get(parentIndex(index)).getPriority()) {
-            // Scambia gli elementi
-            Collections.swap(this.heap, index, parentIndex(index));
-            // Aggiorna gli handle
-            this.heap.get(index).setHandle(index);
-            this.heap.get(parentIndex(index)).setHandle(parentIndex(index));
-            // Passa al nodo superiore
-            index = parentIndex(index);
-        }
+        // Esegue heapify sul nodo genitore del nodo appena aggiunto (verso l'alto)
+        this.heapify(parentIndex(index), true);
     }
 
     /**
@@ -155,7 +147,7 @@ public class TernaryHeapMinPriorityQueue {
             if(elem == element) {
                 // Cambia la priorità
                 elem.setPriority(newPriority);
-                // Esegue heapify sul nodo genitorea (verso l'alto)
+                // Esegue heapify sul nodo genitore del nodo in questione (verso l'alto)
                 this.heapify(parentIndex(elem.getHandle()), true);
             }
         }
