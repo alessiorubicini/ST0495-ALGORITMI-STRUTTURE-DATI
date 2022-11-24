@@ -59,12 +59,12 @@ public class TernaryHeapMinPriorityQueue {
         if(element == null) throw new NullPointerException("Elemento nullo");
         // Add the element as last
         this.heap.add(element);
-        // Get the index of the newly added item in the heap
+        // Get the index of the new element
         int index = this.heap.size() - 1;
-        // Set the correct handle to the newly added element
+        // Set the correct handle to the new element
         this.heap.get(index).setHandle(index);
-        // Heapify on the parent node of the newly added node
-        this.heapify(parentIndex(index), true);
+        // Move the element up to the correct position
+        this.moveElementUp(element);
     }
 
     /**
@@ -106,8 +106,8 @@ public class TernaryHeapMinPriorityQueue {
         heap.remove(heap.size() - 1);
         // If the heap is empty, there was only one element
         if(heap.size() == 0) return minimum;
-        // Heapify starting at the top level of the heap
-        this.heapify(0, false);
+        // Heapify at the top level of the heap
+        this.heapify(0);
         // Return the minimum
         return minimum;
     }
@@ -137,7 +137,7 @@ public class TernaryHeapMinPriorityQueue {
         if(!this.heap.contains(element)) {
             throw new NoSuchElementException("L'elemento non è contenuto nell'heap");
         }
-        // Check if the new priority is correct
+        // Check if the new priority is valid
         if(newPriority >= element.getPriority()) {
             throw new IllegalArgumentException("Priorità non valida");
         }
@@ -145,8 +145,8 @@ public class TernaryHeapMinPriorityQueue {
         PriorityQueueElement elem =  heap.get(element.getHandle());
         // Change its priority
         elem.setPriority(newPriority);
-        // Heapify on the parent node
-        this.heapify(parentIndex(elem.getHandle()), true);
+        // Move the element up to the correct position
+        this.moveElementUp(elem);
     }
 
     /**
@@ -158,71 +158,85 @@ public class TernaryHeapMinPriorityQueue {
     }
 
     /*
-     * Funzione di comodo per calcolare l'indice del genitore del nodo in posizione i.
+     * Convenience function for calculating the index of the parent of the node in position i.
      */
     private int parentIndex(int i) { return (i-1)/3; }
 
     /*
-     * Funzione di comodo per calcolare l'indice del figlio sinistro del nodo in posizione i.
+     * Convenience function to calculate the index of the left child of the node in position i.
      */
     private int leftIndex(int i) {
         return (3*i)+1;
     }
 
     /*
-     * Funzione di comodo per calcolare l'indice del figlio centrale del nodo in posizione i.
+     * Convenience function to calculate the index of the mid child of the node at position i.
      */
     private int centerIndex(int i) {
         return (3*i)+2;
     }
 
     /*
-     * Funzione di comodo per calcolare l'indice del figlio destro  del nodo in posizione i.
+     * Convenience function to calculate the index of the right child of the node in position i.
      */
     private int rightIndex(int i) {
         return (3*i)+3;
     }
 
     /**
-     * Ricostituisce uno heap a partire dal nodo in posizione i assumendo che i
-     * suoi sottoalberi siano heap.
-     * @param i             la posizione da cui ricostruire
-     * @param reversed      true se l'heapify deve essere svolto verso l'alto (decreasePriority),
-     *                      false altrimenti
+     * Rebuild a heap starting from node in position i
+     * assuming that its subtrees are heaps.
+     * @param i             the node to rebuild from
      */
-    private void heapify(int i, boolean reversed) {
-        // Ottiene indici dei nodi figli
+    private void heapify(int i) {
+        // Get indexes of child nodes
         int left = this.leftIndex(i);
         int center = this.centerIndex(i);
         int right = this.rightIndex(i);
-        // Inizializza indice nodo minimo
+        // Initialize minimal node index
         int minimum = i;
-        // Determina l'indice del nodo minimo tra il nodo attuale e i suoi figli
-        // Confronta nodo attuale con figlio sinistro
+        // Determine the index of the minimum node between the current node and its children
+        // Compare current node with left child
         if(left < heap.size() && heap.get(left).getPriority() < heap.get(i).getPriority()) {
             minimum = left;
         }
-        // Confronta minimo trovato con figlio centrale
+        // Compare minimum found with middle child
         if(center < heap.size() && heap.get(center).getPriority() < heap.get(minimum).getPriority()) {
             minimum = center;
         }
-        // Confronta minimo trovato con figlio destro
+        // Compare minimum found with right child
         if(right < heap.size() && heap.get(right).getPriority() < heap.get(minimum).getPriority()) {
             minimum = right;
         }
-        // Se il minimo è diverso dal nodo attuale
+        // If the minimum is different from the current node
         if(minimum != i) {
-            // Scambia i nodi
+            // Swap the nodes
             Collections.swap(heap, i, minimum);
-            // Aggiorna gli handle
+            // Update the handles
             this.heap.get(i).setHandle(i);
             this.heap.get(minimum).setHandle(minimum);
-            // Richiama ricorsivamente heapify sul nodo minimo o sul nodo genitore a seconda della richiesta
-            if(reversed) {
-                this.heapify(parentIndex(i), true);
-            } else {
-                this.heapify(minimum, false);
-            }
+            // Recursive heapify on the minimum
+            this.heapify(minimum);
+        }
+    }
+
+    /**
+     * Moves an element up in the heap to its correct position
+     * It's a simplified and reversed version of heapify
+     * @param element           the element to be moved
+     */
+    private void moveElementUp(PriorityQueueElement element) {
+        // Get the element's handle
+        int handle = element.getHandle();
+        // While the parent node has a higher priority than the current node
+        while(handle > 0 && heap.get(parentIndex(handle)).getPriority() > heap.get(handle).getPriority()) {
+            // Swap the element with its parent node
+            Collections.swap(heap, parentIndex(handle), handle);
+            // Set the correct handles
+            heap.get(parentIndex(handle)).setHandle(parentIndex(handle));
+            heap.get(handle).setHandle(handle);
+            // Go to the next level
+            handle = parentIndex(handle);
         }
     }
 
