@@ -49,30 +49,30 @@ public class BalancedParenthesesChecker {
      *                                      and newline '\n'
      */
     public boolean check(String s) {
-        // Pulisce lo stack
+        // Clears the stack
         this.stack.clear();
-        // Itera sulla stringa partendo dal primo carattere
+        // Iterate through the string starting from the first character
         for (int i = 0; i < s.length(); i++) {
-            // Ottiene il carattere
+            // Get the character
             char character = s.charAt(i);
-            // Controlla se il carattere corrisponde a uno non ammesso
+            // Check if the character matches a not allowed one
             if(character != '(' && character != ')' && character != '[' && character != ']' && character != '{'
                     && character != '}' && character != ' ' && character != '\t' && character != '\n') {
                 throw new IllegalArgumentException("La stringa contiene caratteri non ammessi");
             }
-            // Se il carattere è una parentesi aperta
+            // If the character is an opening bracket
             if (character == '(' || character == '[' || character == '{') {
-                // Push della parentesi aperta in testa allo stack
+                // Push the opening bracket to the top of the stack
                 this.stack.push(character);
-                // Trattandosi di una parentesi aperta, passa alla prossima iterazione
-                // ignorado i controlli delle parentesi chiuse
+                // Since this is an opening bracket, move on to the next iteration
+                // and ignore the closing brackets checks
                 continue;
             }
-            // Ignora caratteri aggiuntivi
+            // Ignore additional characters
             if (character == ' ' || character == '\t' || character == '\n') continue;
-            // Se non ci sono parentesi aperte, allora ci sono parentesi chiuse, quindi la stringa non è bilanciata
+            // If there are no opening brackets, then there are closing brackets, so the string is not balanced
             if (this.stack.isEmpty()) return false;
-            // Controlla se la parentesi chiusa combacia con l'ultima aperta
+            // Check if the closing brackets matches the last opening
             if(character == ')') {
                 if (stack.peekFirst() == '{' || stack.peekFirst() == '[') return false;
                 this.stack.removeFirst();
@@ -86,7 +86,7 @@ public class BalancedParenthesesChecker {
                 this.stack.removeFirst();
             }
         }
-        // Se lo stack è vuoto, allora la stringa è bilanciata
+        // If the stack is empty, then the string is balanced
         return (this.stack.isEmpty());
     }
 

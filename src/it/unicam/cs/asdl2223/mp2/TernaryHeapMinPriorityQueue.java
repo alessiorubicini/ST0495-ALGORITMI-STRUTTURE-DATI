@@ -55,15 +55,15 @@ public class TernaryHeapMinPriorityQueue {
      *                                  if the element passed is null
      */
     public void insert(PriorityQueueElement element) {
-        // Controlla se l'elemento dato è nullo
+        // Check if the given element is null
         if(element == null) throw new NullPointerException("Elemento nullo");
-        // Aggiunge l'elemento come ultimo
+        // Add the element as last
         this.heap.add(element);
-        // Ottiene l'indice dell'elemento appena aggiunto nell'heap
+        // Get the index of the newly added item in the heap
         int index = this.heap.size() - 1;
-        // Imposta l'handle corretto all'elemento appena aggiunto
+        // Set the correct handle to the newly added element
         this.heap.get(index).setHandle(index);
-        // Esegue heapify sul nodo genitore del nodo appena aggiunto (verso l'alto)
+        // Heapify on the parent node of the newly added node
         this.heapify(parentIndex(index), true);
     }
 
@@ -77,11 +77,11 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement minimum() {
-        // Controlla se l'heap è vuoto
+        // Check if the heap is empty
         if(this.size() == 0) {
             throw new NoSuchElementException();
         } else {
-            // Ritorna la radice (il minimo) dell'heap
+            // Return the root (minimum) of the heap
             return this.heap.get(0);
         }
     }
@@ -95,20 +95,20 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement extractMinimum() {
-        // Controlla se l'heap è vuoto
+        // Check if the heap is empty
         if(heap.isEmpty()) throw new NoSuchElementException();
-        // Ottiene il primo elemento (il minimo)
+        // Get the first element (the least)
         PriorityQueueElement minimum = this.minimum();
-        // Sostituisce il primo elemento con l'ultimo e aggiorna l'handle
+        // Replace the first element with the last and update the handle
         heap.set(0, heap.get(heap.size() - 1));
         heap.get(0).setHandle(0);
-        // Rimuove l'ultimo elemento
+        // Remove the last element
         heap.remove(heap.size() - 1);
-        // Se l'heap è vuoto, c'era solo un elemento
+        // If the heap is empty, there was only one element
         if(heap.size() == 0) return minimum;
-        // Esegue heapify a partire dal primo livello dell'heap
+        // Heapify starting at the top level of the heap
         this.heapify(0, false);
-        // Ritorna il minimo
+        // Return the minimum
         return minimum;
     }
 
@@ -133,19 +133,19 @@ public class TernaryHeapMinPriorityQueue {
      *                                      priority of the element
      */
     public void decreasePriority(PriorityQueueElement element, double newPriority) {
-        // Controlla se l'elemento è contenuto nell'heap
+        // Check if the item is contained in the heap
         if(!this.heap.contains(element)) {
             throw new NoSuchElementException("L'elemento non è contenuto nell'heap");
         }
-        // Controlla se la nuova priorità è corretta
+        // Check if the new priority is correct
         if(newPriority >= element.getPriority()) {
             throw new IllegalArgumentException("Priorità non valida");
         }
-        // Ottiene l'elemento dall'heap
+        // Get the element from the heap
         PriorityQueueElement elem =  heap.get(element.getHandle());
-        // Cambia la sua priorità
+        // Change its priority
         elem.setPriority(newPriority);
-        // Esegue heapify sul nodo genitore
+        // Heapify on the parent node
         this.heapify(parentIndex(elem.getHandle()), true);
     }
 
