@@ -116,6 +116,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
             // Aggiunge ogni elemento in coda
             this.add((E) thisIterator.next());
         }
+        // Se la dimensione è cambiata, la collezione è stata aggiunta
         if(oldSize != this.size) return true;
         return false;
     }
@@ -274,6 +275,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
         // L'unica differenza risiede nel controllo iniziale che ritorna null in caso di coda vuota
         if(isEmpty()) return null;
         E retrievedElement = first.item;
+        // Se la coda ha un solo elemento, lo elimina direttamente
         if(this.size == 1) {
             this.first = null;
             this.last = null;
@@ -281,8 +283,10 @@ public class ASDL2223Deque<E> implements Deque<E> {
             this.first = first.next;
             first.prev = null;
         }
+        // Decrementa dimensione e Incrementa numero di modifiche
         this.size--;
         this.changesCounter++;
+        // Ritorna l'elemento rimosso
         return retrievedElement;
     }
 
@@ -292,15 +296,19 @@ public class ASDL2223Deque<E> implements Deque<E> {
         // L'unica differenza risiede nel controllo iniziale che ritorna null in caso di coda vuota
         if(isEmpty()) return null;
         E retrievedElement = last.item;
+        // Se la coda ha un solo elemento, lo elimina direttamente
         if(this.size == 1) {
             this.first = null;
             this.last = null;
         } else {
+            // Altrimenti imposta il penultimo elemento come ultimo
             this.last = this.last.prev;
             this.last.next = null;
         }
+        // Decrementa dimensione e Incrementa numero di modifiche
         this.size--;
         this.changesCounter++;
+        // Ritorna l'elemento rimosso
         return retrievedElement;
     }
 
@@ -488,12 +496,13 @@ public class ASDL2223Deque<E> implements Deque<E> {
         if(isEmpty() || !this.contains(o)) return false;
         // Se il primo elemento è uguale all'ultimo
         if(first == last) {
-            // L'unico elemento presente è quello cercato, quindi lo rimuove
+            // L'unico elemento presente è quello cercato, quindi pulisce la coda
             this.clear();
             return true;
         }
         // Controlla se l'elemento da eliminare è il primo
         if(first.item.equals(o)) return this.removeFirst().equals(o);
+        // Caso generale
         // Itera sui nodi della coda partendo dal primo
         Node<E> node = this.first;
         while (node != null) {
@@ -501,6 +510,7 @@ public class ASDL2223Deque<E> implements Deque<E> {
             if (o.equals(node.item)) {
                 // Controlla se l'elemento da eliminare è l'ultimo
                 if(node.equals(this.last)) {
+                    // Rimuove l'ultimo
                     return this.removeLast().equals(o);
                 } else {
                     // Cambia puntatori in modo da eliminare il nodo

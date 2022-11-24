@@ -57,9 +57,9 @@ public class TernaryHeapMinPriorityQueue {
     public void insert(PriorityQueueElement element) {
         // Controlla se l'elemento dato è nullo
         if(element == null) throw new NullPointerException("Elemento nullo");
-        // Aggiunge l'elemento come foglia
+        // Aggiunge l'elemento come ultimo
         this.heap.add(element);
-        // Ottiene l'indice dell'ultimo elemento
+        // Ottiene l'indice dell'elemento appena aggiunto nell'heap
         int index = this.heap.size() - 1;
         // Imposta l'handle corretto all'elemento appena aggiunto
         this.heap.get(index).setHandle(index);
@@ -96,7 +96,7 @@ public class TernaryHeapMinPriorityQueue {
      */
     public PriorityQueueElement extractMinimum() {
         // Controlla se l'heap è vuoto
-        if(this.size() == 0) throw new NoSuchElementException();
+        if(heap.isEmpty()) throw new NoSuchElementException();
         // Ottiene il primo elemento (il minimo)
         PriorityQueueElement minimum = this.minimum();
         // Sostituisce il primo elemento con l'ultimo e aggiorna l'handle
@@ -141,16 +141,12 @@ public class TernaryHeapMinPriorityQueue {
         if(newPriority >= element.getPriority()) {
             throw new IllegalArgumentException("Priorità non valida");
         }
-        // Cerca l'elemento nell'heap
-        for(PriorityQueueElement elem: this.heap) {
-            // Se trova l'elemento
-            if(elem == element) {
-                // Cambia la priorità
-                elem.setPriority(newPriority);
-                // Esegue heapify sul nodo genitore del nodo in questione (verso l'alto)
-                this.heapify(parentIndex(elem.getHandle()), true);
-            }
-        }
+        // Ottiene l'elemento dall'heap
+        PriorityQueueElement elem =  heap.get(element.getHandle());
+        // Cambia la sua priorità
+        elem.setPriority(newPriority);
+        // Esegue heapify sul nodo genitore
+        this.heapify(parentIndex(elem.getHandle()), true);
     }
 
     /**
