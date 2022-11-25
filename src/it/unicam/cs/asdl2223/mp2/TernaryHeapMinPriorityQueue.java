@@ -63,8 +63,8 @@ public class TernaryHeapMinPriorityQueue {
         int index = this.heap.size() - 1;
         // Set the correct handle to the new element
         this.heap.get(index).setHandle(index);
-        // Move the element up to the correct position
-        this.moveElementUp(element);
+        // Rebuild the MinHeap
+        this.buildMinHeap();
     }
 
     /**
@@ -145,8 +145,8 @@ public class TernaryHeapMinPriorityQueue {
         PriorityQueueElement elem =  heap.get(element.getHandle());
         // Change its priority
         elem.setPriority(newPriority);
-        // Move the element up to the correct position
-        this.moveElementUp(elem);
+        // Rebuild the MinHeap
+        this.buildMinHeap();
     }
 
     /**
@@ -166,21 +166,28 @@ public class TernaryHeapMinPriorityQueue {
      * Convenience function to calculate the index of the left child of the node in position i.
      */
     private int leftIndex(int i) {
-        return (3*i)+1;
+        return (3 * i) + 1;
     }
 
     /*
      * Convenience function to calculate the index of the mid child of the node at position i.
      */
     private int centerIndex(int i) {
-        return (3*i)+2;
+        return (3 * i) + 2;
     }
 
     /*
      * Convenience function to calculate the index of the right child of the node in position i.
      */
     private int rightIndex(int i) {
-        return (3*i)+3;
+        return (3 * i) + 3;
+    }
+
+    /*
+     * Convenience function to calculate the index of the first non-leaf node in the heap.
+     */
+    private int firstNonLeafIndex() {
+        return (this.heap.size() / 2) - 1;
     }
 
     /**
@@ -221,22 +228,14 @@ public class TernaryHeapMinPriorityQueue {
     }
 
     /**
-     * Moves an element up in the heap to its correct position
-     * It's a simplified and reversed version of heapify
-     * @param element           the element to be moved
+     * Builds a MinHeap from the instance property {@code ArrayList<PriorityQueueElement> heap }
      */
-    private void moveElementUp(PriorityQueueElement element) {
-        // Get the element's handle
-        int handle = element.getHandle();
-        // While the parent node has a higher priority than the current node
-        while(handle > 0 && heap.get(parentIndex(handle)).getPriority() > heap.get(handle).getPriority()) {
-            // Swap the element with its parent node
-            Collections.swap(heap, parentIndex(handle), handle);
-            // Set the correct handles
-            heap.get(parentIndex(handle)).setHandle(parentIndex(handle));
-            heap.get(handle).setHandle(handle);
-            // Go to the next level
-            handle = parentIndex(handle);
+    private void buildMinHeap() {
+        // Get index of first non-leaf node
+        int index = this.firstNonLeafIndex();
+        // Heapify the sub-trees
+        for (int i = index; i >= 0 ; i--) {
+            this.heapify(i);
         }
     }
 
