@@ -56,7 +56,7 @@ public class QuickSort<E extends Comparable<E>> implements SortingAlgorithm<E> {
         E pivot = l.get(lastIndex);         // Sceglie ultimo elemento come pivot
         int i = (startIndex-1);             // Indice dell'elemento più grande (parte dal precedente al primo)
         // Itera dall'inizio alla fine
-        for(int j = startIndex; j <= lastIndex - 1; j++) {
+        for(int j = startIndex; j < lastIndex; j++) {
             // Se l'elemento corrente è minore del pivot
             if(l.get(j).compareTo(pivot) < 0) {
                 i++;                            // Incrementa indice dell'elemento più grande

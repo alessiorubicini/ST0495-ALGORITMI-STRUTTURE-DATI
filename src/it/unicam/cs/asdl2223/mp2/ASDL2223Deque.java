@@ -94,10 +94,10 @@ public class ASDL2223Deque<E> implements Deque<E> {
     @Override
     public boolean containsAll(Collection<?> c) {
         // Iterate over the elements of the given collection
-        Iterator<?> thisIterator = c.iterator();
-        for (int i = 0; i < c.size(); i++) {
-            // Check if the collection item is contained in the deque
-            if(!this.contains(thisIterator.next())) {
+        Iterator<?> iter = c.iterator();
+        while(iter.hasNext()) {
+            E item = (E) iter.next();
+            if(!this.contains(item)) {
                 return false;
             }
         }
@@ -108,17 +108,15 @@ public class ASDL2223Deque<E> implements Deque<E> {
     public boolean addAll(Collection<? extends E> c) {
         // Check if the collection is null or contains null elements
         if(c == null || c.contains(null)) throw new NullPointerException("Collezione nulla");
-        // Stores the current deque size for later verification
-        int oldSize = this.size;
+        // The deque hasn't changed yet
+        boolean changed = false;
         // Iterate over the elements of the given collection
-        Iterator<?> thisIterator = c.iterator();
-        for (int i = 0; i < c.size(); i++) {
-            // Add each item to the queue
-            this.add((E) thisIterator.next());
+        Iterator<?> iter = c.iterator();
+        while(iter.hasNext()) {
+            E item = (E)iter.next();
+            changed = changed | this.add(item);
         }
-        // If the size has changed, the collection has been added
-        if(oldSize != this.size) return true;
-        return false;
+        return changed;
     }
 
     @Override
