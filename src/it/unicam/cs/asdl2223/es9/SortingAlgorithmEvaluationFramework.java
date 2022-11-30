@@ -120,7 +120,6 @@ public class SortingAlgorithmEvaluationFramework {
                     elapsedTimeNano = System.nanoTime() - startTimeNano;
                     // Controllo se l'ordinamento è stato effettuato
                     // correttamente
-                    System.out.println(a.getName());
                     if (!result.checkOrder()) {
                         // Stampo un messaggio di errore e lancio una eccezione
                         o.close();
