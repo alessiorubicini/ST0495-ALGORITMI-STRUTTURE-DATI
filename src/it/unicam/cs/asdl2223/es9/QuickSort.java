@@ -17,11 +17,15 @@ import java.util.List;
  */
 public class QuickSort<E extends Comparable<E>> implements SortingAlgorithm<E> {
 
-    int countCompare = 0;
+    private int countCompare = 0;
 
     @Override
     public SortingAlgorithmResult<E> sort(List<E> l) {
-        quickSort(l, 0, l.size()-1);
+        if(l == null) throw new NullPointerException("Lista nulla");
+        if(l.size() <= 1) {
+            return new SortingAlgorithmResult<E>(l, 0);
+        }
+        quickSort(l, 0, l.size() - 1);
         return new SortingAlgorithmResult<E>(l, this.countCompare);
     }
 
