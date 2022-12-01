@@ -140,14 +140,16 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
         if(o == null) throw new NullPointerException();
         // Calcola il bucket in cui cercare l'oggetto dato
         int bucket = this.phf.hash(o.hashCode(), this.getCurrentCapacity());
+        // Ottiene il nodo del bucket ottenuto
+        Node<E> n = (Node<E>) this.table[bucket];
         // Se la posizione è null, ritorna false
-        if(this.table[bucket] == null) {
+        if(n == null) {
             return false;
         } else {
-            // Altrimenti, itera sugli elementi
-            for(E e : this) {
-                // Controlla se uno è uguale all'elemento dato
-                if(o.equals(e)) return true;
+            // Altrimenti scorre la lista a cui punta il bucket
+            while(n != null) {
+                if(n.item.equals(o)) return true;
+                n = n.next;
             }
         }
         return false;
@@ -188,7 +190,7 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
             while(n != null) {
                 n = n.next;
             }
-            // Imposta ultimo nodo al nuovo nodoz
+            // Imposta ultimo nodo al nuovo nodo
             n = newNode;
         }
         // Incrementa dimensione tabella e Contatore modifiche
@@ -229,25 +231,27 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
         // Controlla se l'elemento dato è nullo
         if(o == null) throw new NullPointerException();
         // Controlla se la tabella non contiene l'elemento
-        if(!this.contains(o)) throw new NoSuchElementException();
+        if(!this.contains(o)) return false;
         // Ottiene il bucket dell'elemento dato
         int bucket = this.phf.hash(o.hashCode(), this.getCurrentCapacity());
         // Ottiene il nodo dalla posizione della tabella
         Node<E> n = (Node<E>) this.table[bucket];
-        // Itera sull'eventuale lista per rimuovere il nodo
-        if(n == null) {
-            this.table[bucket] = null;
-        } else {
-            while(!o.equals(n.next.item)) {
-                n = n.next;
+        // Se il nodo è diverso da null, allora punta a una lista
+        if(n != null) {
+            // Scorre la lista cercando l'elemento dato
+            while(n.next != null) {
+                // Se l'elemento successivo è quello dato, lo elimina
+                if(n.next.item.equals(o)) {
+                    n.next = n.next.next;
+                } else {
+                    // Altrimenti, passa all'elemento successivo della lista
+                    n = n.next;
+                }
             }
-            n.next = null;
         }
-
         // Decrementa dimensione tabella e Incrementa numero modifiche
         this.size--;
         this.modCount++;
-
         return true;
     }
 
@@ -331,9 +335,13 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
 
         @Override
         public boolean hasNext() {
+            // Se l'ultimo elemento ritornato è null
             if (this.lastReturned == null) {
+                // Ritorna true se la tabella non è vuota
                 return size != 0;
             } else if(lastReturned.next == null) {
+                // Altrimenti, se il successivo dell'ultimo ritornato è null
+                // Allora siamo alla fine della lista corrente
                 // Ottiene bucket dell'ultimo nodo ritornato
                 int currentBucket = phf.hash(this.lastReturned.hashCode(), getCurrentCapacity());
                 // Scorre in avanti la tabella
@@ -358,8 +366,10 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
             }
             // Controlla se c'è un nodo successivo
             if (!this.hasNext()) throw new NoSuchElementException("Non c'è un nodo successivo");
-            // Se il nodo sucessivo è null (cioè è arrivato alla fine della lista corrente)
-            if(this.lastReturned.next == null) {
+            
+            if(lastReturned == null) {
+                // TODO Implement
+            } else if(lastReturned.next == null) {
                 // Calcola posizione del bucket corrente (l'ultimo ritornato)
                 int currentBucket = phf.hash(this.lastReturned.hashCode(), getCurrentCapacity());
                 // Scorre la tabella in avanti
@@ -369,8 +379,7 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
                     // Se il nuovo bucket punta ad una lista
                     if(table[currentBucket] != null) {
                         // Imposta come ultimo elemento ritornato la testa di quella lista
-                        lastReturned = (Node<E>) table[currentBucket];
-                        // Esce dal ciclo
+                        lastReturned = (Node<E>)table[currentBucket];
                         break;
                     }
                 }
