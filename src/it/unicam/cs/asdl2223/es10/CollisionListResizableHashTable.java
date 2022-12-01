@@ -125,29 +125,19 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
 
     @Override
     public boolean contains(Object o) {
-        /*
-         * ATTENZIONE: usare l'hashCode dell'oggetto e la funzione di hash
-         * primaria passata all'atto della creazione: il bucket in cui cercare
-         * l'oggetto o è la posizione
-         * this.phf.hash(o.hashCode(),this.getCurrentCapacity)
-         *
-         * In questa posizione, se non vuota, si deve cercare l'elemento o
-         * utilizzando il metodo equals() su tutti gli elementi della lista
-         * concatenata lì presente
-         *
-         */
         // Controlla se l'oggetto dato è null
         if(o == null) throw new NullPointerException();
         // Calcola il bucket in cui cercare l'oggetto dato
         int bucket = this.phf.hash(o.hashCode(), this.getCurrentCapacity());
         // Ottiene il nodo del bucket ottenuto
         Node<E> n = (Node<E>) this.table[bucket];
-        // Se la posizione è null, ritorna false
+        // Se il nodo contiene null, ritorna false
         if(n == null) {
             return false;
         } else {
-            // Altrimenti scorre la lista a cui punta il bucket
+            // Altrimenti scorre la lista a cui punta il nodo
             while(n != null) {
+                // Se trova l'oggetto dato, ritorna true
                 if(n.item.equals(o)) return true;
                 n = n.next;
             }
@@ -208,21 +198,24 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
      * chiamare quando this.size diventa maggiore di getCurrentThreshold()
      */
     private void resize() {
+        // Crea nuova tabella grande il doppio della corrente
         Object[] doubleTable = new Object[this.getCurrentCapacity() * 2];
         int bucket;
-
+        // Scorre la tabella utilizzando l'iterator
         for(E e : this) {
+            // Ottiene bucket dell'elemento corrente
             bucket = this.phf.hash(e.hashCode(), doubleTable.length);
-            Node<E> newNode = new Node<E>(e, null);
+            // Ottiene nodo del bucket corrente
             Node<E> n = (Node<E>) this.table[bucket];
-
             while(n != null) {
                 n = n.next;
             }
-
+            // Crea nuovo nodo con l'elemento
+            Node<E> newNode = new Node<E>(e, null);
+            // Inserisce nuovo nodo nella corretta posizione
             n = newNode;
         }
-
+        // Sostituisce la tabella corrente con la nuova
         this.table = doubleTable;
     }
 
@@ -366,9 +359,9 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
             }
             // Controlla se c'è un nodo successivo
             if (!this.hasNext()) throw new NoSuchElementException("Non c'è un nodo successivo");
-            
+
             if(lastReturned == null) {
-                // TODO Implement
+                
             } else if(lastReturned.next == null) {
                 // Calcola posizione del bucket corrente (l'ultimo ritornato)
                 int currentBucket = phf.hash(this.lastReturned.hashCode(), getCurrentCapacity());
@@ -379,7 +372,7 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
                     // Se il nuovo bucket punta ad una lista
                     if(table[currentBucket] != null) {
                         // Imposta come ultimo elemento ritornato la testa di quella lista
-                        lastReturned = (Node<E>)table[currentBucket];
+                        lastReturned = (Node<E>) table[currentBucket];
                         break;
                     }
                 }
