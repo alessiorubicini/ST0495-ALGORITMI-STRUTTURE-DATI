@@ -136,12 +136,19 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
          * concatenata lì presente
          *
          */
+        // Controlla se l'oggetto dato è null
+        if(o == null) throw new NullPointerException();
+        // Calcola il bucket in cui cercare l'oggetto dato
         int bucket = this.phf.hash(o.hashCode(), this.getCurrentCapacity());
+        // Se la posizione è null, ritorna false
         if(this.table[bucket] == null) {
             return false;
-        }
-        for(E e : this) {
-            if(o.equals(e)) return true;
+        } else {
+            // Altrimenti, itera sugli elementi
+            for(E e : this) {
+                // Controlla se uno è uguale all'elemento dato
+                if(o.equals(e)) return true;
+            }
         }
         return false;
     }
@@ -163,25 +170,17 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
 
     @Override
     public boolean add(E e) {
-        /*
-         * ATTENZIONE: usare l'hashCode dell'oggetto e la funzione di hash
-         * primaria passata all'atto della creazione: il bucket in cui inserire
-         * l'oggetto o è la posizione
-         * this.phf.hash(o.hashCode(),this.getCurrentCapacity)
-         *
-         * In questa posizione, se non vuota, si deve inserire l'elemento o
-         * nella lista concatenata lì presente. Se vuota, si crea la lista
-         * concatenata e si inserisce l'elemento, che sarà l'unico.
-         *
-         */
-        if(this.contains(e) || e == null) return false;
+        // Controlla se l'elemento dato è null
+        if(e == null) throw new NullPointerException();
+        // Controlla se la tabella contiene già l'elemento
+        if(this.contains(e)) return false;
         // Crea nuovo nodo con l'elemento dato
         Node<E> newNode = new Node<E>(e, null);
         // Ottiene il bucket dell'elemento dato
         int bucket = this.phf.hash(e.hashCode(), this.getCurrentCapacity());
         // Ottiene il nodo del bucket ottenuto
         Node<E> n = (Node<E>) this.table[bucket];
-        // Se il nodo è null, ci inserisce il nuovo nodo
+        // Se il nodo è null, ci inserisce il nuovo nodo creando la lista
         if(n == null) {
             this.table[bucket] = newNode;
         } else {
@@ -227,32 +226,25 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
 
     @Override
     public boolean remove(Object o) {
-        /*
-         * ATTENZIONE: usare l'hashCode dell'oggetto e la funzione di hash
-         * primaria passata all'atto della creazione: il bucket in cui cercare
-         * l'oggetto o è la posizione
-         * this.phf.hash(o.hashCode(),this.getCurrentCapacity)
-         *
-         * In questa posizione, se non vuota, si deve cercare l'elemento o
-         * utilizzando il metodo equals() su tutti gli elementi della lista
-         * concatenata lì presente. Se presente, l'elemento deve essere
-         * eliminato dalla lista concatenata
-         *
-         */
-        // ATTENZIONE: la rimozione, in questa implementazione, **non** comporta
-        // mai una resize "al ribasso", cioè un dimezzamento della tabella se si
-        // scende sotto il fattore di bilanciamento desiderato.
+        // Controlla se l'elemento dato è nullo
         if(o == null) throw new NullPointerException();
+        // Controlla se la tabella non contiene l'elemento
         if(!this.contains(o)) throw new NoSuchElementException();
-
+        // Ottiene il bucket dell'elemento dato
         int bucket = this.phf.hash(o.hashCode(), this.getCurrentCapacity());
+        // Ottiene il nodo dalla posizione della tabella
         Node<E> n = (Node<E>) this.table[bucket];
-
-        while(!o.equals(n.next.item)) {
-            n = n.next;
+        // Itera sull'eventuale lista per rimuovere il nodo
+        if(n == null) {
+            this.table[bucket] = null;
+        } else {
+            while(!o.equals(n.next.item)) {
+                n = n.next;
+            }
+            n.next = null;
         }
 
-        n.next = null;
+        // Decrementa dimensione tabella e Incrementa numero modifiche
         this.size--;
         this.modCount++;
 
