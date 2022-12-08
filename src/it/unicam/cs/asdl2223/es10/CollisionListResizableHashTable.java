@@ -125,23 +125,33 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
 
     @Override
     public boolean contains(Object o) {
+        /*
+         * ATTENZIONE: usare l'hashCode dell'oggetto e la funzione di hash
+         * primaria passata all'atto della creazione: il bucket in cui cercare
+         * l'oggetto o è la posizione
+         * this.phf.hash(o.hashCode(),this.getCurrentCapacity)
+         *
+         * In questa posizione, se non vuota, si deve cercare l'elemento o
+         * utilizzando il metodo equals() su tutti gli elementi della lista
+         * concatenata lì presente
+         *
+         */
         // Controlla se l'oggetto dato è null
-        if(o == null) throw new NullPointerException();
+        if(o == null) throw new NullPointerException("L'elemento dato è nullo");
         // Calcola il bucket in cui cercare l'oggetto dato
         int bucket = this.phf.hash(o.hashCode(), this.getCurrentCapacity());
+        // Controlla se c'è una lista di collisioni
+        if(table[bucket] == null) return false;
         // Ottiene il nodo del bucket ottenuto
-        Node<E> n = (Node<E>) this.table[bucket];
+        Node<E> list = (Node<E>) this.table[bucket];
         // Se il nodo contiene null, ritorna false
-        if(n == null) {
-            return false;
-        } else {
-            // Altrimenti scorre la lista a cui punta il nodo
-            while(n != null) {
-                // Se trova l'oggetto dato, ritorna true
-                if(n.item.equals(o)) return true;
-                n = n.next;
-            }
-        }
+        do {
+            // Controlla l'elemento corrente
+            if (o.equals(list.item)) return true;
+            // altrimenti vado avanti nella lista di collisioni
+            list = list.next;
+        } while (list != null);
+        // Non ha trovato l'elemento, ritorna false
         return false;
     }
 
@@ -162,14 +172,28 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
 
     @Override
     public boolean add(E e) {
+        /*
+         * ATTENZIONE: usare l'hashCode dell'oggetto e la funzione di hash
+         * primaria passata all'atto della creazione: il bucket in cui inserire
+         * l'oggetto o è la posizione
+         * this.phf.hash(o.hashCode(),this.getCurrentCapacity)
+         *
+         * In questa posizione, se non vuota, si deve inserire l'elemento o
+         * nella lista concatenata lì presente. Se vuota, si crea la lista
+         * concatenata e si inserisce l'elemento, che sarà l'unico.
+         *
+         */
+        // ATTENZIONE, si inserisca prima il nuovo elemento e poi si controlli
+        // se bisogna fare resize(), cioè se this.size >
+        // this.getCurrentThreshold()
         // Controlla se l'elemento dato è null
         if(e == null) throw new NullPointerException();
         // Controlla se la tabella contiene già l'elemento
         if(this.contains(e)) return false;
-        // Crea nuovo nodo con l'elemento dato
-        Node<E> newNode = new Node<E>(e, null);
         // Ottiene il bucket dell'elemento dato
         int bucket = this.phf.hash(e.hashCode(), this.getCurrentCapacity());
+        // Crea nuovo nodo con l'elemento dato
+        Node<E> newNode = new Node<E>(e, null);
         // Ottiene il nodo del bucket ottenuto
         Node<E> n = (Node<E>) this.table[bucket];
         // Se il nodo è null, ci inserisce il nuovo nodo creando la lista
@@ -193,40 +217,52 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
         return true;
     }
 
+
     /*
      * Raddoppia la tabella corrente e riposiziona tutti gli elementi. Da
      * chiamare quando this.size diventa maggiore di getCurrentThreshold()
      */
     private void resize() {
-        // Crea nuova tabella grande il doppio della corrente
-        Object[] doubleTable = new Object[this.getCurrentCapacity() * 2];
-        int originalBucket, newBucket;
-        // Scorre la tabella utilizzando l'iterator
-        for(Iterator i = this.iterator(); i.hasNext(); ) {
-            E element = (E) i.next();
-            // Ottiene bucket dell'elemento corrente
-            originalBucket = this.phf.hash(element.hashCode(), table.length);
-            newBucket = this.phf.hash(element.hashCode(), doubleTable.length);
-            // Ottiene il nodo del bucket ottenuto
-            Node<E> n = (Node<E>) this.table[originalBucket];
-            Node<E> newNode = new Node<E>(element, null);
-            // Se il nodo è null, ci inserisce il nuovo nodo creando la lista
-            if(n == null) {
-                doubleTable[originalBucket] = newNode;
-            } else {
-                // Altrimenti scorre la lista a cui punta il bucket
-                while(n != null) {
-                    n = n.next;
-                }
-                // Imposta ultimo nodo al nuovo nodo
-                n = newNode;
-            }
-            // Inserisce nuovo nodo nella corretta posizione
-            //n = newNode;
+        // Calcola la capacità per la nuova tabella
+        int newCapacity = this.getCurrentCapacity() * 2;
+        // Crea la nuova tabella
+        Object[] newTable = new Object[newCapacity];
+        // Itera sulla tabella attuale
+        Itr it = (CollisionListResizableHashTable<E>.Itr) this.iterator();
+        while(it.hasNext()) {
+            E elem = it.next();
+            // Calcola il bucket dell'elemento con la nuova capacità
+            int bucket = this.phf.hash(elem.hashCode(), newCapacity);
+            // Inserisce l'elemento nella nuova tabella
+            this.insertElementInTable(newTable, bucket, elem);
         }
-        // Sostituisce la tabella corrente con la nuova
-        System.out.println("EFFETTUATO RESIZE");
-        this.table = doubleTable;
+        // Sostituisce la tabella attuale con la nuova tabella
+        this.table = newTable;
+    }
+
+    /**
+     * Inserisce un elemento in una tabella a una certa posizione
+     * @param table     tabella a cui aggiungere l'elemento
+     * @param bucket    bucket in cui aggiungere l'elemento
+     * @param e         elemento da aggiungere
+     */
+    public boolean insertElementInTable(Object[] table, int bucket, E e) {
+        if (table[bucket] == null) {
+            // Se la posizione è vuota creo una nuova lista
+            table[bucket] = new Node<E>(e, null);
+            return true;
+        } else {
+            Node<E> list = (Node<E>) table[bucket];
+            do {
+                // Controlla l'elemento corrente
+                if (e.equals(list.item)) return false;
+                // Altrimenti va avanti nella lista di collisioni
+                list = list.next;
+            } while (list != null);
+            Node<E> head = (Node<E>) table[bucket];
+            table[bucket] = new Node<E>(e, head);
+        }
+        return true;
     }
 
     @Override
@@ -328,84 +364,38 @@ public class CollisionListResizableHashTable<E> implements Set<E> {
      */
     private class Itr implements Iterator<E> {
 
-        private Node<E> lastReturned;
+        private Iterator<E> flattenIterator = null;
         private int numeroModificheAtteso;
 
         private Itr() {
-            this.lastReturned = null;
             this.numeroModificheAtteso = modCount;
+            ArrayList<E> flatten = new ArrayList<>();
+
+            for(Object cell: table) {
+                if(cell != null) {
+                    Node<E> node = (Node<E>) cell;
+                    do {
+                        flatten.add(node.item);
+                        node = node.next;
+                    } while(node != null);
+                }
+            }
+
+            this.flattenIterator = flatten.iterator();
         }
 
         @Override
         public boolean hasNext() {
-            // Se l'ultimo elemento ritornato è null
-            if (lastReturned == null) {
-                // Ritorna true se la tabella non è vuota
-                return size != 0;
-            } else if(lastReturned.next == null) {
-                // Altrimenti, se il successivo dell'ultimo ritornato è null
-                // Allora siamo alla fine della lista di collisioni
-                // Quindi ottiene bucket dell'ultimo nodo ritornato
-                int currentBucket = phf.hash(this.lastReturned.hashCode(), getCurrentCapacity());
-                // Scorre in avanti la tabella
-                while(currentBucket < getCurrentCapacity()-1) {
-                    currentBucket++;
-                    // Se trova un bucket che punta a una lista ritorna true
-                    if(table[currentBucket] != null) return true;
-                }
-                // Se non ha trovato altri bucket con liste, ritorna false
-                return false;
-            } else {
-                return true;
-            }
+            return flattenIterator.hasNext();
         }
 
         @Override
         public E next() {
-            // Controlla se sono avvenute modifiche concorrenti durante l'iterazione
             if (this.numeroModificheAtteso != modCount) {
                 throw new ConcurrentModificationException("Tabella modificata durante l'iterazione");
             }
-            // Controlla se c'è un nodo successivo
             if (!this.hasNext()) throw new NoSuchElementException("Non c'è un nodo successivo");
-
-            int currentBucket;
-            // Se l'ultimo elemento ritornato è null
-            if(lastReturned == null) {
-                // Scorre la tabella dal primo bucket
-                currentBucket = 0;
-                while(currentBucket < getCurrentCapacity()-1) {
-                    currentBucket++;
-                    // Se il bucket corrente punta ad una lista (quindi non è null)
-                    if(table[currentBucket] != null) {
-                        // Imposta come ultimo elemento ritornato la testa di quella lista
-                        lastReturned = (Node<E>) table[currentBucket];
-                        break;
-                    }
-                }
-            } else {
-                // Se l'ultimo elemento ritornato non è null
-                // Calcola il bucket dell'ultimo elemento ritornato
-                currentBucket = phf.hash(lastReturned.hashCode(), getCurrentCapacity());
-                // Se il nodo successivo è null, la lista di collisioni è finita
-                if(lastReturned.next == null) {
-                    // Scorre la tabella in avanti
-                    while(currentBucket < getCurrentCapacity()-1) {
-                        currentBucket++;
-                        // Se il nuovo bucket punta ad una lista (quindi non è null)
-                        if(table[currentBucket] != null) {
-                            // Imposta come ultimo elemento ritornato la testa di quella lista
-                            lastReturned = (Node<E>) table[currentBucket];
-                            break;
-                        }
-                    }
-                } else {
-                    // Altrimenti, scorre al prossimo nodo della lista di collisioni
-                    lastReturned = lastReturned.next;
-                }
-            }
-            // Ritorna l'item
-            return lastReturned.item;
+            return flattenIterator.next();
         }
 
     }
