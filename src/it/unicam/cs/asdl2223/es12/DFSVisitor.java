@@ -28,9 +28,22 @@ public class DFSVisitor<L> {
      *                                  se il grafo passato è null
      */
     public void DFSVisit(Graph<L> g) {
-        // TODO implementare
-        // NOTA: inizializza il grafo e chiama la recDFS sui nodi in un ordine
-        // qualsiasi per calcolare la "foresta" DFS
+        // Inizializza il grafo
+        for (GraphNode<L> node : g.getNodes()) {
+            node.setColor(GraphNode.COLOR_WHITE);
+            node.setIntegerDistance(-1);
+            node.setPrevious(null);
+        }
+
+        // Inizializza il tempo
+        this.time = 0;
+
+        // Esegue la DFS su ogni nodo
+        for (GraphNode<L> node : g.getNodes()) {
+            if (node.getColor() == GraphNode.COLOR_WHITE) {
+                recDFS(g, node);
+            }
+        }
     }
 
     /*
@@ -41,8 +54,30 @@ public class DFSVisitor<L> {
      * @param u il nodo su cui parte la DFS
      */
     protected void recDFS(Graph<L> g, GraphNode<L> u) {
-        // TODO implementare ricorsivamente
-        // NOTA: chiamare il metodo visitNode alla "scoperta" di un nuovo nodo
+        // Imposta il colore del nodo corrente su grigio
+        u.setColor(GraphNode.COLOR_GREY);
+
+        // Incrementa il tempo
+        time++;
+        // Imposta il tempo di ingresso e di fine per il nodo corrente
+        u.setEnteringTime(time);
+        u.setExitingTime(time);
+
+        // Itera sugli archi in uscita del nodo corrente
+        for (GraphEdge<L> e : g.getEdgesOf(u)) {
+            // Per ogni arco ottiene il nodo destinazione
+            GraphNode<L> neighbor = e.getNode2();
+
+            // Se il colore del nodo destinazione è bianco, vuol dire che è ancora da visitare
+            if (neighbor.getColor() == GraphNode.COLOR_WHITE) {
+                neighbor.setPrevious(u);
+                // Richiama ricorsivamente la DFS sul nodo di destinazione
+                recDFS(g, neighbor);
+            }
+        }
+
+        // Imposta il colore del nodo a nero perchè è stato visitato
+        u.setColor(GraphNode.COLOR_BLACK);
     }
 
     /**

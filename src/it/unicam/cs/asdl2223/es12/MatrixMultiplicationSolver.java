@@ -58,7 +58,31 @@ public class MatrixMultiplicationSolver {
      * dinamica.
      */
     private void solve() {
-        // TODO implementare
+        // Inizializziamo la matrice m e b con valori di default
+        for (int i = 0; i < this.p.size() - 1; i++) {
+            this.m[i][i] = 0; // La moltiplicazione di una sola matrice non ha costo
+            this.b[i][i] = i; // La scelta di k per la moltiplicazione di una sola matrice è sempre se stessa
+        }
+
+        // Calcoliamo i costi minimi per le sotto-sequenze di lunghezza crescente
+        for (int len = 2; len < this.p.size(); len++) {
+            for (int i = 0; i < this.p.size() - len; i++) {
+                int j = i + len - 1;
+                // Inizializziamo il costo minimo con il valore più alto possibile
+                this.m[i][j] = Integer.MAX_VALUE;
+                // Cerchiamo il valore di k che minimizza il costo per la moltiplicazione di A[i]...A[k] e A[k+1]...A[j]
+                for (int k = i; k < j; k++) {
+                    // Calcoliamo il costo per la moltiplicazione di A[i]...A[k] e A[k+1]...A[j] e verifichiamo se è minore del costo minimo attuale
+                    int cost = this.m[i][k] + this.m[k + 1][j] + this.p.get(i) * this.p.get(k + 1) * this.p.get(j + 1);
+                    if (cost < this.m[i][j]) {
+                        // Aggiorniamo il costo minimo
+                        this.m[i][j] = cost;
+                        // Aggiorniamo la scelta di k
+                        this.b[i][j] = k;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -94,8 +118,19 @@ public class MatrixMultiplicationSolver {
      * appositamente durante il processo di calcolo del costo minimo
      */
     private String traceBack(int i, int j) {
-        // TODO implementare ricorsivamente
-        return null;
+        // Se i e j sono uguali, la sottosequenza è una sola matrice, quindi la stampiamo e terminiamo la ricorsione
+        if (i == j) {
+            return "A_{" + i + "}";
+        }
+
+        // Altrimenti, stampiamo la parentesi sinistra e continuiamo il traceback per la sotto-sequenza di matrici prima di k
+        String result = "(" + traceBack(i, this.b[i][j]);
+
+        // Quindi stampiamo la parentesi destra e continuiamo il traceback per la sotto-sequenza di matrici dopo k
+        result += " x " + traceBack(this.b[i][j] + 1, j);
+
+        result += ")";
+        return result;
     }
 
 }
