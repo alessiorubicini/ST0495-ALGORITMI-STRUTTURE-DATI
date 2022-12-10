@@ -113,7 +113,7 @@ public class MapAdjacentListDirectedGraph<L> extends Graph<L> {
     public boolean containsNode(GraphNode<L> node) {
         // Controlla se il nodo dato è nullo
         if (node == null) {
-            throw new NullPointerException("Tentativo di cercare un nodo null");
+            throw new NullPointerException("Il nodo dato è null");
         }
         // Controlla se il nodo dato è presente nel grafo
         return this.adjacentLists.containsKey(node);
@@ -123,7 +123,7 @@ public class MapAdjacentListDirectedGraph<L> extends Graph<L> {
     public GraphNode<L> getNodeOf(L label) {
         // Controlla se l'etichetta data è nulla
         if (label == null) {
-            throw new NullPointerException("L'etichetta passata è null");
+            throw new NullPointerException("L'etichetta data è null");
         }
         // Cerca il nodo con l'etichetta specificata nelle liste di adiacenza
         for (GraphNode<L> node : this.adjacentLists.keySet()) {
@@ -235,7 +235,7 @@ public class MapAdjacentListDirectedGraph<L> extends Graph<L> {
     @Override
     public boolean containsEdge(GraphEdge<L> edge) {
         // Controlla se l'arco dato è nullo
-        if (edge == null) throw new NullPointerException("Arco nullo");
+        if (edge == null) throw new NullPointerException("L'arco dato è nullo");
         // Controlla se i nodi dell'arco dato esistono
         if (!adjacentLists.containsKey(edge.getNode1()) || !adjacentLists.containsKey(edge.getNode2())) {
             throw new IllegalArgumentException("L'arco passato non appartiene a questo grafo");

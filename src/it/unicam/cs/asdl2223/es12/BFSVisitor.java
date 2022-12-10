@@ -1,5 +1,10 @@
 package it.unicam.cs.asdl2223.es12;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+
 /**
  * Classe singoletto che fornisce lo schema generico di visita Breadth-First di
  * un grafo rappresentato da un oggetto di tipo Graph<L>.
@@ -32,8 +37,60 @@ public class BFSVisitor<L> {
      *                                      al grafo dato
      */
     public void BFSVisit(Graph<L> g, GraphNode<L> source) {
-        // TODO implementare
-        // NOTA: chiamare il metodo visitNode quando un nodo passa da grigio a nero
+        // Controlla se il grafo e il nodo sorgente sono nulli
+        if (g == null || source == null) {
+            throw new NullPointerException("Grafo o nodo sorgente nulli");
+        }
+        // Controlla se il grafo contiene il nodo sorgente dato
+        if (!g.getNodes().contains(source)) {
+            throw new IllegalArgumentException("Nodo sorgente non appartenente al grafo dato");
+        }
+
+        // Crea un insieme di nodi non ancora visitati
+        Set<GraphNode<L>> nodesToVisit = new HashSet<>(g.getNodes());
+        // Crea una lista di nodi visitati i cui vicini non sono stati visitati
+        Queue<GraphNode<L>> nodesWithUnvisitedNeighbors = new LinkedList<>();
+
+
+        // Imposta i nodi del grafo ai valori di default che rappresentano un nodo non visitato
+        // Così l'algoritmo BFS può calcolare correttamente questi valori per ciascun nodo
+        for (GraphNode<L> node : g.getNodes()) {
+            node.setColor(GraphNode.COLOR_WHITE);
+            node.setIntegerDistance(-1);
+            node.setPrevious(null);
+        }
+
+        // Imposta il nodo sorgente come visitato
+        source.setColor(GraphNode.COLOR_GREY);
+        source.setIntegerDistance(0);
+        nodesWithUnvisitedNeighbors.add(source);
+
+        // Finché non c'è più nessun nodo i cui vicini non sono stati visitati
+        while (!nodesWithUnvisitedNeighbors.isEmpty()) {
+            // Estrae il nodo i cui vicini sono da visitare
+            GraphNode<L> current = nodesWithUnvisitedNeighbors.poll();
+            // Rimuove il nodo dai nodi ancora da visitare
+            nodesToVisit.remove(current);
+
+            // Itera sugli archi di questo nodo
+            for (GraphEdge<L> e : g.getEdgesOf(current)) {
+                // Per ogni arco ottiene il nodo destinazione
+                GraphNode<L> neighbor = e.getNode2();
+                // Se il colore del nodo destinazione è bianco, vuol dire che è ancora da visitare
+                if (neighbor.getColor() == GraphNode.COLOR_WHITE) {
+                    // Imposta i suoi valori correttamente
+                    neighbor.setColor(GraphNode.COLOR_GREY);
+                    neighbor.setIntegerDistance(current.getIntegerDistance() + 1);
+                    neighbor.setPrevious(current);
+                    // Aggiunge il nodo destinazione alla lista dei nodi i cui vicini sono da visitare
+                    nodesWithUnvisitedNeighbors.add(neighbor);
+                }
+            }
+
+            // Il nodo viene visitato e il suo colore impostato a nero
+            current.setColor(GraphNode.COLOR_BLACK);
+            visitNode(current);
+        }
     }
 
     /**

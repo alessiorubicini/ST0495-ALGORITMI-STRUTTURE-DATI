@@ -56,6 +56,7 @@ class LCSSolverTest {
         assertTrue(s2.getOneSolution().equals(""));
         LCSSolver s3 = new LCSSolver("ABCBDAB", "BDCABA");
         s3.solve();
+        System.out.println(s3.getOneSolution());
         assertTrue(s3.getOneSolution().equals("BCBA"));
     }
     
@@ -107,4 +108,5 @@ class LCSSolverTest {
         assertFalse(s1.isCommonSubsequence("ABCBDAB"));
         assertFalse(s1.isCommonSubsequence("BDCABA"));
     }
+
 }

@@ -67,7 +67,25 @@ public class LCSSolver {
      * prima volta il problema verrà considerato risolto.
      */
     public void solve() {
-        // TODO implementare
+        // Per ogni carattere nella stringa x
+        for (int i = 1; i <= x.length(); i++) {
+            // Per ogni carattere nella stringa y
+            for (int j = 1; j <= y.length(); j++) {
+                // Se i caratteri corrispondono, allora la lunghezza della più lunga sottosequenza comune fino a quel punto
+                // è uguale alla lunghezza della più lunga sottosequenza comune fino ai caratteri precedenti + 1
+                if (x.charAt(i-1) == y.charAt(j-1)) {
+                    m[i][j] = m[i-1][j-1] + 1;
+                } else {
+                    /* Altrimenti, la lunghezza della più lunga sottosequenza comune è uguale alla massima
+                       tra la lunghezza della più lunga sottosequenza comune fino al carattere i nella stringa x
+                       e la lunghezza della più lunga sottosequenza comune fino al carattere j nella stringa y
+                    */
+                    m[i][j] = Math.max(m[i-1][j], m[i][j-1]);
+                }
+            }
+        }
+        // Impostiamo il flag isSolved a true per indicare che il problema è stato risolto
+        isSolved = true;
     }
 
     /**
@@ -117,9 +135,33 @@ public class LCSSolver {
      * soluzione ottima, ma va usata la stessa matrice m
      */
     private String traceBack(int i, int j) {
-        // TODO implementare ricorsivamente
-        return null;
+        // Se i o j sono uguali a 0, significa che siamo arrivati ai bordi della matrice e non ci sono
+        // altri caratteri da considerare nella sottosequenza comune. In questo caso, ritorniamo una stringa vuota.
+        if (i == 0 || j == 0) {
+            return "";
+        }
+
+        // Se il carattere nella stringa x alla posizione i-1 corrisponde al carattere nella stringa y
+        // alla posizione j-1, allora questo carattere fa parte della sottosequenza comune e lo
+        // aggiungiamo alla stringa risultato.
+        // Quindi, continuiamo il ripercorrimento della matrice verso la posizione (i-1, j-1)
+        if (x.charAt(i-1) == y.charAt(j-1)) {
+            return traceBack(i-1, j-1) + x.charAt(i-1);
+        } else {
+            // Altrimenti, se la cella (i-1, j) contiene un valore maggiore della cella (i, j-1), significa
+            // che la sottosequenza comune non contiene il carattere nella stringa y alla posizione j-1.
+            // Quindi, continuiamo il ripercorrimento della matrice verso la posizione (i-1, j)
+            if (m[i-1][j] > m[i][j-1]) {
+                return traceBack(i-1, j);
+            } else {
+                // Se nessuna delle condizioni sopra è vera, significa che la sottosequenza comune non contiene
+                // il carattere nella stringa x alla posizione i-1.
+                // Quindi, continuiamo il ripercorrimento della matrice verso la posizione (i, j-1)
+                return traceBack(i, j-1);
+            }
+        }
     }
+
 
     /**
      * Determina se una certa stringa è una sottosequenza comune delle due
@@ -147,7 +189,28 @@ public class LCSSolver {
      * @return true se z è sottosequenza di w, false altrimenti
      */
     private static boolean isSubsequence(String z, String w) {
-        // TODO implementare ricorsivamente
-        return false;
+        // Se la lunghezza della stringa z è uguale a 0, significa che abbiamo esaurito tutti i caratteri
+        // da considerare nella stringa z. In questo caso, la stringa z è una sottosequenza di w.
+        if (z.length() == 0) {
+            return true;
+        }
+
+        // Se la lunghezza della stringa w è uguale a 0, significa che abbiamo esaurito tutti i caratteri
+        // da considerare nella stringa w. In questo caso, la stringa z non è una sottosequenza di w.
+        if (w.length() == 0) {
+            return false;
+        }
+
+        // Se il primo carattere della stringa z corrisponde al primo carattere della stringa w,
+        // allora verifichiamo se la sottostringa z che inizia dal secondo carattere è una
+        // sottosequenza della sottostringa w che inizia dal secondo carattere
+        if (z.charAt(0) == w.charAt(0)) {
+            return isSubsequence(z.substring(1), w.substring(1));
+        }
+
+        // Altrimenti, verifichiamo se la stringa z è una sottosequenza della sottostringa w che
+        // inizia dal secondo carattere, ignorando il primo carattere di w
+        return isSubsequence(z, w.substring(1));
     }
+
 }
