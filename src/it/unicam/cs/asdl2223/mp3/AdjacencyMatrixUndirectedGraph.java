@@ -3,10 +3,7 @@
  */
 package it.unicam.cs.asdl2223.mp3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 // ATTENZIONE: è vietato includere import a pacchetti che non siano della Java SE
 
@@ -273,75 +270,182 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public boolean addEdge(GraphEdge<L> edge) {
-        // TODO implementare
-        return false;
+        // Controlla se l'arco dato è nullo
+        if(edge == null) {
+            throw new NullPointerException("L'arco dato è nullo");
+        }
+        // Controlla se l'arco è valido
+        if(!nodesIndex.containsKey(edge.getNode1()) || !nodesIndex.containsKey(edge.getNode2()) || edge.isDirected()) {
+            throw new IllegalArgumentException("Nodi non esistenti o Arco diretto");
+        }
+        // Controlla se l'arco esiste già
+        if(this.getEdge(edge) != null) { return false; }
+        // Ottiene gli indici dei nodi collegati dall'arco
+        int node1Index = this.getNodeIndexOf(edge.getNode1());
+        int node2Index = this.getNodeIndexOf(edge.getNode2());
+        // Aggiunge l'arco alla matrice di adiacenza
+        this.matrix.get(node1Index).set(node2Index, edge);
+        return true;
     }
 
     @Override
     public boolean addEdge(GraphNode<L> node1, GraphNode<L> node2) {
-        // TODO implementare
-        return false;
+        // Controlla se i nodi dati sono nulli
+        if(node1 == null || node2 == null) {
+            throw new IllegalArgumentException("I nodi dati sono nulli");
+        }
+        // Crea l'arco che collega i due nodi
+        GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
+        // Aggiunge il nodo
+        return this.addEdge(edge);
     }
 
     @Override
-    public boolean addWeightedEdge(GraphNode<L> node1, GraphNode<L> node2,
-            double weight) {
-        // TODO implementare
-        return false;
+    public boolean addWeightedEdge(GraphNode<L> node1, GraphNode<L> node2, double weight) {
+        // Controlla se i nodi dati sono nulli
+        if(node1 == null || node2 == null) {
+            throw new IllegalArgumentException("I nodi dati sono nulli");
+        }
+        // Crea l'arco che collega i due nodi
+        GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
+        // Imposta il peso
+        edge.setWeight(weight);
+        // Aggiunge il nodo
+        return this.addEdge(edge);
     }
 
     @Override
     public boolean addEdge(L label1, L label2) {
-        // TODO implementare
-        return false;
+        // Controlla se le etichette date sono nulle
+        if(label1 == null || label2 == null) {
+            throw new NullPointerException("Le etichette date sono nulle");
+        }
+        // Crea i nodi corrispondenti
+        GraphNode<L> node1 = new GraphNode<L>(label1);
+        GraphNode<L> node2 = new GraphNode<L>(label2);
+        // Aggiunge l'arco che collega i due nodi
+        return this.addEdge(node1, node2);
     }
 
     @Override
     public boolean addWeightedEdge(L label1, L label2, double weight) {
-        // TODO implementare
-        return false;
+        // Controlla se le etichette date sono nulle
+        if(label1 == null || label2 == null) {
+            throw new NullPointerException("Le etichette date sono nulle");
+        }
+        // Crea i nodi corrispondenti
+        GraphNode<L> node1 = new GraphNode<L>(label1);
+        GraphNode<L> node2 = new GraphNode<L>(label2);
+        // Aggiunge l'arco
+        return this.addWeightedEdge(node1, node2, weight);
     }
 
     @Override
     public boolean addEdge(int i, int j) {
-        // TODO implementare
-        return false;
+        // Controlla se gli indici rientrano nel range
+        if(this.isEmpty() || i > matrix.size() || j > matrix.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        // Aggiunge l'arco alla matrice di adiacenza
+        // Richiamando l'apposito metodo
+        return this.addEdge(this.getNode(i), this.getNode(j));
     }
 
     @Override
     public boolean addWeightedEdge(int i, int j, double weight) {
-        // TODO implementare
-        return false;
+        // Controlla se gli indici rientrano nel range
+        if(this.isEmpty() || i > matrix.size() || j > matrix.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        // Aggiunge l'arco alla matrice di adiacenza
+        // Richiamando l'apposito metodo
+        return this.addWeightedEdge(this.getNode(i), this.getNode(j), weight);
     }
 
     @Override
     public void removeEdge(GraphEdge<L> edge) {
-        // TODO implementare
+        // Controlla se l'arco dato è nullo
+        if(edge == null) {
+            throw new NullPointerException("L'arco dato è nullo");
+        }
+        // Controlla se l'arco esiste
+        if(this.getEdge(edge) == null) {
+            throw new IllegalArgumentException("L'arco non esiste");
+        }
+        // Cerca l'arco nella matrice
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = 0; j < matrix.get(i).size(); j++) {
+                // Se lo trova, lo elimina
+                if(this.matrix.get(i).get(j).equals(edge)) {
+                    this.matrix.get(i).set(j, null);
+                }
+            }
+        }
     }
 
     @Override
     public void removeEdge(GraphNode<L> node1, GraphNode<L> node2) {
-        // TODO implementare
+        // Controlla se i nodi dati sono nulli
+        if(node1 == null || node2 == null) {
+            throw new IllegalArgumentException("I nodi dati sono nulli");
+        }
+        // Richiama il metodo di rimozione sull'arco che collega i due nodi
+        this.removeEdge(this.getEdge(node1, node2));
     }
 
     @Override
     public void removeEdge(L label1, L label2) {
-        // TODO implementare
+        // Controlla se le etichette date sono nulle
+        if(label1 == null || label2 == null) {
+            throw new NullPointerException("Le etichette date sono nulle");
+        }
+        // Richiama il metodo di rimozione sull'arco che collega i nodi con queste etichette
+        this.removeEdge(this.getEdge(label1, label2));
     }
 
     @Override
     public void removeEdge(int i, int j) {
-        // TODO implementare
+        // Controlla se gli indici rientrano nel range
+        if(this.isEmpty() || i > matrix.size() || j > matrix.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        // Richiama il metodo di rimozione sull'arco che collega i nodi con questi indici
+        this.removeEdge(this.getEdge(i, j));
     }
 
     @Override
     public GraphEdge<L> getEdge(GraphEdge<L> edge) {
-        // TODO implementare
+        // Controlla se l'arco dato è nullo
+        if(edge == null) {
+            throw new NullPointerException("L'arco dato è nullo");
+        }
+        // Controlla se l'arco esiste
+        if(this.getEdge(edge) == null) {
+            throw new IllegalArgumentException("L'arco non esiste");
+        }
+        // Cerca l'arco nella matrice
+        GraphEdge<L> currentEdge = null;
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = 0; j < matrix.get(i).size(); j++) {
+                // Se lo trova, lo elimina
+                currentEdge = this.matrix.get(i).get(j);
+                if(currentEdge.equals(edge)) {
+                    return currentEdge;
+                }
+            }
+        }
         return null;
     }
 
     @Override
     public GraphEdge<L> getEdge(GraphNode<L> node1, GraphNode<L> node2) {
+        // Controlla se i nodi dati sono nulli
+        if(node1 == null || node2 == null) {
+            throw new IllegalArgumentException("I nodi dati sono nulli");
+        }
+        // Richiama il metodo get sull'arco che collega i due nodi
+
+
         // TODO implementare
         return null;
     }
@@ -432,7 +536,18 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public Set<GraphEdge<L>> getEdges() {
-        // TODO implementare
-        return null;
+        // Crea un insieme di archi per l'output
+        Set<GraphEdge<L>> edges = new HashSet<>();
+        // Itera sulla matrice degli archi
+        for (List<GraphEdge<L>> row : this.matrix) {
+            for (GraphEdge<L> edge : row) {
+                // Aggiunge gli archi esistenti all'insieme di archi
+                if (edge != null) {
+                    edges.add(edge);
+                }
+            }
+        }
+        // Ritorna l'insieme degli archi
+        return edges;
     }
 }
