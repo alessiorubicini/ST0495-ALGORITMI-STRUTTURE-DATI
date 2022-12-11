@@ -361,20 +361,15 @@ class AdjacencyMatrixUndirectedGraphTest {
     @Test
     final void testGetEdge() {
         Graph<String> g = new AdjacencyMatrixUndirectedGraph<String>();
-        assertThrows(NullPointerException.class,
-                () -> g.getEdge((GraphEdge<String>) null));
-        assertThrows(NullPointerException.class,
-                () -> g.getEdge((String) null, (String) null));
-        assertThrows(NullPointerException.class, () -> g
-                .getEdge((GraphNode<String>) null, (GraphNode<String>) null));
+        assertThrows(NullPointerException.class, () -> g.getEdge((GraphEdge<String>) null));
+        assertThrows(NullPointerException.class,  () -> g.getEdge((String) null, (String) null));
+        assertThrows(NullPointerException.class, () -> g.getEdge((GraphNode<String>) null, (GraphNode<String>) null));
         assertThrows(IndexOutOfBoundsException.class, () -> g.getEdge(0, 0));
         GraphNode<String> ns = new GraphNode<String>("s");
         g.addNode(ns);
         GraphNode<String> nu = new GraphNode<String>("u");
-            assertThrows(IllegalArgumentException.class,
-                () -> g.getEdge(new GraphEdge<String>(ns, nu, false)));
-        assertThrows(IllegalArgumentException.class,
-                () -> g.getEdge(new GraphEdge<String>(nu, ns, false)));
+        assertThrows(IllegalArgumentException.class, () -> g.getEdge(new GraphEdge<String>(ns, nu, false)));
+        assertThrows(IllegalArgumentException.class, () -> g.getEdge(new GraphEdge<String>(nu, ns, false)));
         g.addNode(nu);
         GraphEdge<String> esu = new GraphEdge<String>(ns, nu, false);
         assertTrue(g.getEdge(new GraphEdge<String>(ns, nu, false)) == null);
@@ -386,8 +381,7 @@ class AdjacencyMatrixUndirectedGraphTest {
         g.addWeightedEdge("s", "b", 1);
         assertTrue(g.getEdge("s", "a").getNode1().getLabel().equals("s")
                 || g.getEdge("s", "a").getNode1().getLabel().equals("a"));
-        assertTrue(g.getEdge(new GraphNode<String>("b"),
-                new GraphNode<String>("s")) != null);
+        assertTrue(g.getEdge(new GraphNode<String>("b"), new GraphNode<String>("s")) != null);
         assertTrue(g.getEdge("u", "b") == null);
         int is = g.getNodeIndexOf(ns);
         int ia = g.getNodeIndexOf("a");
