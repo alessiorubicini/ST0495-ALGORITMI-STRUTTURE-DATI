@@ -371,7 +371,7 @@ class AdjacencyMatrixUndirectedGraphTest {
         GraphNode<String> ns = new GraphNode<String>("s");
         g.addNode(ns);
         GraphNode<String> nu = new GraphNode<String>("u");
-        assertThrows(IllegalArgumentException.class,
+            assertThrows(IllegalArgumentException.class,
                 () -> g.getEdge(new GraphEdge<String>(ns, nu, false)));
         assertThrows(IllegalArgumentException.class,
                 () -> g.getEdge(new GraphEdge<String>(nu, ns, false)));
