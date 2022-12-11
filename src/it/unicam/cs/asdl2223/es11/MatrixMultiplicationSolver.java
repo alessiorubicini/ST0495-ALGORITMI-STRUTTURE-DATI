@@ -72,7 +72,8 @@ public class MatrixMultiplicationSolver {
                 this.m[i][j] = Integer.MAX_VALUE;
                 // Cerchiamo il valore di k che minimizza il costo per la moltiplicazione di A[i]...A[k] e A[k+1]...A[j]
                 for (int k = i; k < j; k++) {
-                    // Calcoliamo il costo per la moltiplicazione di A[i]...A[k] e A[k+1]...A[j] e verifichiamo se è minore del costo minimo attuale
+                    // Calcoliamo il costo per la moltiplicazione di A[i]...A[k] e A[k+1]...A[j]
+                    // e verifichiamo se è minore del costo minimo attuale
                     int cost = this.m[i][k] + this.m[k + 1][j] + this.p.get(i) * this.p.get(k + 1) * this.p.get(j + 1);
                     if (cost < this.m[i][j]) {
                         // Aggiorniamo il costo minimo

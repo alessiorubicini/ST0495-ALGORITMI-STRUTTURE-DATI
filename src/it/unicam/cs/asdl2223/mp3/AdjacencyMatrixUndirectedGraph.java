@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-// TODO completare gli import necessari
-
 // ATTENZIONE: è vietato includere import a pacchetti che non siano della Java SE
 
 /**
@@ -40,8 +38,7 @@ import java.util.Set;
  * supporta tutti i metodi che usano indici, utilizzando l'indice assegnato a
  * ogni nodo in fase di inserimento.
  * 
- * @author Luca Tesei (template) **INSERIRE NOME, COGNOME ED EMAIL
- *         xxxx@studenti.unicam.it DELLO STUDENTE** (implementazione)
+ * @author Luca Tesei (template), Alessio Rubicini alessio.rubicini@studenti.unicam.it (implementazione)
  *
  * 
  */
@@ -75,24 +72,22 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public int nodeCount() {
-        // TODO implementare
-        return -1;
+        return this.nodesIndex.size();
     }
 
     @Override
     public int edgeCount() {
-        // TODO implementare
-        return -1;
+        return this.matrix.size();
     }
 
     @Override
     public void clear() {
-        // TODO implementare
+        this.matrix = new ArrayList<ArrayList<GraphEdge<L>>>();
+        this.nodesIndex = new HashMap<GraphNode<L>, Integer>();
     }
 
     @Override
     public boolean isDirected() {
-        // TODO implementare
         return false;
     }
 
@@ -102,8 +97,17 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
      */
     @Override
     public boolean addNode(GraphNode<L> node) {
-        // TODO implementare
-        return false;
+        // Controlla se il nodo dato è nullo
+        if(node == null) {
+            throw new NullPointerException("Il nodo dato è nullo");
+        }
+        // Controlla se il nodo è già presente
+        if(this.nodesIndex.containsKey(node)) {
+            return false;
+        }
+        // Aggiunge il nodo alla lista dei nodi indice
+        this.nodesIndex.put(node, nodesIndex.size());
+        return true;
     }
 
     /*
@@ -112,8 +116,12 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
      */
     @Override
     public boolean addNode(L label) {
-        // TODO implementare
-        return false;
+        // Controlla se l'etichetta data è nulla
+        if(label == null) {
+            throw new NullPointerException("L'etichetta data è nulla");
+        }
+        // Richiama il metodo di aggiunta del nodo
+        return this.addNode(new GraphNode<L>(label));
     }
 
     /*
@@ -123,7 +131,32 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
      */
     @Override
     public void removeNode(GraphNode<L> node) {
-        // TODO implementare
+        // Controlla se il nodo dato è nullo
+        if(node == null) {
+            throw new NullPointerException("Il nodo dato è nullo");
+        }
+        // Controlla se il nodo è già presente
+        if(!this.nodesIndex.containsKey(node)) {
+            throw new IllegalArgumentException("Il nodo non esiste");
+        }
+        // Salva l'indice del nodo da rimuovere
+        int nodeToRemoveIndex = nodesIndex.get(node);
+        // Elimina il nodo
+        this.nodesIndex.remove(node);
+        // Modifica l'indice dei nodi successivi
+        for (GraphNode<L> currentNode: nodesIndex.keySet()) {
+            if(nodesIndex.get(currentNode) > nodeToRemoveIndex) {
+                nodesIndex.put(currentNode, nodesIndex.get(currentNode)-1);
+            }
+        }
+        // Elimina gli archi corrispondenti al nodo eliminato
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = 0; j < matrix.get(i).size(); j++) {
+                if(i == nodeToRemoveIndex || j == nodeToRemoveIndex) {
+                    this.matrix.get(i).set(j, null);
+                }
+            }
+        }
     }
 
     /*
@@ -133,7 +166,12 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
      */
     @Override
     public void removeNode(L label) {
-        // TODO implementare
+        // Controlla se l'etichetta passata è nulla
+        if(label == null) {
+            throw new NullPointerException("L'etichetta data è nulla");
+        }
+        // Richiama il metodo di rimozione del nodo
+        this.removeNode(new GraphNode<L>(label));
     }
 
     /*
@@ -143,43 +181,94 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
      */
     @Override
     public void removeNode(int i) {
-        // TODO implementare
+        // Controlla se l'indice dato rientra nel range
+        if(this.isEmpty() || i > nodesIndex.size()-1) {
+            throw new IndexOutOfBoundsException();
+        }
+        // Cerca l'indice dato
+        for (GraphNode<L> currentNode : this.nodesIndex.keySet()) {
+            // Se lo trova, richiama il metodo di rimozione sul nodo corrispondente
+            if(nodesIndex.get(currentNode) == i) {
+                this.removeNode(currentNode);
+            }
+        }
     }
 
     @Override
     public GraphNode<L> getNode(GraphNode<L> node) {
-        // TODO implementare
+        // Controlla se il nodo dato è nullo
+        if(node == null) {
+            throw new NullPointerException("Il nodo dato è nullo");
+        }
+        // Controlla se il nodo esiste
+        if(!this.nodesIndex.containsKey(node)) {
+            return null;
+        }
+        // Ritorna il nodo
+        for (GraphNode<L> currentNode : this.nodesIndex.keySet()) {
+            if(node.equals(currentNode)) {
+                return currentNode;
+            }
+        }
         return null;
     }
 
     @Override
     public GraphNode<L> getNode(L label) {
-        // TODO implementare
-        return null;
+        // Controlla se il nodo dato è nullo
+        if(label == null) {
+            throw new NullPointerException("L'etichetta data è nulla");
+        }
+        // Crea il nodo
+        return this.getNode(new GraphNode<L>(label));
     }
 
     @Override
     public GraphNode<L> getNode(int i) {
-        // TODO implementare
+        // Controlla se l'indice dato rientra nel range
+        if(this.isEmpty() || i > nodesIndex.size()-1) {
+            throw new IndexOutOfBoundsException();
+        }
+        // Ritorna il nodo
+        for (GraphNode<L> currentNode : this.nodesIndex.keySet()) {
+            if(nodesIndex.get(currentNode) == i) {
+                return currentNode;
+            }
+        }
         return null;
     }
 
     @Override
     public int getNodeIndexOf(GraphNode<L> node) {
-        // TODO implementare
-        return -1;
+        // Controlla se il nodo dato è nullo
+        if(node == null) {
+            throw new NullPointerException("Il nodo dato è nullo");
+        }
+        // Controlla se il nodo esiste
+        if(!this.nodesIndex.containsKey(node)) {
+            throw new IllegalArgumentException("Il nodo non esiste");
+        }
+        return this.nodesIndex.get(node);
     }
 
     @Override
     public int getNodeIndexOf(L label) {
-        // TODO implementare
-        return -1;
+        // Controlla se il nodo dato è nullo
+        if(label == null) {
+            throw new NullPointerException("L'etichetta data è nulla");
+        }
+        // Crea il nodo
+        GraphNode<L> node = new GraphNode<L>(label);
+        // Controlla se il nodo esiste
+        if(!this.nodesIndex.containsKey(node)) {
+            throw new IllegalArgumentException("Il nodo non esiste");
+        }
+        return this.nodesIndex.get(node);
     }
 
     @Override
     public Set<GraphNode<L>> getNodes() {
-        // TODO implementare
-        return null;
+        return this.nodesIndex.keySet();
     }
 
     @Override
