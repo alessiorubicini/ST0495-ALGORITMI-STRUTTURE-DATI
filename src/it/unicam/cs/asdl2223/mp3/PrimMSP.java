@@ -16,8 +16,7 @@ package it.unicam.cs.asdl2223.mp3;
  * Si possono usare i colori dei nodi per registrare la scoperta e la visita
  * effettuata dei nodi.
  * 
- * @author Luca Tesei (template) **INSERIRE NOME, COGNOME ED EMAIL
- *         xxxx@studenti.unicam.it DELLO STUDENTE** (implementazione)
+ * @author Luca Tesei (template) Alessio Rubicini alessio.rubicini@studenti.unicam.it (implementazione)
  * 
  * @param <L>
  *                tipo delle etichette dei nodi del grafo

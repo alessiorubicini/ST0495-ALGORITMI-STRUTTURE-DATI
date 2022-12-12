@@ -5,8 +5,7 @@ package it.unicam.cs.asdl2223.mp3;
  * Class that solves an instance of the the El Mamun's Caravan problem using
  * dynamic programming.
  * 
- * Template: Daniele Marchei and Luca Tesei, Implementation: INSERIRE NOME E
- * COGNOME DELLO STUDENTE - INSERIRE ANCHE L'EMAIL xxxx@studenti.unicam.it
+ * Template: Daniele Marchei and Luca Tesei, Implementation: Alessio Rubicini alessio.rubicini@studenti.unicam.it
  *
  */
 public class ElMamunCaravanSolver {
