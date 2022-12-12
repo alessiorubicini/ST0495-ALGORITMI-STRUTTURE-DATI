@@ -164,9 +164,10 @@ class AdjacencyMatrixUndirectedGraphTest {
         assertTrue(g.getNode("b") == null);
         // Controlla che la matrice sia ancora quadrata e non ci siano buchi
         assertDoesNotThrow(() -> {
-            for (int i = 0; i < g.nodeCount(); i++)
+            for (int i = 0; i < g.nodeCount(); i++) {
                 for (int j = 0; j < g.nodeCount(); j++)
                     g.getEdge(i, j);
+            }
         });
         assertTrue(g.getEdge("a", "a") != null);
         assertTrue(g.getEdge("a", "d") != null);

@@ -86,7 +86,7 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
             }
         }
 
-        return edgeCount;
+        return edgeCount/2;
     }
 
     @Override
@@ -156,9 +156,9 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         }
         // Salva l'indice del nodo da rimuovere
         int nodeToRemoveIndex = nodesIndex.get(node);
-        // Elimina il nodo
+        // Elimina il nodo dalla mappa dei nodi
         this.nodesIndex.remove(node);
-        // Modifica l'indice dei nodi successivi
+        // Modifica l'indice dei nodi successivi nella mappa
         for (Map.Entry<GraphNode<L>, Integer> entry : nodesIndex.entrySet()) {
             int index = entry.getValue();
             if (index > nodeToRemoveIndex) {
@@ -166,8 +166,8 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
             }
         }
         // Elimina gli archi corrispondenti al nodo eliminato
-        matrix.remove(nodeToRemoveIndex);
-        for (ArrayList<GraphEdge<L>> row : matrix) {
+        this.matrix.remove(nodeToRemoveIndex);
+        for (ArrayList<GraphEdge<L>> row : this.matrix) {
             row.remove(nodeToRemoveIndex);
         }
     }
@@ -297,16 +297,15 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         if(matrix.get(node1Index).get(node2Index) != null) return false;
         // Aggiunge l'arco alla matrice di adiacenza
         this.matrix.get(node1Index).set(node2Index, edge);
-        this.matrix.get(node2Index).set(node1Index,new GraphEdge<L>(edge.getNode2(), edge.getNode1(), false));
+        // Aggiunge anche l'arco inverso (non essendo il grafo orientato)
+        GraphEdge<L> reversedEdge = new GraphEdge<L>(edge.getNode2(), edge.getNode1(), false);
+        reversedEdge.setWeight(edge.getWeight());
+        this.matrix.get(node2Index).set(node1Index, reversedEdge);
         return true;
     }
 
     @Override
     public boolean addEdge(GraphNode<L> node1, GraphNode<L> node2) {
-        // Controlla se uno dei noti dati è nullo
-        if(node1 == null || node2 == null) {
-            throw new NullPointerException("I nodi dati sono nulli");
-        }
         // Crea l'arco che collega i due nodi
         GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
         // Aggiunge l'arco
@@ -315,10 +314,6 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public boolean addWeightedEdge(GraphNode<L> node1, GraphNode<L> node2, double weight) {
-        // Controlla se i nodi dati sono nulli
-        if(node1 == null || node2 == null) {
-            throw new NullPointerException("I nodi dati sono nulli");
-        }
         // Crea l'arco che collega i due nodi
         GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
         // Imposta il peso
@@ -477,7 +472,7 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         if(!nodesIndex.containsValue(i) || !nodesIndex.containsValue(j)) {
             throw new IndexOutOfBoundsException("Indici non corrispondono a nessun nodo");
         }
-        return(matrix.get(i).set(j, null));
+        return(matrix.get(i).get(j));
     }
 
     @Override
