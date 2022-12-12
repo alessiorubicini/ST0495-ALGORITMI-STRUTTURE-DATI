@@ -268,6 +268,7 @@ public class MapAdjacentListDirectedGraph<L> extends Graph<L> {
         if (adjacentEdges != null) {
             edges.addAll(adjacentEdges);
         }
+        // Ritorna l'insieme di archi
         return edges;
     }
 

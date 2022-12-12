@@ -46,11 +46,10 @@ public class BFSVisitor<L> {
             throw new IllegalArgumentException("Nodo sorgente non appartenente al grafo dato");
         }
 
-        // Crea un insieme di nodi non ancora visitati
+        // Crea un insieme di nodi non ancora visitati (bianchi)
         Set<GraphNode<L>> nodesToVisit = new HashSet<>(g.getNodes());
-        // Crea una lista di nodi visitati i cui vicini non sono stati visitati
+        // Crea una lista di nodi visitati i cui vicini non sono stati visitati (grigi)
         Queue<GraphNode<L>> nodesWithUnvisitedNeighbors = new LinkedList<>();
-
 
         // Imposta i nodi del grafo ai valori di default che rappresentano un nodo non visitato
         // Così l'algoritmo BFS può calcolare correttamente questi valori per ciascun nodo

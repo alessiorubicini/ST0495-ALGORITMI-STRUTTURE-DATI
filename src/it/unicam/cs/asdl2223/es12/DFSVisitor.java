@@ -34,10 +34,8 @@ public class DFSVisitor<L> {
             node.setIntegerDistance(-1);
             node.setPrevious(null);
         }
-
         // Inizializza il tempo
         this.time = 0;
-
         // Esegue la DFS su ogni nodo
         for (GraphNode<L> node : g.getNodes()) {
             if (node.getColor() == GraphNode.COLOR_WHITE) {
@@ -56,18 +54,15 @@ public class DFSVisitor<L> {
     protected void recDFS(Graph<L> g, GraphNode<L> u) {
         // Imposta il colore del nodo corrente su grigio
         u.setColor(GraphNode.COLOR_GREY);
-
         // Incrementa il tempo
         time++;
-        // Imposta il tempo di ingresso e di fine per il nodo corrente
+        // Imposta il tempo di ingresso e di uscita per il nodo corrente
         u.setEnteringTime(time);
         u.setExitingTime(time);
-
         // Itera sugli archi in uscita del nodo corrente
         for (GraphEdge<L> e : g.getEdgesOf(u)) {
             // Per ogni arco ottiene il nodo destinazione
             GraphNode<L> neighbor = e.getNode2();
-
             // Se il colore del nodo destinazione è bianco, vuol dire che è ancora da visitare
             if (neighbor.getColor() == GraphNode.COLOR_WHITE) {
                 neighbor.setPrevious(u);
@@ -75,7 +70,6 @@ public class DFSVisitor<L> {
                 recDFS(g, neighbor);
             }
         }
-
         // Imposta il colore del nodo a nero perchè è stato visitato
         u.setColor(GraphNode.COLOR_BLACK);
     }

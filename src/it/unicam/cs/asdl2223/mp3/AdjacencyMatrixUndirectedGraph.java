@@ -248,7 +248,7 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
     @Override
     public GraphNode<L> getNode(int i) {
         // Controlla che l'indice sia corretto
-        if(i < 0 || i > this.nodeCount()-1) {
+        if(i < 0 || i > this.nodeCount() - 1) {
             throw new IndexOutOfBoundsException("Indice non valido");
         }
         // Itera sui nodi
@@ -276,12 +276,8 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public int getNodeIndexOf(L label) {
-        // Controlla se il nodo dato è nullo
-        if(label == null) {
-            throw new NullPointerException("L'etichetta data è nulla");
-        }
         GraphNode<L> node = new GraphNode<L>(label);
-        return this.nodesIndex.get(node);
+        return this.getNodeIndexOf(node);
     }
 
     @Override
