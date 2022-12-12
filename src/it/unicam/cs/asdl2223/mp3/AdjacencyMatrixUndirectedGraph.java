@@ -116,14 +116,10 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         } else {
             // Aggiunge il nodo alla lista dei nodi indice
             this.nodesIndex.put(node, nodesIndex.size());
-            // Aggiunge una nuova riga alla matrice delle adiacenze per il nuovo nodo
-            ArrayList<GraphEdge<L>> newRow = new ArrayList<GraphEdge<L>>(matrix.size() + 1);
+            // Crea una nuova riga della matrice delle adiacenze per il nuovo nodo
             // La imposta tutta a null
-            for (int i = 0; i < matrix.size() + 1; i++) {
-                newRow.add(null);
-            }
-            matrix.add(newRow);
-            for (ArrayList<GraphEdge<L>> row : matrix) {
+            this.matrix.add(new ArrayList<GraphEdge<L>>(Collections.nCopies(this.nodeCount() + 1, null)));
+            for (ArrayList<GraphEdge<L>> row : this.matrix) {
                 row.add(null);
             }
             return true;
@@ -300,8 +296,8 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         // Controlla se esiste già un arco uguale
         if(matrix.get(node1Index).get(node2Index) != null) return false;
         // Aggiunge l'arco alla matrice di adiacenza
-        this.matrix.get(node1Index).add(edge);
-        this.matrix.get(node2Index).add(new GraphEdge<L>(edge.getNode2(), edge.getNode1(), false));
+        this.matrix.get(node1Index).set(node2Index, edge);
+        this.matrix.get(node2Index).set(node1Index,new GraphEdge<L>(edge.getNode2(), edge.getNode1(), false));
         return true;
     }
 
@@ -451,10 +447,8 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         int node1Index = nodesIndex.get(node1);
         int node2Index = nodesIndex.get(node2);
 
-        if (matrix.get(node1Index).get(node2Index) != null) {
+        if (this.matrix.get(node1Index).get(node2Index) != null) {
             return matrix.get(node1Index).get(node2Index);
-        } else if (matrix.get(node2Index).get(node1Index) != null) {
-            return matrix.get(node2Index).get(node1Index);
         } else {
             return null;
         }
