@@ -128,7 +128,6 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
             this.matrix.add(newRow);
             return true;
         }
-
     }
 
     /*
@@ -193,6 +192,10 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         }
         // Crea un nodo con l'etichetta data
         GraphNode<L> node = new GraphNode<L>(label);
+        // Controlla se il nodo con l'etichetta esiste
+        if(!nodesIndex.containsKey(node)) {
+            throw new IllegalArgumentException("Non esiste un nodo con l'etichetta data");
+        }
         // Rimuove il nodo
         this.removeNode(node);
     }
@@ -208,18 +211,10 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         if(i < 0 || i > this.nodeCount()-1) {
             throw new IndexOutOfBoundsException("Indice non valido");
         }
-        // Ottiene l'insieme dei nodi del grafo
-        Set<GraphNode<L>> nodes = nodesIndex.keySet();
-        // Itera sui nodi
-        for (GraphNode<L> node : nodes) {
-            // Quando incontra l'indice dato
-            if (nodesIndex.get(node) == i) {
-                // Rimuove il nodo
-                this.removeNode(node);
-                // Esce dal ciclo
-                break;
-            }
-        }
+        // Ottiene il nodo all'indice i
+        GraphNode<L> node = this.getNode(i);
+        // Rimuove il nodo
+        this.removeNode(node);
     }
 
     @Override
@@ -259,11 +254,8 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         }
         // Itera sui nodi del grafo
         for (GraphNode<L> node : nodesIndex.keySet()) {
-            // Quando incontra il nodo con l'indice dato
-            if (nodesIndex.get(node) == i) {
-                // Ritorna il nodo
-                return node;
-            }
+            // Quando incontra il nodo con l'indice dato, lo ritorna
+            if (nodesIndex.get(node) == i) return node;
         }
         return null;
     }
@@ -284,10 +276,18 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public int getNodeIndexOf(L label) {
+        // Controlla se l'etichetta data è nulla
+        if(label == null) {
+            throw new NullPointerException("L'etichetta data è nulla");
+        }
         // Crea un nodo con l'etichetta data
         GraphNode<L> node = new GraphNode<L>(label);
+        // Controlla se esiste un nodo con l'etichetta
+        if(!nodesIndex.containsKey(node)) {
+            throw new IllegalArgumentException("Il nodo dato non esiste");
+        }
         // Ritorna l'indice del nodo
-        return this.getNodeIndexOf(node);
+        return this.nodesIndex.get(node);
     }
 
     @Override
@@ -330,9 +330,7 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
     @Override
     public boolean addWeightedEdge(GraphNode<L> node1, GraphNode<L> node2, double weight) {
         // Crea l'arco che collega i nodi dati
-        GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
-        // Imposta il peso dell'arco
-        edge.setWeight(weight);
+        GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false, weight);
         // Aggiunge l'arco creato
         return this.addEdge(edge);
     }
@@ -344,8 +342,8 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
             throw new NullPointerException("Le etichette date sono nulle.");
         }
         // Crea i nodi corrispondenti
-        GraphNode<L> node1 = new GraphNode<L>(label1);
-        GraphNode<L> node2 = new GraphNode<L>(label2);
+        GraphNode<L> node1 = this.getNode(label1);
+        GraphNode<L> node2 = this.getNode(label2);
         // Aggiunge l'arco che collega i due nodi
         return this.addEdge(node1, node2);
     }
@@ -357,8 +355,8 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
             throw new NullPointerException("Le etichette date sono nulle.");
         }
         // Crea i nodi con le etichette date
-        GraphNode<L> node1 = new GraphNode<L>(label1);
-        GraphNode<L> node2 = new GraphNode<L>(label2);
+        GraphNode<L> node1 = this.getNode(label1);
+        GraphNode<L> node2 = this.getNode(label2);
         // Aggiunge l'arco con il peso dato
         return this.addWeightedEdge(node1, node2, weight);
     }
@@ -372,11 +370,10 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         // Ottiene i rispettivi nodi
         GraphNode<L> node1 = this.getNode(i);
         GraphNode<L> node2 = this.getNode(j);
-        // Crea un arco che collega i due nodi
-        GraphEdge<L> edge = new GraphEdge<>(node1, node2, false);
+        // Ottiene l'arco che collega i due nodi
+        GraphEdge<L> edge = this.getEdge(node1, node2);
         // Aggiunge l'arco
-        this.addEdge(edge);
-        return true;
+        return this.addEdge(edge);
     }
 
     @Override
@@ -416,19 +413,41 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public void removeEdge(GraphNode<L> node1, GraphNode<L> node2) {
-        // Crea un arco non-orientato con i nodi dati
-        GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
+        // Controlla se le etichette date sono nulle
+        if(node1 == null || node2 == null) {
+            throw new NullPointerException("I nodi dati sono nulli.");
+        }
+        // Controlla se i nodi esistono
+        if(!nodesIndex.containsKey(node1) || !nodesIndex.containsKey(node2)) {
+            throw new IllegalArgumentException("I nodi non esistono");
+        }
+        // Controlla se l'arco che collega i due nodi esiste
+        if(this.matrix.get(getNodeIndexOf(node1)).get(getNodeIndexOf(node2)) == null) {
+            throw new IllegalArgumentException("L'arco non esiste.");
+        }
+        // Ottiene l'arco che collega i nodi dati
+        GraphEdge<L> edge = this.getEdge(node1, node2);
         // Rimuove l'arco
         this.removeEdge(edge);
     }
 
     @Override
     public void removeEdge(L label1, L label2) {
-        // Crea i nodi con le etichette date
-        GraphNode<L> node1 = new GraphNode<L>(label1);
-        GraphNode<L> node2 = new GraphNode<L>(label2);
-        // Rimuove l'arco che collega i due nodi
-        this.removeEdge(node1, node2);
+        // Controlla se le etichette date sono nulle
+        if(label1 == null || label2 == null) {
+            throw new NullPointerException("Le etichette date sono nulle.");
+        }
+        // Ottiene i nodi con le etichette date e l'arco corrispondente
+        GraphNode<L> node1 = this.getNode(label1);
+        GraphNode<L> node2 = this.getNode(label2);
+        GraphEdge<L> edge = this.getEdge(node1, node2);
+        // Controlla se esiste un arco con i nodi con le etichette date
+        if(node1 == null || node2 == null || edge == null) {
+            throw new IllegalArgumentException("L'arco o i suoi nodi non esistono.");
+        } else {
+            // Rimuove l'arco che collega i due nodi
+            this.removeEdge(edge);
+        }
     }
 
     @Override
@@ -462,27 +481,32 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         // Ottiene gli indici dei nodi
         int node1Index = nodesIndex.get(node1);
         int node2Index = nodesIndex.get(node2);
-        // Se l'arco esiste, lo ritorna
-        if (this.matrix.get(node1Index).get(node2Index) != null) {
-            return matrix.get(node1Index).get(node2Index);
-        } else {
-            return null;
-        }
+        // Ritorna l'arco, se esiste (altrimenti è null)
+        return matrix.get(node1Index).get(node2Index);
     }
 
     @Override
     public GraphEdge<L> getEdge(GraphNode<L> node1, GraphNode<L> node2) {
-        // Crea un arco non orientato con i nodi dati
-        GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
-        // Ritorna lo stesso arco dal grafo
-        return this.getEdge(edge);
+        // Controlla se i nodi dati sono nulli
+        if(node1 == null || node2 == null) {
+            throw new NullPointerException("I nodi dati sono nulli");
+        }
+        // Ottiene gli indici dei nodi
+        int node1Index = nodesIndex.get(node1);
+        int node2Index = nodesIndex.get(node2);
+        // Ritorna l'arco, se esiste (altrimenti è null)
+        return matrix.get(node1Index).get(node2Index);
     }
 
     @Override
     public GraphEdge<L> getEdge(L label1, L label2) {
+        // Controlla se le etichette date sono nulle
+        if(label1 == null || label2 == null) {
+            throw new NullPointerException("Le etichette date sono nulle");
+        }
         // Crea due nodi con le etichette date
-        GraphNode<L> node1 = new GraphNode<L>(label1);
-        GraphNode<L> node2 = new GraphNode<L>(label2);
+        GraphNode<L> node1 = this.getNode(label1);
+        GraphNode<L> node2 = this.getNode(label2);
         // Ritorna l'arco che collega i due nodi
         return this.getEdge(node1, node2);
     }
@@ -516,10 +540,9 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         // Crea un insieme di nodi adiacenti
         Set<GraphNode<L>> adjacentNodes = new HashSet<GraphNode<L>>();
         // Itera sugli archi del nodo
-        for (int i = 0; i < matrix.get(nodeIndex).size(); i++) {
-            // Se esiste un arco, aggiunge il nodo a cui è collegato all'insieme
-            if (matrix.get(nodeIndex).get(i) != null) {
-                adjacentNodes.add(getNode(i));
+        for(GraphEdge<L> edge: matrix.get(nodeIndex)) {
+            if(edge != null) {
+                adjacentNodes.add(edge.getNode2());
             }
         }
         return adjacentNodes;
@@ -527,8 +550,16 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public Set<GraphNode<L>> getAdjacentNodesOf(L label) {
+        // Controlla se l'etichetta data è nulla
+        if(label == null) {
+            throw new NullPointerException("L'etichetta data è nulla");
+        }
         // Crea un nodo con l'etichetta data
         GraphNode<L> node = new GraphNode<L>(label);
+        // Controlla se esiste un nodo con l'etichetta data
+        if(!nodesIndex.containsKey(node)) {
+            throw new IllegalArgumentException("Non esiste un nodo con l'etichetta data.");
+        }
         // Ritorna i nodi adiacenti al nodo
         return this.getAdjacentNodesOf(node);
     }
@@ -539,17 +570,8 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         if (i < 0 || i > nodeCount() - 1) {
             throw new IndexOutOfBoundsException("Indice non valido.");
         }
-        // Crea un insieme di nodi adiacenti
-        Set<GraphNode<L>> adjacentNodes = new HashSet<GraphNode<L>>();
-        // Itera sulla rispettiva riga del nodo nella matrice di adiacenze
-        for (int j = 0; j < matrix.get(i).size(); j++) {
-            // Se l'arco esiste, aggiunge l'altro nodo all'insieme
-            if (matrix.get(i).get(j) != null) {
-                adjacentNodes.add(getNode(j));
-            }
-        }
-
-        return adjacentNodes;
+        // Ritorna i nodi adiacenti al nodo di indice i
+        return this.getAdjacentNodesOf(this.getNode(i));
     }
 
     @Override
@@ -583,14 +605,21 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         // Ottiene l'indice del nodo dalla mappa
         int nodeIndex = nodesIndex.get(node);
         // Ottiene l'insieme di archi del nodo dato il suo indice
-        Set<GraphEdge<L>> edges = this.getEdgesOf(nodeIndex);
-        return edges;
+        return this.getEdgesOf(nodeIndex);
     }
 
     @Override
     public Set<GraphEdge<L>> getEdgesOf(L label) {
-        // Crea un nodo con l'etichetta data
-        GraphNode<L> node = new GraphNode<L>(label);
+        // Controlla se l'etichetta data è nulla
+        if(label == null) {
+            throw new NullPointerException("L'etichetta data è nulla");
+        }
+        // Ottiene il nodo con l'etichetta data
+        GraphNode<L> node = this.getNode(label);
+        // Controlla se il nodo esiste
+        if(!this.nodesIndex.containsKey(node)) {
+            throw new IllegalArgumentException("Il nodo con l'etichetta data non esiste.");
+        }
         // Ritorna gli archi del nodo
         return this.getEdgesOf(node);
     }
