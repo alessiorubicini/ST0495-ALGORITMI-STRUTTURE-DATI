@@ -81,23 +81,23 @@ public class PrimMSP<L> {
                 throw new IllegalArgumentException("Grafo non pesato");
             } else if(edge.getWeight() < 0) {
                 throw new IllegalArgumentException("Grafo pesato con pesi negativi");
-            } else {
-                continue;
             }
         }
-
-        // Inizializza la coda di priorità
-        priorityQueue.clear();
 
         // Inizializza i valori di tutti i nodi
         for(GraphNode<L> node: g.getNodes()) {
             if(node.equals(s)) {
                 // Imposta il valore chiave (distanza) del nodo sorgente a 0
                 node.setFloatingPointDistance(0);
+                // Il nodo sorgente è subito visitato, quindi viene colorato di nero
+                node.setColor(GraphNode.COLOR_BLACK);
             } else {
                 // Per gli altri nodi imposta un valore massimo
-                node.setFloatingPointDistance(Double.MAX_VALUE);
+                node.setFloatingPointDistance(Double.POSITIVE_INFINITY);
+                // E il colore bianco di non visitato
+                node.setColor(GraphNode.COLOR_WHITE);
             }
+            // Imposta il nodo parent a null
             node.setPrevious(null);
             // Aggiunge il nodo alla coda di priorità
             priorityQueue.add(node);
@@ -106,31 +106,42 @@ public class PrimMSP<L> {
         // Finché la coda di priorità non è vuota
         while (!priorityQueue.isEmpty()) {
             // Estra il primo nodo dalla coda di priorità
-            GraphNode<L> extractedNode = priorityQueue.remove(0);
-            System.out.println("Estratto " + extractedNode);
+            GraphNode<L> extractedNode = this.extractNodeWithMinimumKey();
+            // Colora il nodo come visitato
+            extractedNode.setColor(GraphNode.COLOR_BLACK);
             // Itera sui nodi adiacenti al nodo estratto
             for(GraphNode<L> currentNode: g.getAdjacentNodesOf(extractedNode)) {
-                System.out.println("-- " + currentNode);
-                // Ottiene l'arco che collega il nodo estratto al nodo corrente
+                // Ottiene l'arco che collega il nodo estratto al nodo corrente del loop
                 GraphEdge<L> edge = g.getEdge(extractedNode, currentNode);
-                System.out.println("-- " + edge);
                 // Se la coda di priorità contiene il nodo corrente
                 // e il peso dell'arco è minore del valore chiave (distanza) del nodo corrente
-                System.out.println("---> Peso " + edge.getWeight() + " < Key " + currentNode.getFloatingPointDistance());
                 if(priorityQueue.contains(currentNode) && edge.getWeight() < currentNode.getFloatingPointDistance()) {
-                    System.out.println("SI!!! --->");
-                    // Imposta il parent del nodo corrente al nodo estratto
+                    // Imposta il nodo estratto come parent del nodo corrente
                     currentNode.setPrevious(extractedNode);
-                    System.out.println("---- Imposto " + currentNode + ".previous a " + extractedNode);
                     // Imposta come valore chiave (distanza) il peso dell'arco
                     currentNode.setFloatingPointDistance(edge.getWeight());
-                } else {
-
                 }
             }
         }
+    }
 
-        // TODO implementare
+    /**
+     * Estrae dalla coda di priorità il nodo con chiave (distanza) minima
+     * @return il nodo con chiave (distanza) minima
+     */
+    private GraphNode<L> extractNodeWithMinimumKey() {
+        // Prende come riferimento il primo elemento
+        GraphNode<L> minimum = priorityQueue.get(0);
+        // Scorre la coda di priorità cercando il minimo
+        for(GraphNode<L> node: priorityQueue) {
+            if(node.getFloatingPointDistance() < minimum.getFloatingPointDistance()) {
+                minimum = node;
+            }
+        }
+        // Rimuove il nodo dalla coda
+        priorityQueue.remove(minimum);
+        // Ritorna il nodo
+        return minimum;
     }
 
 }
