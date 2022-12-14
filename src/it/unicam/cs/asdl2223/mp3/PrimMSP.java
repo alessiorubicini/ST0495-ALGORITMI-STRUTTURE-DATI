@@ -91,15 +91,17 @@ public class PrimMSP<L> {
 
         // Inizializza i valori di tutti i nodi
         for(GraphNode<L> node: g.getNodes()) {
-            node.setFloatingPointDistance(Double.MAX_VALUE);
+            if(node.equals(s)) {
+                // Imposta il valore chiave (distanza) del nodo sorgente a 0
+                node.setFloatingPointDistance(0);
+            } else {
+                // Per gli altri nodi imposta un valore massimo
+                node.setFloatingPointDistance(Double.MAX_VALUE);
+            }
             node.setPrevious(null);
             // Aggiunge il nodo alla coda di priorità
             priorityQueue.add(node);
         }
-
-        // Imposta il valore chiave (distanza) del nodo sorgente a default
-        s.setFloatingPointDistance(0);
-        s.setPrevious(null);
 
         // Finché la coda di priorità non è vuota
         while (!priorityQueue.isEmpty()) {
@@ -108,19 +110,22 @@ public class PrimMSP<L> {
             System.out.println("Estratto " + extractedNode);
             // Itera sui nodi adiacenti al nodo estratto
             for(GraphNode<L> currentNode: g.getAdjacentNodesOf(extractedNode)) {
-                System.out.println("-- Nodo: " + currentNode);
+                System.out.println("-- " + currentNode);
                 // Ottiene l'arco che collega il nodo estratto al nodo corrente
                 GraphEdge<L> edge = g.getEdge(extractedNode, currentNode);
-                System.out.println("-- Arco: " + edge);
+                System.out.println("-- " + edge);
                 // Se la coda di priorità contiene il nodo corrente
                 // e il peso dell'arco è minore del valore chiave (distanza) del nodo corrente
+                System.out.println("---> Peso " + edge.getWeight() + " < Key " + currentNode.getFloatingPointDistance());
                 if(priorityQueue.contains(currentNode) && edge.getWeight() < currentNode.getFloatingPointDistance()) {
-                    System.out.println("---- "+ currentNode + " è nella queue e " + edge.getWeight() + " < " + currentNode.getFloatingPointDistance());
+                    System.out.println("SI!!! --->");
                     // Imposta il parent del nodo corrente al nodo estratto
                     currentNode.setPrevious(extractedNode);
                     System.out.println("---- Imposto " + currentNode + ".previous a " + extractedNode);
                     // Imposta come valore chiave (distanza) il peso dell'arco
                     currentNode.setFloatingPointDistance(edge.getWeight());
+                } else {
+
                 }
             }
         }
