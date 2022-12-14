@@ -40,8 +40,10 @@ public class ElMamunCaravanSolver {
             throw new NullPointerException(
                     "Creazione di solver con expression null");
         this.expression = expression;
-        this.table = new Integer[expression.size()][expression.size()];
-        this.tracebackTable = new Integer[expression.size()][expression.size()];
+        // Inizializza la tabella e la tabella di traceback
+        this.table = new Integer[this.expression.size()][this.expression.size()];
+        this.tracebackTable = new Integer[this.expression.size()][this.expression.size()];
+        // Imposta flag di risoluzione a false
         this.solved = false;
     }
 
@@ -55,42 +57,6 @@ public class ElMamunCaravanSolver {
     }
 
     /**
-     * Initializes the tables used by this solver.
-     */
-    private void initializeTables() {
-        for (int i = 0; i < expression.size(); i++) {
-            for (int j = 0; j < expression.size(); j++) {
-                table[i][j] = null;
-                tracebackTable[i][j] = null;
-            }
-        }
-    }
-
-    private List<Integer> getCandidateSolutions(int start, int end, Expression expression) {
-        List<Integer> candidates = new ArrayList<>();
-
-        // Iterate over the possible split positions of the sub-problem
-        for (int split = start; split < end; split++) {
-            // Left and right sub-problems
-            int left = table[start][split];
-            int right = table[split + 1][end];
-
-            // Get the operator at the split position
-            String operator = expression.get(split).getValue().toString();
-
-            // Calculate the candidate solution based on the operator
-            if (operator.equals("+")) {
-                candidates.add(left + right);
-            } else if (operator.equals("*")) {
-                candidates.add(left * right);
-            }
-        }
-
-        return candidates;
-    }
-
-
-    /**
      * Solve the problem on the expression of this solver by using a given
      * objective function.
      * 
@@ -101,31 +67,7 @@ public class ElMamunCaravanSolver {
      *                                  if the objective function is null
      */
     public void solve(ObjectiveFunction function) {
-        if (function == null) {
-            throw new NullPointerException("Objective function is null");
-        }
-
-        initializeTables();
-
-        for (int span = 1; span <= expression.size(); span++) {
-            for (int i = 0; i + span <= expression.size(); i++) {
-                int j = i + span - 1;
-                if (span == 1) {
-                    // base case: a single digit
-                    table[i][j] = (Integer) expression.get(i).getValue();
-                } else {
-                    // general case: find the optimal solution among the candidates
-                    List<Integer> candidates = getCandidateSolutions(i, j, expression);
-                    table[i][j] = function.getBest(candidates);
-
-                    // record the chosen optimal solution in the traceback table
-                    int k = function.getBestIndex(candidates);
-                    tracebackTable[i][j] = k;
-                }
-            }
-        }
-
-        this.solved = true;
+        // TODO Implement
     }
 
     /**
@@ -138,10 +80,8 @@ public class ElMamunCaravanSolver {
      *                                   if the problem has never been solved
      */
     public int getOptimalSolution() {
-        if (!solved) {
-            throw new IllegalStateException("Problem not solved");
-        }
-        return table[0][expression.size() - 1];
+        // TODO Implement
+        return -1;
     }
 
     /**

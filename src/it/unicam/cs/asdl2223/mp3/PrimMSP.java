@@ -1,8 +1,10 @@
 package it.unicam.cs.asdl2223.mp3;
 
-//TODO completare gli import necessari
-
 //ATTENZIONE: è vietato includere import a pacchetti che non siano della Java SE
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * Classe singoletto che implementa l'algoritmo di Prim per trovare un Minimum
@@ -24,7 +26,12 @@ package it.unicam.cs.asdl2223.mp3;
  */
 public class PrimMSP<L> {
 
-    // TODO inserire le variabili istanza che si ritengono necessarie
+    // Coda di priorità per l'algoritmo di Prim
+    private PriorityQueue<GraphNode<L>> priorityQueue;
+
+
+    // Insieme dei nodi già visitati
+    private List<GraphNode<L>> visitedNodes;
 
     /*
      * In particolare: si deve usare una coda con priorità che può semplicemente
@@ -37,7 +44,10 @@ public class PrimMSP<L> {
      * vuota.
      */
     public PrimMSP() {
-        // TODO implementare
+        // Inizializza la coda di priorità come lista vuota
+        this.priorityQueue = new PriorityQueue<GraphNode<L>>();
+        // Inizializza l'insieme dei nodi già visitati come lista vuota
+        this.visitedNodes = new ArrayList<GraphNode<L>>();
     }
 
     /**
@@ -60,6 +70,64 @@ public class PrimMSP<L> {
      *        con pesi negativi
      */
     public void computeMSP(Graph<L> g, GraphNode<L> s) {
+        // Controlla se il grafo e il nodo sorgente sono nulli
+        if (g == null || s == null) {
+            throw new NullPointerException("Grafo o nodo sorgente nulli");
+        }
+        // Controlla se il nodo sorgente esiste nel grafo
+        if (g.getNode(s) == null) {
+            throw new IllegalArgumentException("Nodo sorgente non esistente nel grafo");
+        }
+        // Controlla se il grafo è orientato, non pesato o con pesi negativi
+        if(g.isDirected()) {
+            throw new IllegalArgumentException("Grafo orienttato");
+        }
+        // Controlla se il grafo non è pesato o ha pesi negativi
+        for(GraphEdge<L> edge: g.getEdges()) {
+            if(Double.isNaN(edge.getWeight())) {
+                throw new IllegalArgumentException("Grafo non pesato");
+            } else if(edge.getWeight() < 0) {
+                throw new IllegalArgumentException("Grafo pesato con pesi negativi");
+            } else {
+                continue;
+            }
+        }
+
+        // Inizializza la coda di priorità e l'insieme dei nodi già visitati
+        priorityQueue.clear();
+        visitedNodes.clear();
+
+        // Inizializza i valori di tutti i nodi
+        for(GraphNode<L> node: g.getNodes()) {
+            node.setFloatingPointDistance(-1);
+            node.setIntegerDistance(-1);
+            node.setPrevious(null);
+            // Aggiunge il nodo alla coda di priorità
+            priorityQueue.add(node);
+        }
+
+        // Imposta il valore chiave (distanza) del nodo sorgente a default
+        s.setFloatingPointDistance(0);
+
+        // Finché la coda di priorità non è vuota
+        while (!priorityQueue.isEmpty()) {
+            // Estra il primo nodo dalla coda di priorità
+            GraphNode<L> extractedNode = priorityQueue.poll();
+            // Itera sui nodi adiacenti al nodo estratto
+            for(GraphNode<L> currentNode: g.getAdjacentNodesOf(extractedNode)) {
+                // Ottiene l'arco che collega il nodo estratto al nodo corrente
+                GraphEdge<L> edge = g.getEdge(extractedNode, currentNode);
+                // Se la coda di priorità contiene il nodo corrente
+                // e il peso dell'arco è minore del valore chiave (distanza) del nodo corrente
+                if(priorityQueue.contains(currentNode) && edge.getWeight() < currentNode.getFloatingPointDistance()) {
+                    // Imposta il parent del nodo corrente al nodo estratto
+                    currentNode.setPrevious(extractedNode);
+                    // Imposta come valore chiave (distanza) il peso dell'arco
+                    currentNode.setFloatingPointDistance(edge.getWeight());
+                }
+            }
+        }
+
         // TODO implementare
     }
 
