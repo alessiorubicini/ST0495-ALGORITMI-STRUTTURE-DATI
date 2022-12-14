@@ -40,10 +40,10 @@ public class ElMamunCaravanSolver {
             throw new NullPointerException(
                     "Creazione di solver con expression null");
         this.expression = expression;
-        // Inizializza la tabella e la tabella di traceback
+        // Initialize the table and the traceback table
         this.table = new Integer[this.expression.size()][this.expression.size()];
         this.tracebackTable = new Integer[this.expression.size()][this.expression.size()];
-        // Imposta flag di risoluzione a false
+        // Set resolution flag to false
         this.solved = false;
     }
 
@@ -80,8 +80,10 @@ public class ElMamunCaravanSolver {
      *                                   if the problem has never been solved
      */
     public int getOptimalSolution() {
-        // TODO Implement
-        return -1;
+        if (!this.solved) {
+            throw new IllegalStateException("Problem has never been solved");
+        }
+        return this.table[0][this.expression.size() - 1];
     }
 
     /**
