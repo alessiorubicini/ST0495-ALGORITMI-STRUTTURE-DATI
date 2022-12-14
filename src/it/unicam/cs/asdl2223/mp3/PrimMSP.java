@@ -4,7 +4,6 @@ package it.unicam.cs.asdl2223.mp3;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
 
 /**
  * Classe singoletto che implementa l'algoritmo di Prim per trovare un Minimum
@@ -27,11 +26,7 @@ import java.util.PriorityQueue;
 public class PrimMSP<L> {
 
     // Coda di priorità per l'algoritmo di Prim
-    private PriorityQueue<GraphNode<L>> priorityQueue;
-
-
-    // Insieme dei nodi già visitati
-    private List<GraphNode<L>> visitedNodes;
+    private List<GraphNode<L>> priorityQueue;
 
     /*
      * In particolare: si deve usare una coda con priorità che può semplicemente
@@ -45,9 +40,7 @@ public class PrimMSP<L> {
      */
     public PrimMSP() {
         // Inizializza la coda di priorità come lista vuota
-        this.priorityQueue = new PriorityQueue<GraphNode<L>>();
-        // Inizializza l'insieme dei nodi già visitati come lista vuota
-        this.visitedNodes = new ArrayList<GraphNode<L>>();
+        this.priorityQueue = new ArrayList<GraphNode<L>>();
     }
 
     /**
@@ -93,14 +86,12 @@ public class PrimMSP<L> {
             }
         }
 
-        // Inizializza la coda di priorità e l'insieme dei nodi già visitati
+        // Inizializza la coda di priorità
         priorityQueue.clear();
-        visitedNodes.clear();
 
         // Inizializza i valori di tutti i nodi
         for(GraphNode<L> node: g.getNodes()) {
-            node.setFloatingPointDistance(-1);
-            node.setIntegerDistance(-1);
+            node.setFloatingPointDistance(Double.MAX_VALUE);
             node.setPrevious(null);
             // Aggiunge il nodo alla coda di priorità
             priorityQueue.add(node);
@@ -108,20 +99,26 @@ public class PrimMSP<L> {
 
         // Imposta il valore chiave (distanza) del nodo sorgente a default
         s.setFloatingPointDistance(0);
+        s.setPrevious(null);
 
         // Finché la coda di priorità non è vuota
         while (!priorityQueue.isEmpty()) {
             // Estra il primo nodo dalla coda di priorità
-            GraphNode<L> extractedNode = priorityQueue.poll();
+            GraphNode<L> extractedNode = priorityQueue.remove(0);
+            System.out.println("Estratto " + extractedNode);
             // Itera sui nodi adiacenti al nodo estratto
             for(GraphNode<L> currentNode: g.getAdjacentNodesOf(extractedNode)) {
+                System.out.println("-- Nodo: " + currentNode);
                 // Ottiene l'arco che collega il nodo estratto al nodo corrente
                 GraphEdge<L> edge = g.getEdge(extractedNode, currentNode);
+                System.out.println("-- Arco: " + edge);
                 // Se la coda di priorità contiene il nodo corrente
                 // e il peso dell'arco è minore del valore chiave (distanza) del nodo corrente
                 if(priorityQueue.contains(currentNode) && edge.getWeight() < currentNode.getFloatingPointDistance()) {
+                    System.out.println("---- "+ currentNode + " è nella queue e " + edge.getWeight() + " < " + currentNode.getFloatingPointDistance());
                     // Imposta il parent del nodo corrente al nodo estratto
                     currentNode.setPrevious(extractedNode);
+                    System.out.println("---- Imposto " + currentNode + ".previous a " + extractedNode);
                     // Imposta come valore chiave (distanza) il peso dell'arco
                     currentNode.setFloatingPointDistance(edge.getWeight());
                 }
