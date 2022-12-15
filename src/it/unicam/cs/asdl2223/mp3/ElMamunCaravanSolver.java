@@ -69,44 +69,59 @@ public class ElMamunCaravanSolver {
      *                                  if the objective function is null
      */
     public void solve(ObjectiveFunction function) {
-        // TODO Implement
+        // Controlla se la funzione passata è nulla
         if(function == null) {
             throw new NullPointerException("The function is null.");
         }
 
-        // Riempie la diagonale della matrice
-        for (int i = 0; i < expression.size(); i=i+2) {
+        // Inserisco i valori dell'espressione nella diagonale della matrice
+        for (int i = 0; i < expression.size(); i+=2) {
             this.table[i][i] = (Integer) this.expression.get(i).getValue();
         }
 
-        ArrayList<Integer> values = new ArrayList<Integer>();
-        ArrayList<Integer> kChoices = new ArrayList<Integer>();
-        MinimumFunction minimumFunction = new MinimumFunction();
+        ArrayList<Integer> values = new ArrayList<Integer>();       // Valori calcolati da best
+        ArrayList<Integer> kChoices = new ArrayList<Integer>();     // k per i valori calcolati da best
 
-        // Calcola il migliore
-        int bestValueIndex = 0;
-        int bestK = 0;
-        for (int i = 0; i < this.expression.size(); i=i+2) {
-            for (int j = 2; j < this.expression.size(); j=j+2) {
-                // Calcola il valore migliore
-                for (int k = 0; (i + k + 2 <= j); k=k+2) {
-                    if(expression.get(i+k+1).getValue() == "+") {
-                        values.add(table[i][i+k] + table[i+k+2][j]);
-                    } else {
-                        values.add(table[i][i+k] * table[i+k+2][j]);
+        int bestValueIndex = 0;     // Indice del valore miglioree
+        int bestK = 0;              // k per il valore migliore
+        int operand1, operand2;
 
+        printTable();
+
+        // Itera sulla matrice e sull'espressione
+        for (int i = 0; i < this.expression.size(); i+=2) {
+            for (int j = 2; j < this.expression.size(); j+=2) {
+                // Calcola il valore migliore facendo variare k
+                for (int k = 0; (i + k + 2 <= j); k+=2) {
+                    System.out.println("Inizio loop, k = " + k);
+                    if(i < j && expression.get(i).getType() == ItemType.DIGIT && expression.get(j).getType() == ItemType.DIGIT) {
+                        System.out.println(i + " + " + k + " + 2 <= " + j);
+                        System.out.print("table["+i+"]["+(i+k)+"] " +  expression.get(i+k+1).getValue() + " table["+(i+k+2)+"]["+j+"] \t");
+                        System.out.println(table[i][i+k] + " " +  expression.get(i+k+1).getValue() + " " + table[i+k+2][j]);
+
+                        // Se l'operatore è una somma allora somma i due operandi
+                        operand1 = table[i][i+k];
+                        operand2 = table[i+k+2][j];
+                        ExpressionItem operator = expression.get(i+k+1);
+                        // Esegue la corretta operazione
+                        if(operator.getValue() == "+") {
+                            values.add(operand1 + operand2);
+                        } else {
+                            values.add(operand1 * operand2);
+                        }
+                        // Aggiunge il rispettivo k alla lista dei k
+                        kChoices.add(k);
                     }
-                    // Aggiunge il rispettivo k alla lista dei k
-                    kChoices.add(k);
                 }
-                System.out.println(values.size() + " = " + kChoices.size());
+
                 // Calcolo il valore migliore tra quelli calcolati
-                bestValueIndex = minimumFunction.getBestIndex(values);
-                // Memorizza la scelta di k nella tabella di traceback
+                bestValueIndex = function.getBestIndex(values);
+                // Memorizza la scelta di k per il valore migliore nella tabella di traceback
                 this.tracebackTable[i][j] = kChoices.get(bestValueIndex);
             }
         }
-
+        this.solved = true;
+        // TODO Implement
     }
 
     /**
@@ -175,5 +190,25 @@ public class ElMamunCaravanSolver {
         // Recursively compute the optimal parenthesization for the two
         // sub-expressions and return the result with the appropriate parenthesis
         return "(" + traceback(i, k) + expression.get(k) + traceback(k + 1, j) + ")";
+    }
+
+    public void printTable() {
+        System.out.print("   ");
+        for (int i = 0; i <table.length ; i++) {
+            System.out.print(i + "\t  ");
+        }
+        System.out.println();
+        for (int i = 0; i < table.length; i++) {
+            System.out.print(i + " [");
+            for (int j = 0; j < table.length; j++) {
+                if(table[i][j] != null) {
+                    System.out.print(table[i][j] + "   , ");
+                } else {
+                    System.out.print(table[i][j] + ", ");
+                }
+            }
+            System.out.println("]");
+        }
+        System.out.println();
     }
 }
