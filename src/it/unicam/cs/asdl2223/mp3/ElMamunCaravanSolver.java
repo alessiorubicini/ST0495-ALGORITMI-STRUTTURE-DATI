@@ -1,7 +1,9 @@
 package it.unicam.cs.asdl2223.mp3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -68,6 +70,43 @@ public class ElMamunCaravanSolver {
      */
     public void solve(ObjectiveFunction function) {
         // TODO Implement
+        if(function == null) {
+            throw new NullPointerException("The function is null.");
+        }
+
+        // Riempie la diagonale della matrice
+        for (int i = 0; i < expression.size(); i=i+2) {
+            this.table[i][i] = (Integer) this.expression.get(i).getValue();
+        }
+
+        ArrayList<Integer> values = new ArrayList<Integer>();
+        ArrayList<Integer> kChoices = new ArrayList<Integer>();
+        MinimumFunction minimumFunction = new MinimumFunction();
+
+        // Calcola il migliore
+        int bestValueIndex = 0;
+        int bestK = 0;
+        for (int i = 0; i < this.expression.size(); i=i+2) {
+            for (int j = 2; j < this.expression.size(); j=j+2) {
+                // Calcola il valore migliore
+                for (int k = 0; (i + k + 2 <= j); k=k+2) {
+                    if(expression.get(i+k+1).getValue() == "+") {
+                        values.add(table[i][i+k] + table[i+k+2][j]);
+                    } else {
+                        values.add(table[i][i+k] * table[i+k+2][j]);
+
+                    }
+                    // Aggiunge il rispettivo k alla lista dei k
+                    kChoices.add(k);
+                }
+                System.out.println(values.size() + " = " + kChoices.size());
+                // Calcolo il valore migliore tra quelli calcolati
+                bestValueIndex = minimumFunction.getBestIndex(values);
+                // Memorizza la scelta di k nella tabella di traceback
+                this.tracebackTable[i][j] = kChoices.get(bestValueIndex);
+            }
+        }
+
     }
 
     /**
@@ -124,13 +163,12 @@ public class ElMamunCaravanSolver {
         return "ElMamunCaravanSolver for " + expression;
     }
 
-    // TODO implementare: inserire eventuali metodi privati per rendere l'implementazione più modulare
-
     // Recursive method to compute the optimal parenthesization of a sub-expression
     private String traceback(int i, int j) {
         // If the sub-expression is just a digit, return the digit as a string
-        if (i == j)
+        if (i == j) {
             return expression.get(i).toString();
+        }
         // Otherwise, compute the index of the operator that separates the
         // sub-expression in two sub-expressions
         int k = tracebackTable[i][j];
