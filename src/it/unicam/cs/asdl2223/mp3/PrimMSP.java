@@ -63,46 +63,12 @@ public class PrimMSP<L> {
      *        con pesi negativi
      */
     public void computeMSP(Graph<L> g, GraphNode<L> s) {
-        // Controlla se il grafo e il nodo sorgente sono nulli
-        if (g == null || s == null) {
-            throw new NullPointerException("Grafo o nodo sorgente nulli");
-        }
-        // Controlla se il nodo sorgente esiste nel grafo
-        if (g.getNode(s) == null) {
-            throw new IllegalArgumentException("Nodo sorgente non esistente nel grafo");
-        }
-        // Controlla se il grafo è orientato, non pesato o con pesi negativi
-        if(g.isDirected()) {
-            throw new IllegalArgumentException("Grafo orienttato");
-        }
-        // Controlla se il grafo non è pesato o ha pesi negativi
-        for(GraphEdge<L> edge: g.getEdges()) {
-            if(Double.isNaN(edge.getWeight())) {
-                throw new IllegalArgumentException("Grafo non pesato");
-            } else if(edge.getWeight() < 0) {
-                throw new IllegalArgumentException("Grafo pesato con pesi negativi");
-            }
-        }
+        // Controlla se il grafo e il nodo sorgente sono validi
+        this.checkComputationParameters(g, s);
+        // Inizializza i nodi del grafo
+        this.initializeNodesForPrim(g, s);
 
-        // Inizializza i valori di tutti i nodi
-        for(GraphNode<L> node: g.getNodes()) {
-            if(node.equals(s)) {
-                // Imposta il valore chiave (distanza) del nodo sorgente a 0
-                node.setFloatingPointDistance(0);
-                // Il nodo sorgente è subito visitato, quindi viene colorato di nero
-                node.setColor(GraphNode.COLOR_BLACK);
-            } else {
-                // Per gli altri nodi imposta un valore massimo
-                node.setFloatingPointDistance(Double.POSITIVE_INFINITY);
-                // E il colore bianco di non visitato
-                node.setColor(GraphNode.COLOR_WHITE);
-            }
-            // Imposta il nodo parent a null
-            node.setPrevious(null);
-            // Aggiunge il nodo alla coda di priorità
-            priorityQueue.add(node);
-        }
-
+        // Trova il cammino minimo
         // Finché la coda di priorità non è vuota
         while (!priorityQueue.isEmpty()) {
             // Estra il primo nodo dalla coda di priorità
@@ -142,6 +108,68 @@ public class PrimMSP<L> {
         priorityQueue.remove(minimum);
         // Ritorna il nodo
         return minimum;
+    }
+
+    /**
+     * Controlla se il grafo e il nodo sorgente utilizzati per la computazione di Prim sono validi
+     * @param g
+     *              un grafo non orientato, pesato, con pesi non negativi
+     * @param s
+     *              il nodo del grafo g sorgente, cioè da cui parte il calcolo
+     *              dell'albero di copertura minimo. Tale nodo sarà la radice
+     *              dell'albero di copertura trovato
+     */
+    private void checkComputationParameters(Graph<L> g, GraphNode<L> s) {
+        // Controlla se il grafo e il nodo sorgente sono nulli
+        if (g == null || s == null) {
+            throw new NullPointerException("Grafo o nodo sorgente nulli");
+        }
+        // Controlla se il nodo sorgente esiste nel grafo
+        if (g.getNode(s) == null) {
+            throw new IllegalArgumentException("Nodo sorgente non esistente nel grafo");
+        }
+        // Controlla se il grafo è orientato, non pesato o con pesi negativi
+        if(g.isDirected()) {
+            throw new IllegalArgumentException("Grafo orienttato");
+        }
+        // Controlla se il grafo non è pesato o ha pesi negativi
+        for(GraphEdge<L> edge: g.getEdges()) {
+            if(Double.isNaN(edge.getWeight())) {
+                throw new IllegalArgumentException("Grafo non pesato");
+            } else if(edge.getWeight() < 0) {
+                throw new IllegalArgumentException("Grafo pesato con pesi negativi");
+            }
+        }
+    }
+
+    /**
+     * Inizializza i nodi del grafo preparandoli alla computazione dell'algoritmo Prim
+     * @param g
+     *              un grafo non orientato, pesato, con pesi non negativi
+     * @param s
+     *              il nodo del grafo g sorgente, cioè da cui parte il calcolo
+     *              dell'albero di copertura minimo. Tale nodo sarà la radice
+     *              dell'albero di copertura trovato
+     */
+    private void initializeNodesForPrim(Graph<L> g, GraphNode<L> s) {
+        // Inizializza i valori di tutti i nodi
+        for(GraphNode<L> node: g.getNodes()) {
+            if(node.equals(s)) {
+                // Imposta il valore chiave (distanza) del nodo sorgente a 0
+                node.setFloatingPointDistance(0);
+                // Il nodo sorgente è subito visitato, quindi viene colorato di nero
+                node.setColor(GraphNode.COLOR_BLACK);
+            } else {
+                // Per gli altri nodi imposta un valore massimo
+                node.setFloatingPointDistance(Double.POSITIVE_INFINITY);
+                // E il colore bianco di non visitato
+                node.setColor(GraphNode.COLOR_WHITE);
+            }
+            // Imposta il nodo parent a null
+            node.setPrevious(null);
+            // Aggiunge il nodo alla coda di priorità
+            priorityQueue.add(node);
+        }
     }
 
 }

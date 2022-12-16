@@ -87,18 +87,24 @@ public class ElMamunCaravanSolver {
         int operand1, operand2;     // Operandi dell'operazione
         int result = 0;             // Risultato dell'operazione
         int k = 0;
+        printTable();
 
         // Itera sulla matrice e sull'espressione
         for (int i = 0; i < this.expression.size(); i+=2) {
-            for (int j = 2; j < this.expression.size(); j+=2) {
+            for (int j = 2; j < this.expression.size(); j=j+2) {
                 // Calcola il valore migliore facendo variare k di due in due finché i + k + 2 <= j
+                k = 0;
+                System.out.println("Loop j, j = " + j);
+                // while(i + k + 2 <= j) {
                 while(i + k + 2 <= j) {
-                    printTable();
+                    System.out.println("Inizio while: k = " + k);
                     // Se i < j  e  expression[i] ed expression.[j] sono cifre
                     if(i < j && expression.get(i).getType() == ItemType.DIGIT && expression.get(j).getType() == ItemType.DIGIT) {
+
                         System.out.println(i + " + " + k + " + 2 <= " + j);
                         System.out.print("table["+i+"]["+(i+k)+"] " +  expression.get(i+k+1).getValue() + " table["+(i+k+2)+"]["+j+"] \t");
                         System.out.println(table[i][i+k] + " " +  expression.get(i+k+1).getValue() + " " + table[i+k+2][j]);
+
                         // Esegue la corretta operazione tra i due operandi
                         operand1 = table[i][i+k];
                         operand2 = table[i+k+2][j];
@@ -115,6 +121,7 @@ public class ElMamunCaravanSolver {
                         this.table[i][j] = result;
                     }
                     k+=2;
+                    System.out.println("Fine while, k incrementata a " + k +", j = "+ j);
                 }
                 // Calcolo il valore migliore tra quelli calcolati utilizzando gli array di supporto
                 bestValueIndex = function.getBestIndex(values);
@@ -122,6 +129,7 @@ public class ElMamunCaravanSolver {
                 this.tracebackTable[i][j] = kChoices.get(bestValueIndex);
             }
         }
+
         this.solved = true;
         // TODO Implement
     }
