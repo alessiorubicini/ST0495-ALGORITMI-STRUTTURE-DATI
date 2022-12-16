@@ -1,9 +1,8 @@
 package it.unicam.cs.asdl2223.mp3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import sun.java2d.xr.XRRenderer;
+
+import java.util.*;
 
 /**
  * 
@@ -74,68 +73,63 @@ public class ElMamunCaravanSolver {
             throw new NullPointerException("The function is null.");
         }
 
-        // Inserisco i valori dell'espressione nella diagonale della matrice
-        for (int i = 0; i < expression.size(); i+=2) {
-            this.table[i][i] = (Integer) this.expression.get(i).getValue();
-        }
-
-        ArrayList<Integer> values = new ArrayList<Integer>();       // Valori calcolati da best
-        ArrayList<Integer> kChoices = new ArrayList<Integer>();     // k per i valori calcolati da best
-
-        int bestValueIndex = 0;     // Indice del valore migliore
-        int bestK = 0;              // k per il valore migliore
-        int operand1, operand2;     // Operandi dell'operazione
         int result = 0;             // Risultato dell'operazione
-        int k = 0;
+
         printTable();
 
+        // Ciclo esterno che scorre la tabella da sinistra a destra
+        for (int i = 0; i < expression.size(); i++) {
+            // Ciclo interno che scorre la tabella dall'alto verso il basso
+            for (int j = i; j < expression.size(); j++) {
+                if (i == j && isDigit(i)) {
+                    this.table[i][j] = (Integer) expression.get(i).getValue();
+                } else if(i < j && isDigit(i) && isDigit(j)) {
+                    // inizializzo il valore ottimo a -infinito o +infinito a seconda della funzione
+                    int best = function instanceof MaximumFunction ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+                    // Calcola il valore migliore tra i valori ottenuti utilizzando l'operatore
+                    for (int k = 0; (i + k + 2 <= j); k += 2) {
+                        System.out.println("\t\ttable["+i+"]["+j+"] = "+"table["+i+"]["+(i+k)+"] "+expression.get(i+k+1).getValue()+" table["+(i+k+2)+"]["+j+"] = "+table[i][i+k]+" "+expression.get(i+k+1).getValue() + " " + table[i+k+2][j]);
+                        // Calcola l'operazione
+                        if(expression.get(i+k+1).getValue().equals("+")) {
+                            result = table[i][i+k] + table[i+k+2][j];
+                        } else {
+                            result = table[i][i+k] * table[i+k+2][j];
+                        }
+                        // Ottiene il valore migliore
+                        best = function.getBest(Arrays.asList(best, result));
+                        // Salva il valore ottimo nella tabella
+                        this.table[i][j] = best;
+                        // Memorizza la scelta di k per il valore migliore nella tabella di traceback
+                        this.tracebackTable[i][j] = k;
+                    }
+
+                } else {
+                    // I casi in cui e[i] ed e[j] non sono cifre non ci interessano
+                    // e i relativi valori di m potranno essere considerati nulli senza produrre errori;
+                    // lo stesso dicasi per i casi in cui j < i.
+                }
+            }
+        }
+
+
         // Itera sulla matrice e sull'espressione
-        for (int i = 0; i < this.expression.size(); i+=2) {
+        /*for (int i = 0; i < this.expression.size(); i+=2) {
             for (int j = 2; j < this.expression.size(); j=j+2) {
                 // Calcola il valore migliore facendo variare k di due in due finché i + k + 2 <= j
                 k = 0;
                 System.out.println("For j = " + j);
-                while(i + k + 2 <= j) {
 
-                    // TODO: j è 2 e k viene incrementato di 2, il ciclo verrà eseguito sempre una volta!
-
-                    System.out.println("\twhile " + i + " + " + k + " + 2 <= " + j);
-                    // Se i < j  e  expression[i] ed expression[j] sono cifre
-                    if(i < j && isDigit(i) && isDigit(j)) {
-                        System.out.println("\t\ttable["+i+"]["+j+"] = "+"table["+i+"]["+(i+k)+"] "+expression.get(i+k+1).getValue()+" table["+(i+k+2)+"]["+j+"] = "+table[i][i+k]+" "+expression.get(i+k+1).getValue() + " " + table[i+k+2][j]);
-                        // Esegue la corretta operazione tra i due operandi
-                        operand1 = table[i][i+k];
-                        operand2 = table[i+k+2][j];
-                        ExpressionItem operator = expression.get(i+k+1);
-                        if(operator.getValue().equals("+")) {
-                            result = operand1 + operand2;
-                        } else {
-                            result = operand1 * operand2;
-                        }
-                        // Aggiunge il risultato e il rispettivo k ai due array di supporto
-                        values.add(result);
-                        kChoices.add(k);
-                        // Aggiunge il risultato alla tabellas
-                        this.table[i][j] = result;
-                    }
-                    k+=2;
-                    System.out.println("\t\tFine while, k incrementata a " + k);
-                }
-                // Calcolo il valore migliore tra quelli calcolati utilizzando gli array di supporto
-                bestValueIndex = function.getBestIndex(values);
-                // Memorizza la scelta di k per il valore migliore nella tabella di traceback
-                this.tracebackTable[i][j] = kChoices.get(bestValueIndex);
             }
-        }
+        }*/
 
         this.solved = true;
+        printTable();
         // TODO Implement
     }
 
     private boolean isDigit(int i) {
         return expression.get(i).getType() == ItemType.DIGIT;
     }
-
 
     /**
      * Returns the current optimal value for the expression of this solver. The
@@ -199,6 +193,7 @@ public class ElMamunCaravanSolver {
         }
         // Otherwise, compute the index of the operator that separates the
         // sub-expression in two sub-expressions
+        System.out.println("Cerco traceback di " + i + ", "+j);
         int k = tracebackTable[i][j];
         // Recursively compute the optimal parenthesization for the two
         // sub-expressions and return the result with the appropriate parenthesis
