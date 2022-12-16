@@ -94,17 +94,15 @@ public class ElMamunCaravanSolver {
             for (int j = 2; j < this.expression.size(); j=j+2) {
                 // Calcola il valore migliore facendo variare k di due in due finché i + k + 2 <= j
                 k = 0;
-                System.out.println("Loop j, j = " + j);
-                // while(i + k + 2 <= j) {
+                System.out.println("For j = " + j);
                 while(i + k + 2 <= j) {
-                    System.out.println("Inizio while: k = " + k);
-                    // Se i < j  e  expression[i] ed expression.[j] sono cifre
-                    if(i < j && expression.get(i).getType() == ItemType.DIGIT && expression.get(j).getType() == ItemType.DIGIT) {
 
-                        System.out.println(i + " + " + k + " + 2 <= " + j);
-                        System.out.print("table["+i+"]["+(i+k)+"] " +  expression.get(i+k+1).getValue() + " table["+(i+k+2)+"]["+j+"] \t");
-                        System.out.println(table[i][i+k] + " " +  expression.get(i+k+1).getValue() + " " + table[i+k+2][j]);
+                    // TODO: j è 2 e k viene incrementato di 2, il ciclo verrà eseguito sempre una volta!
 
+                    System.out.println("\twhile " + i + " + " + k + " + 2 <= " + j);
+                    // Se i < j  e  expression[i] ed expression[j] sono cifre
+                    if(i < j && isDigit(i) && isDigit(j)) {
+                        System.out.println("\t\ttable["+i+"]["+j+"] = "+"table["+i+"]["+(i+k)+"] "+expression.get(i+k+1).getValue()+" table["+(i+k+2)+"]["+j+"] = "+table[i][i+k]+" "+expression.get(i+k+1).getValue() + " " + table[i+k+2][j]);
                         // Esegue la corretta operazione tra i due operandi
                         operand1 = table[i][i+k];
                         operand2 = table[i+k+2][j];
@@ -121,7 +119,7 @@ public class ElMamunCaravanSolver {
                         this.table[i][j] = result;
                     }
                     k+=2;
-                    System.out.println("Fine while, k incrementata a " + k +", j = "+ j);
+                    System.out.println("\t\tFine while, k incrementata a " + k);
                 }
                 // Calcolo il valore migliore tra quelli calcolati utilizzando gli array di supporto
                 bestValueIndex = function.getBestIndex(values);
@@ -133,6 +131,11 @@ public class ElMamunCaravanSolver {
         this.solved = true;
         // TODO Implement
     }
+
+    private boolean isDigit(int i) {
+        return expression.get(i).getType() == ItemType.DIGIT;
+    }
+
 
     /**
      * Returns the current optimal value for the expression of this solver. The
@@ -203,13 +206,8 @@ public class ElMamunCaravanSolver {
     }
 
     public void printTable() {
-        System.out.print("   ");
-        for (int i = 0; i <table.length ; i++) {
-            System.out.print(i + "\t  ");
-        }
-        System.out.println();
         for (int i = 0; i < table.length; i++) {
-            System.out.print(i + " [");
+            System.out.print("[");
             for (int j = 0; j < table.length; j++) {
                 if(table[i][j] != null) {
                     System.out.print(table[i][j] + "   , ");
