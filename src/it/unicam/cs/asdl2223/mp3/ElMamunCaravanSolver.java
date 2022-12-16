@@ -82,39 +82,41 @@ public class ElMamunCaravanSolver {
         ArrayList<Integer> values = new ArrayList<Integer>();       // Valori calcolati da best
         ArrayList<Integer> kChoices = new ArrayList<Integer>();     // k per i valori calcolati da best
 
-        int bestValueIndex = 0;     // Indice del valore miglioree
+        int bestValueIndex = 0;     // Indice del valore migliore
         int bestK = 0;              // k per il valore migliore
-        int operand1, operand2;
-
-        printTable();
+        int operand1, operand2;     // Operandi dell'operazione
+        int result = 0;             // Risultato dell'operazione
+        int k = 0;
 
         // Itera sulla matrice e sull'espressione
         for (int i = 0; i < this.expression.size(); i+=2) {
             for (int j = 2; j < this.expression.size(); j+=2) {
-                // Calcola il valore migliore facendo variare k
-                for (int k = 0; (i + k + 2 <= j); k+=2) {
-                    System.out.println("Inizio loop, k = " + k);
+                // Calcola il valore migliore facendo variare k di due in due finché i + k + 2 <= j
+                while(i + k + 2 <= j) {
+                    printTable();
+                    // Se i < j  e  expression[i] ed expression.[j] sono cifre
                     if(i < j && expression.get(i).getType() == ItemType.DIGIT && expression.get(j).getType() == ItemType.DIGIT) {
                         System.out.println(i + " + " + k + " + 2 <= " + j);
                         System.out.print("table["+i+"]["+(i+k)+"] " +  expression.get(i+k+1).getValue() + " table["+(i+k+2)+"]["+j+"] \t");
                         System.out.println(table[i][i+k] + " " +  expression.get(i+k+1).getValue() + " " + table[i+k+2][j]);
-
-                        // Se l'operatore è una somma allora somma i due operandi
+                        // Esegue la corretta operazione tra i due operandi
                         operand1 = table[i][i+k];
                         operand2 = table[i+k+2][j];
                         ExpressionItem operator = expression.get(i+k+1);
-                        // Esegue la corretta operazione
-                        if(operator.getValue() == "+") {
-                            values.add(operand1 + operand2);
+                        if(operator.getValue().equals("+")) {
+                            result = operand1 + operand2;
                         } else {
-                            values.add(operand1 * operand2);
+                            result = operand1 * operand2;
                         }
-                        // Aggiunge il rispettivo k alla lista dei k
+                        // Aggiunge il risultato e il rispettivo k ai due array di supporto
+                        values.add(result);
                         kChoices.add(k);
+                        // Aggiunge il risultato alla tabellas
+                        this.table[i][j] = result;
                     }
+                    k+=2;
                 }
-
-                // Calcolo il valore migliore tra quelli calcolati
+                // Calcolo il valore migliore tra quelli calcolati utilizzando gli array di supporto
                 bestValueIndex = function.getBestIndex(values);
                 // Memorizza la scelta di k per il valore migliore nella tabella di traceback
                 this.tracebackTable[i][j] = kChoices.get(bestValueIndex);
