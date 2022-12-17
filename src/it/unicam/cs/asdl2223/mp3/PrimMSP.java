@@ -154,22 +154,17 @@ public class PrimMSP<L> {
     private void initializeNodesForPrim(Graph<L> g, GraphNode<L> s) {
         // Inizializza i valori di tutti i nodi
         for(GraphNode<L> node: g.getNodes()) {
-            if(node.equals(s)) {
-                // Imposta il valore chiave (distanza) del nodo sorgente a 0
-                node.setFloatingPointDistance(0);
-                // Il nodo sorgente è subito visitato, quindi viene colorato di nero
-                node.setColor(GraphNode.COLOR_BLACK);
-            } else {
-                // Per gli altri nodi imposta un valore massimo
-                node.setFloatingPointDistance(Double.POSITIVE_INFINITY);
-                // E il colore bianco di non visitato
-                node.setColor(GraphNode.COLOR_WHITE);
-            }
+            // Imposta distanza a infinito
+            node.setFloatingPointDistance(Double.POSITIVE_INFINITY);
+            // E il colore bianco di non visitato
+            node.setColor(GraphNode.COLOR_WHITE);
             // Imposta il nodo parent a null
             node.setPrevious(null);
             // Aggiunge il nodo alla coda di priorità
             priorityQueue.add(node);
         }
+        // Imposta la distanza del nodo sorgente
+        s.setFloatingPointDistance(0);
     }
 
 }
