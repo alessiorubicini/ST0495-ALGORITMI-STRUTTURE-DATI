@@ -93,18 +93,18 @@ public class ElMamunCaravanSolver {
                 }
                 // Otherwise, compute the optimal solution for the sub-problem
                 else {
-                    // Initialize the list of candidates
-                    List<Integer> candidates = new ArrayList<>();
+                    // Initialize the list of candidates e the operation result
+                    List<Integer> candidates = new ArrayList<Integer>();
                     int result = 0;
                     // Loop through all possible splits of the sub-problem
                     for (int k = 0; (i + k + 2 <= j); k+=2) {
                         // Evaluate the expression resulting from the split
-                        int left = table[i][i+k];
-                        int right = table[i+k+2][j];
-                        if (expression.get(i+k+1).getValue().equals("*")) {
-                            result = left * right;
+                        int leftOperand = table[i][i+k];
+                        int rightOperand = table[i+k+2][j];
+                        if (expression.get(i+k+1).getValue().equals("+")) {
+                            result = leftOperand + rightOperand;
                         } else {
-                            result = left + right;
+                            result = leftOperand * rightOperand;
                         }
                         // Add the result to the list of candidates
                         candidates.add(result);
