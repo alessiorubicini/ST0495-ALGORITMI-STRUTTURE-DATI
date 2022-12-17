@@ -1,15 +1,14 @@
 package it.unicam.cs.asdl2223.mp3;
 
-import sun.java2d.xr.XRRenderer;
-
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * 
  * Class that solves an instance of the the El Mamun's Caravan problem using
  * dynamic programming.
  * 
- * Template: Daniele Marchei and Luca Tesei, Implementation: Alessio Rubicini alessio.rubicini@studenti.unicam.it
+ * Template: Daniele Marchei and Luca Tesei, Implementation: ALESSIO RUBICINI (alessio.rubicini@studenti.unicam.it)
  *
  */
 public class ElMamunCaravanSolver {
@@ -30,7 +29,7 @@ public class ElMamunCaravanSolver {
 
     /**
      * Create a solver for a specific expression.
-     *
+     * 
      * @param expression
      *                       The expression to work on
      * @throws NullPointerException
@@ -41,16 +40,14 @@ public class ElMamunCaravanSolver {
             throw new NullPointerException(
                     "Creazione di solver con expression null");
         this.expression = expression;
-        // Initialize the table and the traceback table
-        this.table = new Integer[this.expression.size()][this.expression.size()];
-        this.tracebackTable = new Integer[this.expression.size()][this.expression.size()];
-        // Set resolution flag to false
+        this.table = new Integer [expression.size()][expression.size()];
+        this.tracebackTable = new Integer [expression.size()] [expression.size()];
         this.solved = false;
     }
 
     /**
      * Returns the expression that this solver analyse.
-     *
+     * 
      * @return the expression of this solver
      */
     public Expression getExpression() {
@@ -68,67 +65,66 @@ public class ElMamunCaravanSolver {
      *                                  if the objective function is null
      */
     public void solve(ObjectiveFunction function) {
-        // Controlla se la funzione passata è nulla
         if(function == null) {
-            throw new NullPointerException("The function is null.");
+            throw new NullPointerException("Function is null");
         }
-
-        int result = 0;             // Risultato dell'operazione
-
-        printTable();
-
-        // Ciclo esterno che scorre la tabella da sinistra a destra
-        for (int i = 0; i < expression.size(); i++) {
-            // Ciclo interno che scorre la tabella dall'alto verso il basso
-            for (int j = i; j < expression.size(); j++) {
-                if (i == j && isDigit(i)) {
-                    this.table[i][j] = (Integer) expression.get(i).getValue();
-                } else if(i < j && isDigit(i) && isDigit(j)) {
-                    // inizializzo il valore ottimo a -infinito o +infinito a seconda della funzione
-                    int best = function instanceof MaximumFunction ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-                    // Calcola il valore migliore tra i valori ottenuti utilizzando l'operatore
-                    for (int k = 0; (i + k + 2 <= j); k += 2) {
-                        System.out.println("\t\ttable["+i+"]["+j+"] = "+"table["+i+"]["+(i+k)+"] "+expression.get(i+k+1).getValue()+" table["+(i+k+2)+"]["+j+"] = "+table[i][i+k]+" "+expression.get(i+k+1).getValue() + " " + table[i+k+2][j]);
-                        // Calcola l'operazione
-                        if(expression.get(i+k+1).getValue().equals("+")) {
-                            result = table[i][i+k] + table[i+k+2][j];
-                        } else {
-                            result = table[i][i+k] * table[i+k+2][j];
-                        }
-                        // Ottiene il valore migliore
-                        best = function.getBest(Arrays.asList(best, result));
-                        // Salva il valore ottimo nella tabella
-                        this.table[i][j] = best;
-                        // Memorizza la scelta di k per il valore migliore nella tabella di traceback
-                        this.tracebackTable[i][j] = k;
-                    }
-
-                } else {
-                    // I casi in cui e[i] ed e[j] non sono cifre non ci interessano
-                    // e i relativi valori di m potranno essere considerati nulli senza produrre errori;
-                    // lo stesso dicasi per i casi in cui j < i.
-                }
-            }
-        }
-
-
-        // Itera sulla matrice e sull'espressione
-        /*for (int i = 0; i < this.expression.size(); i+=2) {
-            for (int j = 2; j < this.expression.size(); j=j+2) {
-                // Calcola il valore migliore facendo variare k di due in due finché i + k + 2 <= j
-                k = 0;
-                System.out.println("For j = " + j);
-
-            }
-        }*/
-
+        // Clears the matrices
+        table = new Integer[expression.size()][expression.size()];
+        tracebackTable = new Integer[expression.size()][expression.size()];
+        // Runs recursive solver on 0, size-1 with the given function
+        this.recursiveSolver(0, expression.size()-1, function);
+        // Set the solved flag to true
         this.solved = true;
-        printTable();
-        // TODO Implement
     }
 
+    private int recursiveSolver (int i, int j, ObjectiveFunction function) {
+        if (!(table[i][j] == null)) {
+            return table [i][j]; //basic case where the element at indexes i1, i2 is already existing
+        }
+
+        if (i==j) {
+            table[i][j] = (Integer) expression.get(i).getValue();
+            return table[i][j];
+        }
+
+        // i < j and i and j are digits
+        if (i<j && this.isDigit(i) && this.isDigit(j)) {
+            // Initializes operation result and list of candidates
+            int result = 0;
+            List<Integer> candidates = new ArrayList<>();
+
+            // Iterates over the allowed Ks
+            for (int k = 0; (i + k + 2 <= j); k += 2) {
+                // Recursive calls on the sub-problems
+                int rec1 = this.recursiveSolver(i, i+k, function);
+                int rec2 = this.recursiveSolver(i+k+2, j, function);
+                // Calculates the result
+                String operator = expression.get(i+k+1).getValue().toString();
+                if(operator.equals("+")) {
+                    result = rec1 + rec2;
+                } else {
+                    result = rec1 * rec2;
+                }
+                // Adds the result to the candidates' list
+                candidates.add(result);
+            }
+            // Save the optimal value in the table
+            table[i][j] = function.getBest(candidates);
+            // Saves the respective k of the optimal value in the traceback table
+            tracebackTable[i][j] = function.getBestIndex(candidates);
+
+        }
+        return table[i][j];
+    }
+
+    /**
+     * Checks if the expression's item at the given index is a digit
+     * @param i
+     *              index of the item to check
+     * @return      true if the item is a digit, false otherwise
+     */
     private boolean isDigit(int i) {
-        return expression.get(i).getType() == ItemType.DIGIT;
+        return expression.get(i).getType().equals(ItemType.DIGIT);
     }
 
     /**
@@ -141,10 +137,12 @@ public class ElMamunCaravanSolver {
      *                                   if the problem has never been solved
      */
     public int getOptimalSolution() {
-        if (!this.solved) {
-            throw new IllegalStateException("Problem has never been solved");
+        // Checks if the problem is solved
+        if(!this.isSolved()) {
+            throw new IllegalStateException("Problem not solved");
         }
-        return this.table[0][this.expression.size() - 1];
+        // Returns the optimal solution
+        return this.table[0][table.length - 1];
     }
 
     /**
@@ -164,10 +162,14 @@ public class ElMamunCaravanSolver {
      *                                   if the problem has never been solved
      */
     public String getOptimalParenthesization() {
-        if (!solved) {
+        // Checks if the problem is solved
+        if(!this.isSolved()) {
             throw new IllegalStateException("Problem not solved");
         }
-        return traceback(0, expression.size() - 1);
+        // Calls traceback on the whole expression
+        String parenthesization = this.traceback(0, expression.size() - 1);
+        // Returns the optimal parenthesization
+        return parenthesization;
     }
 
     /**
@@ -189,29 +191,19 @@ public class ElMamunCaravanSolver {
     private String traceback(int i, int j) {
         // If the sub-expression is just a digit, return the digit as a string
         if (i == j) {
-            return expression.get(i).toString();
+            return expression.get(i).getValue().toString();
         }
+
         // Otherwise, compute the index of the operator that separates the
         // sub-expression in two sub-expressions
-        System.out.println("Cerco traceback di " + i + ", "+j);
-        int k = tracebackTable[i][j];
+        int index = tracebackTable[i][j] * 2;
+
         // Recursively compute the optimal parenthesization for the two
         // sub-expressions and return the result with the appropriate parenthesis
-        return "(" + traceback(i, k) + expression.get(k) + traceback(k + 1, j) + ")";
+        String result = "("+ traceback(i, i + index)  + expression.get(i+index+1).toString()
+                + traceback(i + index + 2, j) + ")";
+
+        return result;
     }
 
-    public void printTable() {
-        for (int i = 0; i < table.length; i++) {
-            System.out.print("[");
-            for (int j = 0; j < table.length; j++) {
-                if(table[i][j] != null) {
-                    System.out.print(table[i][j] + "   , ");
-                } else {
-                    System.out.print(table[i][j] + ", ");
-                }
-            }
-            System.out.println("]");
-        }
-        System.out.println();
-    }
 }

@@ -35,7 +35,6 @@ class ElMamunCaravanSolverTest {
         Expression f = new Expression("1+2*3*4+5");
         ElMamunCaravanSolver solver = new ElMamunCaravanSolver(f);    
         solver.solve(max);
-        System.out.println(solver.getOptimalParenthesization());
         assertTrue(solver.getOptimalSolution() == 81);
     }
     
