@@ -36,12 +36,16 @@ public class ElMamunCaravanSolver {
      *                                  if the expression is null
      */
     public ElMamunCaravanSolver(Expression expression) {
-        if (expression == null)
-            throw new NullPointerException(
-                    "Creazione di solver con expression null");
+        // Checks if the given expressio is null
+        if (expression == null) {
+            throw new NullPointerException("Creazione di solver con expression null");
+        }
+        // Initializes the expression
         this.expression = expression;
+        // Initializes the matrices
         this.table = new Integer [expression.size()][expression.size()];
         this.tracebackTable = new Integer [expression.size()] [expression.size()];
+        // Initializes the resolution flag
         this.solved = false;
     }
 
@@ -88,6 +92,7 @@ public class ElMamunCaravanSolver {
             return table [i][j];
         }
 
+        // If i and j are equal, saves the value in the table and returns it
         if (i == j) {
             table[i][j] = (Integer) expression.get(i).getValue();
             return table[i][j];
@@ -96,15 +101,15 @@ public class ElMamunCaravanSolver {
         // i < j and i and j are digits
         if (i < j && this.isDigit(i) && this.isDigit(j)) {
             // Initializes operation result and list of candidates
-            int result = 0;
-            List<Integer> candidates = new ArrayList<>();
+            int result = 0, result1 = 0, result2 = 0;
+            List<Integer> candidates = new ArrayList<Integer>();
 
-            // Iterates over the allowed Ks (which match i + k + 2 <= j)
+            // Iterates over the allowed k values (which match i + k + 2 <= j)
             for (int k = 0; (i + k + 2 <= j); k += 2) {
                 // Recursive calls on the sub-expressions
-                int result1 = this.recursiveSolver(i, i+k, function);
-                int result2 = this.recursiveSolver(i+k+2, j, function);
-                // Calculates the result
+                result1 = this.recursiveSolver(i, i+k, function);
+                result2 = this.recursiveSolver(i+k+2, j, function);
+                // Calculates the result with the correct operator
                 if(expression.get(i+k+1).getValue().equals("+")) {
                     result = result1 + result2;
                 } else {
@@ -113,7 +118,7 @@ public class ElMamunCaravanSolver {
                 // Adds the result to the candidates' list
                 candidates.add(result);
             }
-            // Saves the optimal value in the table
+            // Finds the optimal value among the candidates and saves it in the table
             table[i][j] = function.getBest(candidates);
             // Saves the optimal value's k in the traceback table
             tracebackTable[i][j] = function.getBestIndex(candidates);
@@ -192,19 +197,17 @@ public class ElMamunCaravanSolver {
 
     // Recursive method to compute the optimal parenthesization of a sub-expression
     private String traceback(int i, int j) {
-        // If the sub-expression is just a digit, return the digit as a string
+        // If the sub-expression is just a digit, returns the digit as a string
         if (i == j) {
             return expression.get(i).getValue().toString();
         }
 
-        // Otherwise, compute the index of the operator that separates the
-        // sub-expression in two sub-expressions
+        // Otherwise, compute the index of the operator that separates the sub-expression in two sub-expressions
         int index = tracebackTable[i][j] * 2;
 
-        // Recursively compute the optimal parenthesization for the two
-        // sub-expressions and return the result with the appropriate parenthesis
-        String result = "("+ traceback(i, i + index)  + expression.get(i+index+1).toString()
-                + traceback(i + index + 2, j) + ")";
+        // Recursively compute the optimal parenthesization for the two sub-expressions
+        // and returns the result with the appropriate parenthesis
+        String result = "(" + traceback(i, i+index) + expression.get(i+index+1).toString() + traceback(i+index+2, j) + ")";
 
         return result;
     }

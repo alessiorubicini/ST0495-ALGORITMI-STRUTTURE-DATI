@@ -141,21 +141,21 @@ public class DijkstraShortestPathComputer<L> implements SingleSourceShortestPath
         if(!isComputed) {
             throw new IllegalStateException("Il calcolo dei cammini minimi non è stato mai eseguito");
         }
-
         // Crea una lista di archi
-        List<GraphEdge<L>> edges = new ArrayList<>();
+        List<GraphEdge<L>> edges = new ArrayList<GraphEdge<L>>();
         // Salva il nodo target
         GraphNode<L> currentNode = targetNode;
         // Se il nodo target non corrisponde all'ultimo nodo sorgente di cui è stato calcolato il cammino minimo
         if (!targetNode.equals(this.lastSource)) {
             // Scorre all'indietro a partire dal target
             while (currentNode.getPrevious() != null) {
-                // Ottiene il predecessore
+                // Ottiene il predecessore del nodo corrente
                 GraphNode<L> previous = currentNode.getPrevious();
-                // Itera sugli archi del nodo predecessore
+                // Itera sugli archi del predecessore
                 for (GraphEdge<L> edge : this.grafo.getEdgesOf(previous)) {
-                    if (edge.getNode2().equals(currentNode))
+                    if (edge.getNode2().equals(currentNode)) {
                         edges.add(0, edge);
+                    }
                 }
                 // Scorre al predecessore
                 currentNode = previous;
@@ -189,11 +189,6 @@ public class DijkstraShortestPathComputer<L> implements SingleSourceShortestPath
         this.queue.remove(minimum);
         // Ritorna il nodo
         return minimum;
-    }
-
-
-    private void relax(GraphNode<L> u, GraphNode<L> v, int weight) {
-
     }
 
     /**
