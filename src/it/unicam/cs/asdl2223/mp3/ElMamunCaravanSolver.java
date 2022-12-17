@@ -65,62 +65,65 @@ public class ElMamunCaravanSolver {
      *                                  if the objective function is null
      */
     public void solve(ObjectiveFunction function) {
+        // Checks if the given function is null
         if(function == null) {
             throw new NullPointerException("Function is null");
         }
-        // Clears the matrices
-        table = new Integer[expression.size()][expression.size()];
-        tracebackTable = new Integer[expression.size()][expression.size()];
-        // Runs recursive solver on 0, size-1 with the given function
+        // Calls recursive solver on the whole expression with the given function
         this.recursiveSolver(0, expression.size()-1, function);
         // Set the solved flag to true
         this.solved = true;
     }
 
+    /**
+     * Solve the sub-expression within the given indexes
+     * @param i             start index
+     * @param j             end index
+     * @param function      function (max or min)
+     * @return              the result of the sub-expression
+     */
     private int recursiveSolver (int i, int j, ObjectiveFunction function) {
+        // Result already calculated
         if (!(table[i][j] == null)) {
-            return table [i][j]; //basic case where the element at indexes i1, i2 is already existing
+            return table [i][j];
         }
 
-        if (i==j) {
+        if (i == j) {
             table[i][j] = (Integer) expression.get(i).getValue();
             return table[i][j];
         }
 
         // i < j and i and j are digits
-        if (i<j && this.isDigit(i) && this.isDigit(j)) {
+        if (i < j && this.isDigit(i) && this.isDigit(j)) {
             // Initializes operation result and list of candidates
             int result = 0;
             List<Integer> candidates = new ArrayList<>();
 
-            // Iterates over the allowed Ks
+            // Iterates over the allowed Ks (which match i + k + 2 <= j)
             for (int k = 0; (i + k + 2 <= j); k += 2) {
-                // Recursive calls on the sub-problems
-                int rec1 = this.recursiveSolver(i, i+k, function);
-                int rec2 = this.recursiveSolver(i+k+2, j, function);
+                // Recursive calls on the sub-expressions
+                int result1 = this.recursiveSolver(i, i+k, function);
+                int result2 = this.recursiveSolver(i+k+2, j, function);
                 // Calculates the result
-                String operator = expression.get(i+k+1).getValue().toString();
-                if(operator.equals("+")) {
-                    result = rec1 + rec2;
+                if(expression.get(i+k+1).getValue().equals("+")) {
+                    result = result1 + result2;
                 } else {
-                    result = rec1 * rec2;
+                    result = result1 * result2;
                 }
                 // Adds the result to the candidates' list
                 candidates.add(result);
             }
-            // Save the optimal value in the table
+            // Saves the optimal value in the table
             table[i][j] = function.getBest(candidates);
-            // Saves the respective k of the optimal value in the traceback table
+            // Saves the optimal value's k in the traceback table
             tracebackTable[i][j] = function.getBestIndex(candidates);
-
         }
         return table[i][j];
     }
 
     /**
      * Checks if the expression's item at the given index is a digit
-     * @param i
-     *              index of the item to check
+     * @param i     index of the item to check
      * @return      true if the item is a digit, false otherwise
      */
     private boolean isDigit(int i) {
