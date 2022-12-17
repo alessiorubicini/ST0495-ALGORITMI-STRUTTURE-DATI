@@ -1,13 +1,13 @@
-package it.unicam.cs.asdl2223.mp3;
+package it.unicam.cs.asdl2223.mp4;
 
 import java.util.List;
 import java.util.ArrayList;
 
 /**
- *
+ * 
  * Class that solves an instance of the the El Mamun's Caravan problem using
  * dynamic programming.
- *
+ * 
  * Template: Daniele Marchei and Luca Tesei, Implementation: ALESSIO RUBICINI (alessio.rubicini@studenti.unicam.it)
  *
  */
@@ -29,7 +29,7 @@ public class ElMamunCaravanSolver {
 
     /**
      * Create a solver for a specific expression.
-     *
+     * 
      * @param expression
      *                       The expression to work on
      * @throws NullPointerException
@@ -51,7 +51,7 @@ public class ElMamunCaravanSolver {
 
     /**
      * Returns the expression that this solver analyse.
-     *
+     * 
      * @return the expression of this solver
      */
     public Expression getExpression() {
@@ -61,7 +61,7 @@ public class ElMamunCaravanSolver {
     /**
      * Solve the problem on the expression of this solver by using a given
      * objective function.
-     *
+     * 
      * @param function
      *                     The objective function to be used when deciding which
      *                     candidate to choose
@@ -135,7 +135,7 @@ public class ElMamunCaravanSolver {
      * Returns the current optimal value for the expression of this solver. The
      * value corresponds to the one obtained after the last solving (which used
      * a particular objective function).
-     *
+     * 
      * @return the current optimal value
      * @throws IllegalStateException
      *                                   if the problem has never been solved
@@ -154,12 +154,12 @@ public class ElMamunCaravanSolver {
      * of the expression of this solver. The parenthesization corresponds to the
      * optimal value obtained after the last solving (which used a particular
      * objective function).
-     *
+     * 
      * If the expression is just a digit then the parenthesization is the
      * expression itself. If the expression is not just a digit then the
      * parethesization is of the form "(<parenthesization>)". Examples: "1",
      * "(1+2)", "(1*(2+(3*4)))"
-     *
+     * 
      * @return the current optimal parenthesization for the expression of this
      *         solver
      * @throws IllegalStateException
@@ -178,7 +178,7 @@ public class ElMamunCaravanSolver {
 
     /**
      * Determines if the problem has been solved at least once.
-     *
+     * 
      * @return true if the problem has been solved at least once, false
      *         otherwise.
      */
