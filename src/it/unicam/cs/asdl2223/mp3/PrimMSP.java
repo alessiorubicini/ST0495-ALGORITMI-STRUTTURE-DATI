@@ -64,7 +64,7 @@ public class PrimMSP<L> {
      */
     public void computeMSP(Graph<L> g, GraphNode<L> s) {
         // Controlla se il grafo e il nodo sorgente sono validi
-        this.checkComputationParameters(g, s);
+        this.checkIfGraphAndSourceAreValid(g, s);
         // Inizializza i nodi del grafo
         this.initializeNodesForPrim(g, s);
 
@@ -72,12 +72,12 @@ public class PrimMSP<L> {
         // Finché la coda di priorità non è vuota
         while (!priorityQueue.isEmpty()) {
             // Estra il primo nodo dalla coda di priorità
-            GraphNode<L> extractedNode = this.extractNodeWithMinimumKey();
+            GraphNode<L> extractedNode = this.extractMinimumFromQueue();
             // Colora il nodo come visitato
             extractedNode.setColor(GraphNode.COLOR_BLACK);
             // Itera sui nodi adiacenti al nodo estratto
             for(GraphNode<L> currentNode: g.getAdjacentNodesOf(extractedNode)) {
-                // Ottiene l'arco che collega il nodo estratto al nodo corrente del loop
+                // Ottiene l'arco che collega il nodo estratto al nodo corrente
                 GraphEdge<L> edge = g.getEdge(extractedNode, currentNode);
                 // Se la coda di priorità contiene il nodo corrente
                 // e il peso dell'arco è minore del valore chiave (distanza) del nodo corrente
@@ -95,7 +95,7 @@ public class PrimMSP<L> {
      * Estrae dalla coda di priorità il nodo con chiave (distanza) minima
      * @return il nodo con chiave (distanza) minima
      */
-    private GraphNode<L> extractNodeWithMinimumKey() {
+    private GraphNode<L> extractMinimumFromQueue() {
         // Prende come riferimento il primo elemento
         GraphNode<L> minimum = priorityQueue.get(0);
         // Scorre la coda di priorità cercando il minimo
@@ -119,7 +119,7 @@ public class PrimMSP<L> {
      *              dell'albero di copertura minimo. Tale nodo sarà la radice
      *              dell'albero di copertura trovato
      */
-    private void checkComputationParameters(Graph<L> g, GraphNode<L> s) {
+    private void checkIfGraphAndSourceAreValid(Graph<L> g, GraphNode<L> s) {
         // Controlla se il grafo e il nodo sorgente sono nulli
         if (g == null || s == null) {
             throw new NullPointerException("Grafo o nodo sorgente nulli");

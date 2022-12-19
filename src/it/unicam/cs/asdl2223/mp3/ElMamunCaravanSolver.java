@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Class that solves an instance of the the El Mamun's Caravan problem using
  * dynamic programming.
  *
- * Template: Daniele Marchei and Luca Tesei, Implementation: ALESSIO RUBICINI (alessio.rubicini@studenti.unicam.it)
+ * Template: Daniele Marchei and Luca Tesei, Implementation: Alessio rubicini (alessio.rubicini@studenti.unicam.it)
  *
  */
 public class ElMamunCaravanSolver {
@@ -36,16 +36,16 @@ public class ElMamunCaravanSolver {
      *                                  if the expression is null
      */
     public ElMamunCaravanSolver(Expression expression) {
-        // Checks if the given expressio is null
+        // Check if the given expressio is null
         if (expression == null) {
             throw new NullPointerException("Creazione di solver con expression null");
         }
-        // Initializes the expression
+        // Initialize the expression
         this.expression = expression;
-        // Initializes the matrices
+        // Initialize the matrices
         this.table = new Integer [expression.size()][expression.size()];
         this.tracebackTable = new Integer [expression.size()] [expression.size()];
-        // Initializes the resolution flag
+        // Initialize the resolution flag
         this.solved = false;
     }
 
@@ -69,49 +69,46 @@ public class ElMamunCaravanSolver {
      *                                  if the objective function is null
      */
     public void solve(ObjectiveFunction function) {
-        // Checks if the given function is null
+        // Check if the given function is null
         if(function == null) {
             throw new NullPointerException("Function is null");
         }
 
-        // Inserisco i valori dell'espressione nella diagonale della matrice
-        for (int i = 0; i < expression.size(); i+=2) {
-            this.table[i][i] = (Integer) this.expression.get(i).getValue();
-        }
+        int subproblemResult = 0;
 
         // Loop through all possible sub-problems of increasing length
         for (int length = 1; length <= expression.size(); length+=2) {
             // Iterate over all possible sub-problems of fixed length within the expression
-            for (int i = 0; i < expression.size() - length + 1; i+=2) {
-                // Compute index of the last element of sub-problem
+            for (int i = 0; i < expression.size() - length + 1; i += 2) {
+                // Compute index of the last element in the sub-problem
                 int j = i + length - 1;
                 // If the sub-problem is just a single digit
                 if (length == 1) {
                     // Store the value in the table
                     table[i][j] = (Integer) expression.get(i).getValue();
+                    // Store the index in the traceback table
                     tracebackTable[i][j] = i;
                 }
                 // Otherwise, compute the optimal solution for the sub-problem
-                else {
-                    // Initialize the list of candidates e the operation result
-                    List<Integer> candidates = new ArrayList<Integer>();
-                    int result = 0;
+                if(i < j && isDigit(i) && isDigit(j)) {
+                    // Initialize the list of candidates to be the optimal value
+                    List<Integer> optimalCandidates = new ArrayList<Integer>();
                     // Loop through all possible splits of the sub-problem
-                    for (int k = 0; (i + k + 2 <= j); k+=2) {
+                    for (int k = 0; (i + k + 2 <= j); k += 2) {
                         // Evaluate the expression resulting from the split
                         int leftOperand = table[i][i+k];
                         int rightOperand = table[i+k+2][j];
                         if (expression.get(i+k+1).getValue().equals("+")) {
-                            result = leftOperand + rightOperand;
+                            subproblemResult = leftOperand + rightOperand;
                         } else {
-                            result = leftOperand * rightOperand;
+                            subproblemResult = leftOperand * rightOperand;
                         }
                         // Add the result to the list of candidates
-                        candidates.add(result);
+                        optimalCandidates.add(subproblemResult);
                     }
                     // Select the optimal solution from the list of candidates
-                    int bestValue = function.getBest(candidates);
-                    int bestIndex = function.getBestIndex(candidates);
+                    int bestValue = function.getBest(optimalCandidates);
+                    int bestIndex = function.getBestIndex(optimalCandidates);
                     // Store the optimal solution in the table and traceback table
                     table[i][j] = bestValue;
                     tracebackTable[i][j] = bestIndex;
@@ -124,8 +121,9 @@ public class ElMamunCaravanSolver {
 
     /**
      * Checks if the expression's item at the given index is a digit
-     * @param i     index of the item to check
-     * @return      true if the item is a digit, false otherwise
+     * @param i
+     *              index of the item to check
+     * @return true if the item is a digit, false otherwise.
      */
     private boolean isDigit(int i) {
         return expression.get(i).getType().equals(ItemType.DIGIT);
@@ -199,6 +197,7 @@ public class ElMamunCaravanSolver {
         }
 
         // Otherwise, compute the index of the operator that separates the sub-expression in two sub-expressions
+        // The index of the split point must be multiplied by 2 to get the index of the operator in the original expression
         int index = tracebackTable[i][j] * 2;
 
         // Recursively compute the optimal parenthesization for the two sub-expressions
