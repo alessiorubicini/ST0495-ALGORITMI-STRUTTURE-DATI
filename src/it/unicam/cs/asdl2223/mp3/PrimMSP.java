@@ -73,7 +73,7 @@ public class PrimMSP<L> {
         while (!priorityQueue.isEmpty()) {
             // Estra il primo nodo dalla coda di priorità
             GraphNode<L> extractedNode = this.extractMinimumFromQueue();
-            // Colora il nodo come visitato
+            // Colora il nodo come visitato (nero)
             extractedNode.setColor(GraphNode.COLOR_BLACK);
             // Itera sui nodi adiacenti al nodo estratto
             for(GraphNode<L> currentNode: g.getAdjacentNodesOf(extractedNode)) {
@@ -104,9 +104,9 @@ public class PrimMSP<L> {
                 minimum = node;
             }
         }
-        // Rimuove il nodo dalla coda
+        // Rimuove il minimo trovato dalla coda
         priorityQueue.remove(minimum);
-        // Ritorna il nodo
+        // Ritorna il minimo
         return minimum;
     }
 
@@ -128,16 +128,17 @@ public class PrimMSP<L> {
         if (g.getNode(s) == null) {
             throw new IllegalArgumentException("Nodo sorgente non esistente nel grafo");
         }
-        // Controlla se il grafo è orientato, non pesato o con pesi negativi
+        // Controlla se il grafo è orientato
         if(g.isDirected()) {
             throw new IllegalArgumentException("Grafo orienttato");
         }
         // Controlla se il grafo non è pesato o ha pesi negativi
         for(GraphEdge<L> edge: g.getEdges()) {
             if(Double.isNaN(edge.getWeight())) {
-                throw new IllegalArgumentException("Grafo non pesato");
-            } else if(edge.getWeight() < 0) {
-                throw new IllegalArgumentException("Grafo pesato con pesi negativi");
+                throw new IllegalArgumentException("Trovato arco non pesato.");
+            }
+            if(edge.getWeight() < 0) {
+                throw new IllegalArgumentException("Trovato arco con peso negativo.");
             }
         }
     }
@@ -152,18 +153,18 @@ public class PrimMSP<L> {
      *              dell'albero di copertura trovato
      */
     private void initializeNodesForPrim(Graph<L> g, GraphNode<L> s) {
-        // Inizializza i valori di tutti i nodi
+        // Itera su tutti i nodi del grafo
         for(GraphNode<L> node: g.getNodes()) {
             // Imposta distanza a infinito
             node.setFloatingPointDistance(Double.POSITIVE_INFINITY);
-            // E il colore bianco di non visitato
+            // Colora nodo come non visitato (bianco)
             node.setColor(GraphNode.COLOR_WHITE);
-            // Imposta il nodo parent a null
+            // Imposta il predecessore a null
             node.setPrevious(null);
-            // Aggiunge il nodo alla coda di priorità
+            // Aggiunge il nodo inizializzato alla coda di priorità
             priorityQueue.add(node);
         }
-        // Imposta la distanza del nodo sorgente
+        // Imposta la distanza del nodo sorgente a 0
         s.setFloatingPointDistance(0);
     }
 
