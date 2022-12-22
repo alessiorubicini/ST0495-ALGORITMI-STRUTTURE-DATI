@@ -67,8 +67,6 @@ public class PrimMSP<L> {
         this.checkIfGraphAndSourceAreValid(g, s);
         // Inizializza i nodi del grafo
         this.initializeNodesForPrim(g, s);
-
-        // Trova il cammino minimo
         // Finché la coda di priorità non è vuota
         while (!priorityQueue.isEmpty()) {
             // Estra il primo nodo dalla coda di priorità
@@ -106,7 +104,7 @@ public class PrimMSP<L> {
         }
         // Rimuove il minimo trovato dalla coda
         priorityQueue.remove(minimum);
-        // Ritorna il minimo
+        // Ritorna il minimo trovato
         return minimum;
     }
 

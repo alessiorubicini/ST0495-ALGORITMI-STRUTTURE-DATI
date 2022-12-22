@@ -73,14 +73,13 @@ public class ElMamunCaravanSolver {
         if(function == null) {
             throw new NullPointerException("Function is null");
         }
-
+        // Initialize the variable to store sub-problem result
         int subproblemResult = 0;
-
         // Loop through all possible sub-problems of increasing length
-        for (int length = 1; length <= expression.size(); length+=2) {
+        for (int length = 1; length <= expression.size(); length += 2) {
             // Iterate over all possible sub-problems of fixed length within the expression
-            for (int i = 0; i < expression.size() - length + 1; i += 2) {
-                // Compute index of the last element in the sub-problem
+            for (int i = 0; (i < expression.size() - length + 1); i += 2) {
+                // Index of the last element in the sub-problem
                 int j = i + length - 1;
                 // If the sub-problem is just a single digit
                 if (length == 1) {
@@ -106,11 +105,11 @@ public class ElMamunCaravanSolver {
                         // Add the result to the list of candidates
                         optimalCandidates.add(subproblemResult);
                     }
-                    // Select the optimal solution from the list of candidates
+                    // Select the optimal value from the list of candidates and store it in the table
                     int bestValue = function.getBest(optimalCandidates);
-                    int bestIndex = function.getBestIndex(optimalCandidates);
-                    // Store the optimal solution in the table and traceback table
                     table[i][j] = bestValue;
+                    // Select the index of the optimal value and store it in the traceback table
+                    int bestIndex = function.getBestIndex(optimalCandidates);
                     tracebackTable[i][j] = bestIndex;
                 }
             }
@@ -189,7 +188,14 @@ public class ElMamunCaravanSolver {
         return "ElMamunCaravanSolver for " + expression;
     }
 
-    // Recursive method to compute the optimal parenthesization of a sub-expression
+    /**
+     * Recursive method to compute the optimal parenthesization of a sub-expression
+     * @param i
+     *              start of the sub-expression
+     * @param j
+     *              end of the sub-expression
+     * @return  the optimal parenthesization as a string
+     */
     private String traceback(int i, int j) {
         // If the sub-expression is just a digit, returns the digit as a string
         if (i == j) {

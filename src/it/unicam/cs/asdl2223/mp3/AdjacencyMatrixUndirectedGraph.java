@@ -84,8 +84,9 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
                 }
             }
         }
-        // Ritorna il contatore diviso in modo da considerare ogni arco una sola volta (essendo un grafo non orientato)
-        return edgeCount/2;
+        // Ritorna il contatore diviso due
+        // (essendo un grafo non orientato consideriamo ogni arco una sola volta)
+        return edgeCount / 2;
     }
 
     @Override
@@ -323,6 +324,14 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
 
     @Override
     public boolean addEdge(GraphNode<L> node1, GraphNode<L> node2) {
+        // Controlla se i nodi dati sono nulli
+        if(node1 == null && node2 == null) {
+            throw new NullPointerException("I nodi dati sono nulli.");
+        }
+        // Controlla se i nodi esistono nel grafo
+        if(!this.nodesIndex.containsKey(node1) && !this.nodesIndex.containsKey(node2)) {
+            throw new IllegalArgumentException("I nodi dati non esistono nel grafo");
+        }
         // Crea l'arco che collega i due nodi
         GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
         // Aggiunge l'arco creato
@@ -346,8 +355,9 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         // Ottiene i nodi corrispondenti
         GraphNode<L> node1 = this.getNode(label1);
         GraphNode<L> node2 = this.getNode(label2);
+        GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false);
         // Aggiunge l'arco che collega i due nodi
-        return this.addEdge(node1, node2);
+        return this.addEdge(edge);
     }
 
     @Override
@@ -359,8 +369,9 @@ public class AdjacencyMatrixUndirectedGraph<L> extends Graph<L> {
         // Ottiene i nodi con le etichette date
         GraphNode<L> node1 = this.getNode(label1);
         GraphNode<L> node2 = this.getNode(label2);
+        GraphEdge<L> edge = new GraphEdge<L>(node1, node2, false, weight);
         // Aggiunge l'arco con il peso dato
-        return this.addWeightedEdge(node1, node2, weight);
+        return this.addEdge(edge);
     }
 
     @Override
